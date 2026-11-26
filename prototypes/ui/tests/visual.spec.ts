@@ -158,3 +158,44 @@ test('provider artwork is local, legible and consistent across views',async({pag
  await expect(page.locator('.catalogue-item .provider-mark[data-provider="spotify"]')).toBeVisible();
  await page.screenshot({path:info.outputPath('provider-catalogue.png'),animations:'disabled',scale:'css'});
 });
+
+test('reading dialog uses shared controls and accessible modal behavior',async({page},info)=>{
+ await page.goto('/');
+ await page.evaluate(()=>document.fonts.ready);
+ await page.getByRole('button',{name:'Continuar leitura',exact:true}).click();
+ const opener=page.getByRole('button',{name:'Atualizar progresso',exact:true});
+ await opener.click();
+ const dialog=page.getByRole('dialog',{name:'Atualizar progresso'});
+ await expect(dialog).toBeVisible();
+ await expect(dialog.getByRole('spinbutton',{name:'Página atual'})).toBeFocused();
+ const heights=await dialog.locator('.dialog-actions .ui-button').evaluateAll(nodes=>nodes.map(n=>n.getBoundingClientRect().height));
+ expect(heights).toEqual(Array(2).fill(info.project.name==='mobile'?44:36));
+ await dialog.getByRole('spinbutton').fill('433');
+ await dialog.getByRole('button',{name:'Salvar',exact:true}).click();
+ await expect(dialog).toBeVisible();
+ await dialog.getByRole('spinbutton').fill('84');
+ await page.screenshot({path:info.outputPath('reading-dialog.png'),animations:'disabled',scale:'css'});
+ await page.keyboard.press('Escape');
+ await expect(dialog).toHaveCount(0);
+ await expect(opener).toBeFocused();
+ await opener.click();
+ await dialog.getByRole('spinbutton').fill('84');
+ await dialog.getByRole('button',{name:'Salvar',exact:true}).click();
+ await expect(dialog).toHaveCount(0);
+ await expect(page.getByText('Pág. 84 de 432')).toBeVisible();
+ await expect(page.getByRole('status')).toContainText('Progresso atualizado.');
+});
+test('local Inter font and settings field render consistently',async({page},info)=>{
+ await page.goto('/');
+ await page.evaluate(()=>document.fonts.ready);
+ expect(await page.evaluate(()=>document.fonts.check('14px "Inter Variable"'))).toBeTruthy();
+ const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
+ await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ const select=page.getByLabel('Duração do Pomodoro');
+ await expect(select).toBeVisible();
+ const size=await select.boundingBox();
+ expect(size?.height).toBe(info.project.name==='mobile'?44:42);
+ await select.selectOption('3000');
+ await nav.getByRole('button',{name:'Hoje',exact:true}).click();
+ await expect(page.getByRole('img',{name:'50:00 · Leitura'})).toBeVisible();
+});

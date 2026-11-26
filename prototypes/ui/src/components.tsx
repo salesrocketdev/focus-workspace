@@ -15,7 +15,26 @@ export function Ring({seconds=1500,total=1500,label='Leitura',large=false}:{seco
 }
 export function Segment({value,onChange}:{value:'Pomodoro'|'Livre';onChange:(v:'Pomodoro'|'Livre')=>void}){return <div className="segment" aria-label="Método de foco">{(['Pomodoro','Livre'] as const).map(v=><button key={v} aria-pressed={value===v} className={value===v?'selected':''} onClick={()=>onChange(v)}>{v}</button>)}</div>}
 export function Card({title,icon:Icon,children,actions,provider}:{title:string;icon:LucideIcon;children:ReactNode;actions?:ReactNode;provider?:ProviderId}){return <section className="card"><header className="card-head"><span>{provider?<ProviderIcon provider={provider} size={16}/>:<Icon size={16} strokeWidth={1.8}/>}<span className="card-title" title={title}>{title}</span></span>{actions??<Ellipsis size={16} aria-hidden="true"/>}</header><div className="card-body">{children}</div></section>}
-export function Cover({album=false}:{album?:boolean}){return <div className={'cover '+(album?'album':'book')} aria-hidden="true">{!album&&<b>Clean<br/>Architecture</b>}<svg viewBox="0 0 100 110" preserveAspectRatio="xMidYMid slice"><circle cx="71" cy="29" r="16" fill="#ffcc8b"/><path d="M0 55L20 36 44 57 61 43 100 63V110H0Z" fill="#e9b375"/><path d="M0 70L21 60 42 77 62 58 100 74V110H0Z" fill="#a9a993"/><path d="M0 89L34 65 58 90 80 69 100 85V110H0Z" fill="#637e7b"/><path d="M0 98L29 88 52 99 80 85 100 98V110H0Z" fill="#3c555a"/>{[8,17,29,43,59,72,88,96].map((x,i)=><path key={x} d={`M${x} ${90+i%3*4}l-4 10h2l-5 6h14l-5-6h2z`} fill="#344d50" opacity=".85"/>)}</svg></div>}
+export function Cover({album=false}:{album?:boolean}){
+ const id=useId();
+ return <div className={'cover '+(album?'album':'book')} aria-hidden="true">
+ {!album&&<b>Clean<br/>Architecture</b>}
+ <svg viewBox={album?'0 0 100 100':'0 0 100 145'} preserveAspectRatio="xMidYMid slice">
+ <defs>
+  <linearGradient id={id+'sky'} x1="0%" y1="0%" x2="0%" y2="100%"><stop stopColor={album?'#756784':'#a5c0ae'}/><stop offset=".55" stopColor={album?'#dcb0a1':'#e3d6aa'}/><stop offset="1" stopColor="#f9d3a1"/></linearGradient>
+  <linearGradient id={id+'warm'} x1="0%" y1="0%" x2="0%" y2="100%"><stop stopColor="#f7c783"/><stop offset="1" stopColor="#cb9d77"/></linearGradient>
+ </defs>
+ <rect width="100" height="145" fill={'url(#'+id+'sky)'}/>
+ {album?<><circle cx="57" cy="40" r="20" fill="#ffce9a" opacity=".24"/><circle cx="57" cy="40" r="13" fill="#ffdaa5"/></>:null}
+ <path d={album?'M0 56L13 48 25 54 39 44 55 58 67 51 82 60 100 48V145H0Z':'M0 83L17 73 29 78 47 69 59 77 75 66 91 76 100 72V145H0Z'} fill={'url(#'+id+'warm)'}/>
+ <path d={album?'M0 70L17 58 34 65 49 57 63 65 81 53 100 67V145H0Z':'M0 96L12 84 27 91 44 80 58 91 73 81 89 91 100 85V145H0Z'} fill="#e4ad72"/>
+ <path d={album?'M0 80L18 69 31 77 52 64 68 77 83 70 100 76V145H0Z':'M0 105L15 96 28 103 43 91 57 102 70 95 84 105 100 91V145H0Z'} fill="#b5aaa4"/>
+ <path d={album?'M0 89L15 78 34 84 49 75 70 86 86 75 100 83V145H0Z':'M0 118L18 103 31 113 48 99 65 111 81 105 100 116V145H0Z'} fill="#778c98"/>
+ <path d={album?'M0 93L20 86 42 94 63 85 85 92 100 86V145H0Z':'M0 132L14 116 32 125 47 114 65 126 83 116 100 123V145H0Z'} fill="#536b78"/>
+ <path d={album?'M0 98L22 91 42 97 68 91 100 97V145H0Z':'M0 140L21 130 42 139 58 126 80 139 100 130V145H0Z'} fill="#3d515c"/>
+ {[4,12,22,34,66,78,91,97].map((x,i)=><g key={x} transform={`translate(${x} ${(album?76:119)+(i%3)*4}) scale(${i%2?.8:1.1})`} fill="#344955"><path d="M0 0l-3.6 7h2l-4 5h2l-4 5h14l-4-5h2l-4-5h2Z"/><rect x="-.7" y="16" width="1.4" height="5"/></g>)}
+ </svg></div>
+}
 export function Progress({value}:{value:number}){return <div className="progress" role="progressbar" aria-valuenow={value} aria-valuemin={0} aria-valuemax={100}><div style={{width:Math.min(100,Math.max(0,value))+'%'}}/></div>}
 export function AgendaRows({single=false}:{single?:boolean}){return <div className="agenda-list">{(single?events.slice(1,2):events).map(e=><div className={'event '+e.color} key={e.title}><time>{e.time}</time><ProviderIcon provider={e.provider==='Outlook'?'outlook':'google-calendar'} size={19}/><div><b>{e.title}</b><small>{e.provider}</small></div><small className="event-duration">{e.duration}</small></div>)}</div>}
 export function Transport({running,onToggle,onReset,onStop}:{running:boolean;onToggle:()=>void;onReset:()=>void;onStop:()=>void}){return <div className="transport"><button className="circle-button" aria-label="Reiniciar" onClick={onReset}><RotateCcw size={22}/></button><button className="circle-button primary big" aria-label={running?'Pausar':'Iniciar'} onClick={onToggle}>{running?<Pause size={28} fill="currentColor"/>:<Play size={28} fill="currentColor"/>}</button><button className="circle-button" aria-label="Encerrar" onClick={onStop}><Square size={20} fill="currentColor"/></button></div>}
