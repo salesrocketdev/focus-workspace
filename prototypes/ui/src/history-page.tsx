@@ -1,0 +1,41 @@
+import { useState } from 'react';
+import { Timer,Target,CheckCircle2,Flame,ChartNoAxesColumn,History,ChevronRight,CalendarDays,Filter,Clock } from 'lucide-react';
+import { Button,Dialog } from './ui';
+import { dateLabel,DEMO_DAY } from './calendar-model';
+import { categoryTotals,dailyTotals,durationLabel,filterPeriod,newest,streak,totalSeconds,type FocusRecord } from './history-model';
+const colors:Record<string,string>={work:'#8ba9d1',study:'#b2a0d1',reading:'#79b384',personal:'#e7a16e'};
+const color=(id:string)=>colors[id]??'#c0a591';
+const ranges=[{value:1,label:'Hoje'},{value:7,label:'7 dias'},{value:30,label:'30 dias'}];
+export function HistoryPage({records,goal}:{records:FocusRecord[];goal:number}){
+ const [range,setRange]=useState(7);
+ const [category,setCategory]=useState('all');
+ const [status,setStatus]=useState('all');
+ const [mode,setMode]=useState('all');
+ const [limit,setLimit]=useState(8);
+ const [selected,setSelected]=useState<FocusRecord|null>(null);
+ const period=filterPeriod(records,range);
+ const items=period.filter(r=>(category==='all'||r.categoryId===category)&&(status==='all'||r.status===status)&&(mode==='all'||r.mode===mode));
+ const total=totalSeconds(items),days=dailyTotals(items,range),groups=categoryTotals(items);
+ const max=Math.max(3600, ...days.map(d=>d.seconds));
+ const today=totalSeconds(filterPeriod(records,1));
+ const dailyPct=Math.min(100,Math.round(today/(goal*60)*100));
+ const allCategories=categoryTotals(records);
+ const ordered=newest(items);
+ function resetLimit(){setLimit(8)}
+ return <div className="history-page">
+  <div className="history-toolbar"><div className="history-ranges" role="group" aria-label="Período do histórico">{ranges.map(r=><button key={r.value} aria-pressed={range===r.value} onClick={()=>{setRange(r.value);resetLimit()}}>{r.label}</button>)}</div><small><CalendarDays size={15}/> Até {dateLabel(DEMO_DAY,{day:'numeric',month:'long',year:'numeric'})} · demonstração</small></div>
+  <div className="history-filters"><span><Filter size={15}/> Filtros</span><label>Categoria<select aria-label="Categoria do histórico" value={category} onChange={e=>{setCategory(e.target.value);resetLimit()}}><option value="all">Todas</option>{allCategories.map(c=><option key={c.id} value={c.id}>{c.label}</option>)}</select></label><label>Método<select aria-label="Método do histórico" value={mode} onChange={e=>{setMode(e.target.value);resetLimit()}}><option value="all">Todos</option><option>Pomodoro</option><option>Livre</option></select></label><label>Status<select aria-label="Status do histórico" value={status} onChange={e=>{setStatus(e.target.value);resetLimit()}}><option value="all">Todos</option><option value="completed">Concluídas</option><option value="interrupted">Interrompidas</option></select></label></div>
+  <div className="history-stats">
+   {[{label:'Tempo de foco',value:durationLabel(total),Icon:Timer,tone:'orange'},{label:'Sessões registradas',value:String(items.length),Icon:CheckCircle2,tone:'green'},{label:'Média por dia',value:durationLabel(Math.floor(total/range)),Icon:ChartNoAxesColumn,tone:'lavender'},{label:'Sequência atual',value:streak(records)+' dias',Icon:Flame,tone:'orange'}].map(s=><article className="history-stat" key={s.label}><span className={'activity-stat-icon tone-'+s.tone}><s.Icon size={20}/></span><div><small>{s.label}</small><strong>{s.value}</strong></div></article>)}
+  </div>
+  <div className="history-charts"><section className="history-surface"><header><h2><ChartNoAxesColumn size={18}/> Evolução do foco</h2><small>Tempo por dia · incluindo dias sem sessões</small></header>
+   <div className={'history-bars '+(range===30?'dense-bars':'')} role="img" aria-label={days.map(d=>dateLabel(d.day,{day:'numeric',month:'numeric'})+': '+durationLabel(d.seconds)).join(', ')}>
+    <div className="history-axis"><span>{Math.round(max/60)} min</span><span>{Math.round(max/120)} min</span><span>0</span></div><div className="history-plot">{days.map((d,i)=><div className="history-bar-column" key={d.day}><div className="history-bar-track"><i title={durationLabel(d.seconds)} style={{height:(d.seconds/max*100)+'%'}} className={d.day===DEMO_DAY?'today-bar':''}/></div><small>{range!==30||i%5===0||i===days.length-1?dateLabel(d.day,{day:'numeric',...(range!==30?{month:'numeric'}:{})}):''}</small></div>)}</div>
+   </div>
+  </section><section className="history-surface"><header><h2><Target size={18}/> Meta de hoje</h2><small>Todos os registros de hoje, independente dos filtros</small></header><div className="history-goal"><svg viewBox="0 0 120 120" role="img" aria-label={dailyPct+'% da meta diária'}><circle cx="60" cy="60" r="48" fill="none" stroke="var(--ring-track)" strokeWidth="10"/><circle cx="60" cy="60" r="48" fill="none" stroke="#79b384" strokeWidth="10" strokeLinecap="round" pathLength="100" strokeDasharray={dailyPct+' 100'} transform="rotate(-90 60 60)"/></svg><div><strong>{dailyPct}%</strong><small>{durationLabel(today)} de {durationLabel(goal*60)}</small></div></div><p className="history-goal-caption">{today>=goal*60?'Meta alcançada!':durationLabel(goal*60-today)+' restantes para a meta'}</p></section></div>
+  <section className="history-surface"><header><h2>Distribuição por categoria</h2><small>Tempo de foco no período e filtros selecionados</small></header>{groups.length?<><div className="history-distribution" role="img" aria-label={groups.map(g=>g.label+': '+durationLabel(g.seconds)).join(', ')}>{groups.map(g=><i key={g.id} style={{width:g.seconds/total*100+'%',background:color(g.id)}}/>)}</div><div className="history-legend">{groups.map(g=><div key={g.id}><i style={{background:color(g.id)}}/><span>{g.label}</span><b>{durationLabel(g.seconds)}</b><small>{Math.round(g.seconds/total*100)}%</small></div>)}</div></>:<p className="history-empty">Sem dados para os filtros selecionados.</p>}</section>
+  <section className="history-surface"><header><h2><History size={18}/> Sessões de foco</h2><small>{items.length} registro(s) · pausas não contabilizadas</small></header><div className="history-list">{ordered.slice(0,limit).map(r=><button key={r.id} className="history-session" onClick={()=>setSelected(r)} aria-label={'Detalhes de '+r.title}><span className="history-session-mark" style={{background:color(r.categoryId)}}/><span className="history-session-copy"><b>{r.title}</b><small>{r.category} · {dateLabel(r.day,{day:'numeric',month:'numeric'})} às {r.time}{r.origin==='session'?' · Nesta execução':''}</small></span><span className="history-session-meta"><b>{durationLabel(r.seconds)}</b><small>{r.mode}</small></span><span className={'history-status '+r.status}>{r.status==='completed'?'Concluída':'Interrompida'}</span><ChevronRight size={15}/></button>)}</div>{!items.length&&<div className="history-empty"><Clock size={28}/><b>Nenhuma sessão encontrada</b><small>Experimente outro período ou filtro.</small></div>}{ordered.length>limit&&<Button variant="secondary" onClick={()=>setLimit(n=>n+8)}>Mostrar mais sessões</Button>}</section>
+  <small className="history-note">Histórico de demonstração com registros desta execução. A data de referência é fixa; ao recarregar, as sessões novas são reiniciadas.</small>
+  {selected&&<Dialog title={selected.title} description={selected.origin==='fixture'?'Registro de demonstração':'Sessão registrada nesta execução'} onDismiss={()=>setSelected(null)}><dl className="history-detail"><div><dt>Categoria</dt><dd>{selected.category}</dd></div><div><dt>Tempo de foco</dt><dd>{durationLabel(selected.seconds)}</dd></div><div><dt>Método</dt><dd>{selected.mode}</dd></div><div><dt>Status</dt><dd>{selected.status==='completed'?'Concluída':'Interrompida'}</dd></div><div><dt>Data de demonstração</dt><dd>{dateLabel(selected.day,{day:'numeric',month:'long'})} · {selected.time}</dd></div></dl><footer className="dialog-actions"><Button variant="secondary" onClick={()=>setSelected(null)}>Fechar</Button></footer></Dialog>}
+ </div>;
+}
