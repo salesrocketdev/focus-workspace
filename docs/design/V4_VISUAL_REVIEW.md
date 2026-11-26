@@ -63,3 +63,6 @@ V4.18 Pages succeeded; CI 58 passed / 3 failed (heading alignment and transforme
 
 ## V4.20 — focus presets and contextual picker
 V4.19 Pages passed; CI left one compact/tablet editor width regression. Tightened editor sizing and wrap rules. Added Classic 25/5/15 x4, Deep 50/10/20 x3, Quick 15/3/10 x3 presets to shared focus settings; preserve daily goal and automation flags, custom changes remain editable, active/paused sessions locked. Added searchable focus context picker for pending tasks, books and categories, available in immersive focus, desktop dashboard activity label and quick actions. Reading changes synchronize reading widget selection. New browser tests; device audit and CI pending.
+
+## Iteration 21 — immersive, filters, integrations and iOS
+V4.20 CI and Pages passed. Removed immersive mobile tabbar and fixed centered header grid; transactional mobile history filter sheet; grouped integration cards with status and demo warning; keyboard-aware mobile dialogs via VisualViewport; WebKit prefixed route animations and actual animation event regression, preserving system reduced motion. Added dedicated iPhone WebKit CI project rather than relying on mobile Chromium only. Physical iPhone keyboard and PWA motion remain unverified; simulated visual viewport is not a real OS keyboard. Latest CI pending.

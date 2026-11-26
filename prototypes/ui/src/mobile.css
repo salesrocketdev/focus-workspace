@@ -142,3 +142,55 @@
 .focus-picker-empty{display:grid;justify-items:center;gap:8px;padding:20px;color:var(--ui-muted);font-size:13px}
 @media(max-width:759px){.focus-presets{grid-template-columns:1fr}.focus-preset{grid-template-columns:minmax(0,1fr) auto;min-height:72px;align-items:center;gap:4px 10px;padding:10px 12px}.focus-preset-title{grid-column:1;grid-row:1;font-size:13px;justify-content:flex-start;gap:6px}.focus-preset>small{grid-column:1;grid-row:2}.focus-preset-time{grid-column:2;grid-row:1/span 2;text-align:right}.focus-context-picker{min-height:58px}.edit-page-head .head-actions.edit-header{grid-template-columns:repeat(3,minmax(0,1fr));min-width:0;width:100%}.edit-page-head .edit-header .edit-text-button{min-width:0;white-space:normal;overflow-wrap:anywhere;line-height:1.2;gap:3px}.mobile-widget-name>svg{flex-shrink:0}.mobile-widget-name small{max-width:40px;overflow:hidden;text-overflow:ellipsis}.mobile-layout,.mobile-widget-row{min-width:0}}
 @media(min-width:760px) and (max-width:950px){.workspace.editing,.workspace.editing .widget-grid,.workspace.editing .catalogue-wrap{min-width:0}.workspace.editing .widget-grid{grid-template-columns:repeat(6,minmax(0,1fr))}.editing .widget .card-head{min-width:0}.editing .widget .card-title{min-width:0}.editing .card-head>span{min-width:0}.editing .edit-card-toolbar{flex-shrink:0}}
+
+/* V4.21 — immersive navigation and keyboard-aware sheets. */
+.focus-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr);align-items:center;gap:8px}
+.focus-header-leading,.focus-header-trailing{display:flex;align-items:center;gap:4px;min-width:0}
+.focus-header-trailing{justify-content:flex-end}
+.focus-top h1.focus-breadcrumb{margin:0;justify-content:center;min-width:0;text-align:center}
+.focus-breadcrumb>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.immersive .bottom-nav{display:none!important}
+.history-filter-sheet{display:grid;gap:16px}
+.history-filter-count{display:grid;place-items:center;min-width:18px;height:18px;padding:0 4px;border-radius:99px;background:var(--field-selected);color:var(--field-selected-ink);font-size:11px}
+.history-active-filters{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 0}
+.history-active-filters button{min-height:44px;color:var(--field-selected-ink);font-size:12px}
+.integration-summary{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--field-selected-edge);border-radius:12px;background:var(--field-selected)}
+.integration-summary-icon{width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center;border-radius:10px;background:var(--ui-paper);color:var(--field-selected-ink)}
+.integration-summary>div{display:grid;gap:4px;min-width:0}.integration-summary b{font-size:14px}
+.integration-groups,.integration-group{display:grid;gap:10px}
+.integration-groups{gap:20px}
+.integration-group h3{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ui-muted)}
+.integration-group-rows{border:1px solid var(--ui-line);border-radius:13px;background:var(--ui-paper);padding:0 12px}
+.settings-shell .integration-service{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:14px 0;min-width:0;border:0}
+.integration-service+.integration-service{border-top:1px solid var(--ui-line)}
+.integration-service-copy{display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0}
+.integration-service-mark{width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center;border:1px solid var(--ui-line);border-radius:11px;background:var(--ui-surface)}
+.integration-service-copy>div{display:grid;gap:5px;min-width:0}
+.integration-service-copy b{font-size:13px;overflow-wrap:anywhere}
+.integration-service-copy p{font-size:12px;color:var(--ui-muted);line-height:1.4}
+.integration-service-status{display:flex;align-items:center;gap:5px;font-size:11px}
+.integration-service-status i{width:6px;height:6px;border-radius:50%;background:var(--ui-muted)}
+.integration-service-status.connected{color:#53765b}
+.integration-service-status.connected i{background:#79b384}
+[data-theme=dark] .integration-service-status.connected{color:#b5d9b9}
+.integration-service>.ui-button{flex-shrink:0;min-width:84px}
+@media(max-width:759px){
+ .app.immersive .main{padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+ .focus-top{grid-template-columns:92px minmax(0,1fr) 92px;gap:4px;min-height:44px}
+ .focus-header-leading,.focus-header-trailing{gap:4px}
+ .focus-top .ui-icon-button{width:44px;height:44px;min-width:44px;min-height:44px;flex:0 0 44px}
+ .focus-top h1.focus-breadcrumb{font-size:15px;line-height:1.3}
+ .focus-top .brand{display:none}
+ .focus-main .immersive-grid{margin-top:18px}
+ .history-toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+ .history-toolbar .history-ranges{width:100%;min-width:0;gap:2px}
+ .history-ranges button{min-width:0;padding:0 6px;flex:1;white-space:nowrap}
+ .history-filter-trigger{height:44px;min-height:44px;padding:0 9px;white-space:nowrap;gap:5px}
+ .history-toolbar>small{grid-column:1/-1;font-size:11px}
+ .ui-dialog{bottom:var(--sheet-bottom,0px);max-height:calc(var(--sheet-height,100dvh) - max(12px,env(safe-area-inset-top)));overflow-y:auto;-webkit-overflow-scrolling:touch;scroll-padding:14px}
+ .ui-dialog[data-keyboard=open]{padding-bottom:14px;animation:none!important}
+ .settings-shell .integration-service{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;padding:13px 0}
+ .integration-service>.ui-button{justify-self:stretch;min-height:44px}
+ .integration-service-copy b{font-size:14px}
+ .integration-group-rows{padding:0 12px}
+}

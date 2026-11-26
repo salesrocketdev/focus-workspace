@@ -22,7 +22,7 @@ jobs:
       - run: npm install --no-audit --no-fund
       - run: npm run build
       - run: npm run build-storybook
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium webkit
       - run: npm test
       - uses: actions/upload-artifact@v4
         if: always()

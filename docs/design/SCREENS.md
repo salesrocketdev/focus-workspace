@@ -38,3 +38,6 @@ A single shared timer can be controlled from a compact dock across routes. Closi
 
 ## V4.20 — Focus presets and activity selection
 Shared settings display three optional focus rhythms. Applying a preset replaces focus, short/long break and cycle length only, preserving daily goal and auto-start preferences. Custom settings remain editable. The immersive focus screen exposes a searchable activity picker with pending tasks, books and categories. Context changes do not start the clock and are disabled while a session is active or paused. Selection of a book updates the shared reading context.
+
+## V4.21 — mobile polish
+Immersive focus uses centered context title, grouped back/compact/close controls and no tabbar. Mobile history keeps period buttons and a single filters action; the sheet edits a draft, applies explicitly, supports clear and dismiss without changing active filters. Integration list groups agenda, music and concept-only services with local provider artwork, connection status and descriptions. Dialogs use visualViewport resize/scroll events to stay above keyboard, avoid automatic text focus on touch, and preserve native dialog semantics. WebKit iPhone-emulated tests cover actual animationstart, sheet behavior and simulated viewport reduction; physical keyboard and installed iOS PWA remain a manual verification gate.
