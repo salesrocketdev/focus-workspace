@@ -91,3 +91,7 @@ Charts deployment passed, CI had three strict selector failures because both SVG
 
 ## Native distraction shield and mobile refinement
 Previous session recovery CI and Pages passed. Add opt-in DND reminder, accessible native Focus guide, iOS explicit shortcut invocation with duration; no false system state. Mobile prioritize timer above reading card, compact secondary actions, long book titles, notification rows, dialogs and touch targets. Update outdated activity persistence copy. Tests added for reminder persistence, shortcut URL, mobile geometry and existing session behavior; physical iPhone verification pending.
+
+
+## Opt-in iOS Shortcut on manual start (#38)
+Previous native guide CI and Pages passed. Extend the reminder preference with backward-compatible optional shortcut handoff, persist running timer before invoking user-created shortcut, no launch during recovery/automatic transitions, keep manual fallback. Automated test intercepts the URL handoff and asserts saved timer state; actual native execution requires a configured physical iPhone. CI pending.

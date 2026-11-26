@@ -7,7 +7,7 @@ import { CompactFocus,CommandPalette,QuickActionButton,type QuickAction } from '
 import { CalendarPage } from './calendar-page';
 import { HistoryPage } from './history-page';
 import { MiniTrend } from './charts';
-import {useDistractionShield,DistractionDialog} from './distraction-shield';
+import {useDistractionShield,DistractionDialog,launchFocusShortcut} from './distraction-shield';
 import {loadWorkspace,saveWorkspace} from './workspace-storage';
 import {useScreenWakeLock} from './wake-lock';
 import { AppearancePanel,useAppearance } from './appearance';
@@ -140,7 +140,23 @@ export function App(){
   return()=>{finished=true;window.clearInterval(id);document.removeEventListener('visibilitychange',resume);window.removeEventListener('pageshow',resume);window.removeEventListener('focus',resume);tickRef.current=()=>{}};
  },[running,mode,duration,phase,cycle,prefs,focusContext,notifications.prefs]);
  function setMethod(value:'Pomodoro'|'Livre'){if(hasSession||value===mode)return;setMode(value);setPhase('focus');setCycle(0);setDuration(prefs.focus);setSeconds(value==='Livre'?0:prefs.focus)}
- function toggle(){if(!running&&phase==='focus'&&shield.remind&&(mode==='Livre'?seconds===0:seconds===duration))setShowShield(true);if(running){const elapsed=Math.max(0,Math.floor((Date.now()-clock.current)/1000));if(mode==='Pomodoro'&&elapsed>=duration){tickRef.current();return}setSeconds(mode==='Livre'?elapsed:Math.max(0,duration-elapsed));setRunning(false);return}if(mode==='Pomodoro'&&seconds===0){setSeconds(duration);clock.current=Date.now();setRunning(true);return}clock.current=Date.now()-(mode==='Livre'?seconds:duration-seconds)*1000;setRunning(true)}
+ function toggle(){
+  if(running){
+   const elapsed=Math.max(0,Math.floor((Date.now()-clock.current)/1000));
+   if(mode==='Pomodoro'&&elapsed>=duration){tickRef.current();return}
+   setSeconds(mode==='Livre'?elapsed:Math.max(0,duration-elapsed));setRunning(false);return
+  }
+  const initial=mode==='Pomodoro'&&seconds===0?duration:seconds;
+  const fresh=phase==='focus'&&(mode==='Livre'?initial===0:initial===duration);
+  clock.current=Date.now()-(mode==='Livre'?initial:duration-initial)*1000;
+  setSeconds(initial);setRunning(true);
+  if(fresh&&shield.autoShortcut){
+   // Persist synchronously before handing off to another application.
+   const saved=saveWorkspace({version:1,timer:{mode,phase,cycle,duration,seconds:initial,running:true,startedAt:clock.current,context:focusContext,readingId},tasks,categories,books,records});
+   if(saved){try{launchFocusShortcut((mode==='Livre'?prefs.focus:initial)/60)}catch{setMessage('Não foi possível abrir o atalho. Ative Não Perturbe manualmente.');setShowShield(true)}}
+   else{setMessage('Não foi possível salvar a sessão antes de abrir Atalhos. Ative Não Perturbe manualmente.');setShowShield(true)}
+  }else if(fresh&&shield.remind)setShowShield(true);
+ }
  function reset(){recoverExpired.current=false;setRunning(false);setPhase('focus');setCycle(0);setDuration(prefs.focus);setSeconds(mode==='Livre'?0:prefs.focus)}
  function stop(){recoverExpired.current=false;setRunning(false);if(phase==='focus'){const elapsed=running?Math.max(0,Math.floor((Date.now()-clock.current)/1000)):mode==='Livre'?seconds:duration-seconds;saveFocusRecord(mode==='Livre'?elapsed:Math.min(duration,elapsed),mode==='Livre'||elapsed>=duration?'completed':'interrupted');}setPhase('focus');setCycle(0);setDuration(prefs.focus);setSeconds(mode==='Livre'?0:prefs.focus);setMessage('Sessão encerrada (demo).')}
  function navigate(next:View){if(editing&&next!=='edit'){setMessage('Salve ou cancele a edição antes de sair.');return}if(next==='settings'){if(view!=='settings')setSettingsSection('focus');if(mobile)setMobileSettingsDetail(false)}setView(next)}

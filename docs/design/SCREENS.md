@@ -60,3 +60,6 @@ A versioned local workspace snapshot stores timer state, clock origin, context, 
 
 ## Não Perturbe
 Notification settings contain an opt-in reminder. Immersive focus and command palette open a device Focus guide. iOS can explicitly run a user-created timed Shortcut; other environments use native controls manually. The PWA never claims to detect or change native Focus status. Mobile immersive timer precedes reading details, with compact secondary controls.
+
+
+On iOS the optional automatic shortcut preference runs the user-created timed shortcut when manually starting a new focus. The timer is persisted first; pausing, resuming, reload and automatic phase transitions do not invoke it. Manual guide and duration override remain available.
