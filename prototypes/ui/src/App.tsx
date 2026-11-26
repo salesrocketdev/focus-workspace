@@ -1,0 +1,94 @@
+import { useEffect, useRef, useState } from 'react';
+import { Home, CalendarDays, Layers, History, Settings, Sun, LayoutGrid, ArrowLeft, Plus, X, Grip, ChevronUp, ChevronDown, RotateCcw, Play, Pause, SkipBack, SkipForward, Heart, Volume2, BookOpen, Flame, Timer, Music2, Bell, Check, Maximize2 } from 'lucide-react';
+import { Brand, Ring, Segment, Card, Cover, Progress, AgendaRows, Transport, icons } from './components';
+import { catalogue, defaultLayout, loadLayouts, move, STORAGE, tasksInitial, type Widget, type Size, type WidgetType } from './model';
+
+type View='today'|'edit'|'focus'|'calendar'|'activities'|'history'|'settings';
+const navigation=[{id:'today',title:'Hoje',icon:Home},{id:'calendar',title:'Agenda',icon:CalendarDays},{id:'activities',title:'Atividades',icon:Layers},{id:'history',title:'Histórico',icon:History},{id:'settings',title:'Configurações',icon:Settings}] as const;
+const sizes:Size[]=['small','medium','large'];
+const titles:Record<WidgetType,string>={focus:'Foco (Pomodoro)',agenda:'Agenda de hoje',tasks:'Tarefas',reading:'Leitura em andamento',goal:'Meta diária de foco',music:'Música',summary:'Resumo de hoje',notes:'Notas',next:'Próximo compromisso',recent:'Sessões recentes'};
+const fixtureDate='Quarta-feira, 29 de janeiro';
+
+export function App(){
+ const [view,setView]=useState<View>('today');
+ const [layouts,setLayouts]=useState(loadLayouts);
+ const [mobile,setMobile]=useState(()=>window.innerWidth<760);
+ const [draft,setDraft]=useState<Widget[]|null>(null);
+ const [editKey,setEditKey]=useState<'desktop'|'mobile'>('desktop');
+ const [selected,setSelected]=useState('focus');
+ const [query,setQuery]=useState('');
+ const [showCatalogue,setShowCatalogue]=useState(false);
+ const [message,setMessage]=useState('');
+ const [mode,setMode]=useState<'Pomodoro'|'Livre'>('Pomodoro');
+ const [duration,setDuration]=useState(1500);
+ const [seconds,setSeconds]=useState(1500);
+ const [running,setRunning]=useState(false);
+ const clock=useRef<number>(0);
+ const [tasks,setTasks]=useState(tasksInitial);
+ const [page,setPage]=useState(72);
+ const [music,setMusic]=useState(false);
+ const [favorite,setFavorite]=useState(false);
+ const [volume,setVolume]=useState(65);
+ const [track,setTrack]=useState(0);
+ const [notes,setNotes]=useState('');
+ const [showProgress,setShowProgress]=useState(false);
+ const [pageInput,setPageInput]=useState('72');
+ const [completed,setCompleted]=useState(0);
+ const key=mobile?'mobile':'desktop';
+ const editing=view==='edit';
+ const widgets=editing && draft ? draft : layouts[key];
+ useEffect(()=>{const fn=()=>setMobile(window.innerWidth<760);window.addEventListener('resize',fn);return()=>window.removeEventListener('resize',fn)},[]);
+ useEffect(()=>{if(!running)return;const tick=()=>{const elapsed=Math.floor((Date.now()-clock.current)/1000);const value=mode==='Livre'?elapsed:Math.max(0,duration-elapsed);setSeconds(value);if(mode!=='Livre'&&value===0){setRunning(false);setCompleted(c=>c+1);setMessage('Sessão concluída.')}};const id=window.setInterval(tick,250);tick();return()=>window.clearInterval(id)},[running,mode,duration]);
+ function setMethod(value:'Pomodoro'|'Livre'){if(running)return;setMode(value);setSeconds(value==='Livre'?0:duration)}
+ function toggle(){if(running){setRunning(false);return}clock.current=Date.now()-(mode==='Livre'?seconds:duration-seconds)*1000;setRunning(true)}
+ function reset(){setRunning(false);setSeconds(mode==='Livre'?0:duration)}
+ function stop(){setRunning(false);if((mode==='Livre'&&seconds>0)||(mode!=='Livre'&&seconds<duration))setCompleted(c=>c+1);reset();setMessage('Sessão encerrada (demo).')}
+ function navigate(next:View){if(editing&&next!=='edit'){setMessage('Salve ou cancele a edição antes de sair.');return}setView(next)}
+ function startEdit(){setEditKey(key);setDraft(layouts[key].map(w=>({...w})));setSelected(layouts[key][0]?.id??'');setShowCatalogue(false);setView('edit')}
+ function closeEdit(save:boolean){if(save&&draft){const next={...layouts,[editKey]:draft};try{localStorage.setItem(STORAGE,JSON.stringify(next))}catch{setMessage('Não foi possível salvar no navegador.');return}setLayouts(next);setMessage('Painel salvo.')}setDraft(null);setView('today')}
+ function resize(id:string,size:Size){setDraft(old=>old?.map(w=>w.id===id?{...w,size}:w)??null)}
+ function shift(id:string,delta:number){setDraft(old=>{if(!old)return old;const i=old.findIndex(w=>w.id===id);return old[i+delta]?move(old,id,old[i+delta].id):old})}
+ function add(type:WidgetType){if(draft?.some(w=>w.type===type)){setMessage('Este widget já está no painel.');return}const w={id:type,type,size:catalogue.find(c=>c.type===type)!.size};setDraft(old=>[...(old??[]),w]);setSelected(w.id)}
+ function remove(id:string){setDraft(old=>old?.filter(w=>w.id!==id)??null);if(selected===id)setSelected('')}
+ function beginResize(e:React.PointerEvent,id:string,size:Size){e.stopPropagation();e.preventDefault();const start=e.clientX;const el=e.currentTarget;el.setPointerCapture(e.pointerId);const finish=(ev:PointerEvent)=>{const delta=ev.clientX-start;if(Math.abs(delta)>24){const index=Math.max(0,Math.min(2,sizes.indexOf(size)+(delta>0?1:-1)));resize(id,sizes[index])}el.removeEventListener('pointerup',finish);el.removeEventListener('pointercancel',cancel)};const cancel=()=>{el.removeEventListener('pointerup',finish);el.removeEventListener('pointercancel',cancel)};el.addEventListener('pointerup',finish);el.addEventListener('pointercancel',cancel)}
+ const pct=Math.round(page/432*100);
+ function reading(){return <div className="reading-body"><Cover/><div className="book-info"><b>Clean Architecture</b><small>Robert C. Martin</small><Progress value={pct}/><small><strong>Pág. {page}</strong> de 432 · {pct}%</small><button className="soft-button" onClick={()=>{if(!running){setDuration(1800);setSeconds(mode==='Livre'?0:1800)}navigate('focus')}}><Play size={13}/> Continuar leitura</button></div></div>}
+ function player(){return <div className="music-body"><Cover album/><div className="music-info"><b>{['Deep Focus','Quiet Morning','Evening Flow'][track]}</b><small>Lo-Fi Essentials · demo</small><div className="player-controls"><button aria-label="Anterior" onClick={()=>setTrack(t=>(t+2)%3)}><SkipBack size={17} fill="currentColor"/></button><button className="circle-button primary" aria-label={music?'Pausar música':'Reproduzir música'} onClick={()=>setMusic(m=>!m)}>{music?<Pause size={17} fill="currentColor"/>:<Play size={17} fill="currentColor"/>}</button><button aria-label="Próxima música" onClick={()=>setTrack(t=>(t+1)%3)}><SkipForward size={17} fill="currentColor"/></button><button aria-label="Favoritar" aria-pressed={favorite} onClick={()=>setFavorite(f=>!f)}><Heart size={17} fill={favorite?'currentColor':'none'}/></button></div><Progress value={music?42:35}/></div></div>}
+ function widgetContent(type:WidgetType){
+  switch(type){
+   case 'focus':return <div className="focus-widget"><Ring seconds={seconds} total={duration} label="Leitura"/><div className="focus-controls"><button className="activity-tag" onClick={()=>navigate('focus')}><BookOpen size={14}/> Clean Architecture</button><Segment value={mode} onChange={setMethod}/><small>Ciclos: {completed} / 4</small><div className="focus-start"><button className="primary" onClick={()=>{toggle();navigate('focus')}}>{running?<Pause size={14}/>:<Play size={14} fill="currentColor"/>}{running?'Pausar foco':'Iniciar foco'}</button><button className="outline icon-btn" aria-label="Abrir foco" onClick={()=>navigate('focus')}><Settings size={15}/></button></div></div></div>;
+   case 'agenda':return <AgendaRows/>;
+   case 'tasks':return <div className="task-list">{tasks.map(t=><label key={t.id} className={t.done?'done':''}><input type="checkbox" checked={t.done} onChange={()=>setTasks(ts=>ts.map(x=>x.id===t.id?{...x,done:!x.done}:x))}/><span>{t.title}</span></label>)}</div>;
+   case 'reading':return reading();
+   case 'goal':return <div className="goal-body"><div className="gauge"><svg viewBox="0 0 140 80"><path d="M12 70 A58 58 0 0 1 128 70" fill="none" stroke="#e5ded8" strokeWidth="8" strokeLinecap="round"/><path d="M12 70 A58 58 0 0 1 128 70" fill="none" stroke="#79b384" strokeWidth="8" pathLength="100" strokeDasharray="56 100" strokeLinecap="round"/></svg><div><strong>2h 15min</strong><small>de 4 horas</small></div></div><footer><span><Timer size={13}/> {5+completed} sessões</span><span><Flame size={13} color="#df702c"/> 7 dias seguidos</span></footer></div>;
+   case 'music':return player();
+   case 'summary':return <div className="summary-body"><div><strong>2h 15min <em>+32%</em></strong><small>de foco · vs. ontem</small></div><div className="bars" aria-label="Gráfico ilustrativo">{[30,55,39,76,61].map((h,i)=><i key={i} style={{height:h+'%'}}/>)}</div></div>;
+   case 'notes':return <textarea aria-label="Notas rápidas" value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Escreva uma nota…"/>;
+   case 'next':return <AgendaRows single/>;
+   case 'recent':return <div className="muted">Leitura · 30 min<br/>Estudo · 25 min<br/>Trabalho · 50 min</div>;
+  }
+ }
+ function renderWidget(w:Widget){const Icon=icons[w.type];return <div key={w.id} data-widget={w.type} data-size={w.size} className={'widget '+w.size+' '+(editing&&selected===w.id?'is-selected':'')} onClick={()=>editing&&setSelected(w.id)} onDragOver={e=>editing&&e.preventDefault()} onDrop={e=>{if(!editing)return;e.preventDefault();const from=e.dataTransfer.getData('text/plain');setDraft(old=>old?move(old,from,w.id):old)}}>
+ <Card title={w.type==='tasks'?'Tarefas ('+tasks.length+')':titles[w.type]} icon={Icon} actions={editing?<div className="edit-actions"><button draggable onDragStart={e=>{e.dataTransfer.setData('text/plain',w.id);e.dataTransfer.effectAllowed='move'}} aria-label={'Arrastar '+titles[w.type]}><Grip size={15}/></button><button aria-label={'Mover acima '+titles[w.type]} onClick={()=>shift(w.id,-1)}><ChevronUp size={14}/></button><button aria-label={'Mover abaixo '+titles[w.type]} onClick={()=>shift(w.id,1)}><ChevronDown size={14}/></button><button aria-label={'Remover '+titles[w.type]} onClick={e=>{e.stopPropagation();remove(w.id)}}><X size={15}/></button></div>:undefined}>
+ <div aria-hidden={editing?true:undefined} className={editing?'preview-content':''}>{widgetContent(w.type)}</div>
+ </Card>{editing&&<><button className="resize-handle" aria-label={'Redimensionar '+titles[w.type]} onPointerDown={e=>beginResize(e,w.id,w.size)} onKeyDown={e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();resize(w.id,sizes[Math.max(0,Math.min(2,sizes.indexOf(w.size)+(e.key==='ArrowRight'?1:-1)))])}}}/>{selected===w.id&&<div className="widget-sizes">{sizes.map(s=><button key={s} aria-pressed={w.size===s} onClick={()=>resize(w.id,s)}>{s==='small'?'P':s==='medium'?'M':'G'}</button>)}</div>}</>}</div>}
+ function cataloguePanel(){return <aside className="catalogue"><header><h3>Adicionar widgets</h3><button aria-label="Fechar catálogo" onClick={()=>setShowCatalogue(false)} className="mobile-only"><X size={18}/></button></header><input className="search" aria-label="Buscar widgets" placeholder="Buscar widgets..." value={query} onChange={e=>setQuery(e.target.value)}/>{catalogue.filter(c=>c.title.toLowerCase().includes(query.toLowerCase())).map(c=>{const Icon=icons[c.type];const exists=draft?.some(w=>w.type===c.type);return <button className="catalogue-item" key={c.type} disabled={exists} onClick={()=>add(c.type)}><Icon size={21}/><span><b>{c.title}</b><small>{c.description}</small></span>{exists?<Check size={15}/>:<Plus size={17}/>}</button>})}</aside>}
+ return <div className={'app '+(view==='focus'?'immersive':'')}>
+ {view!=='focus'&&<aside className="sidebar"><Brand/><nav>{navigation.map(n=><button key={n.id} className={view===n.id||editing&&n.id==='today'?'active':''} onClick={()=>navigate(n.id)}><n.icon size={18}/>{n.title}</button>)}</nav><div className="connection"><span><i/> Dados de demonstração</span><span><b className="provider google">G</b> Google Agenda</span><span><b className="provider outlook">O</b> Outlook</span></div></aside>}
+ <main className="main">
+ {view==='focus'?<><header className="focus-top"><button onClick={()=>setView('today')} aria-label="Voltar"><ArrowLeft size={19}/></button><Brand/><span className="focus-breadcrumb"><BookOpen size={16}/> Leitura · Clean Architecture</span><button onClick={()=>setView('today')} aria-label="Fechar foco"><X size={21}/></button></header><div className="immersive-grid"><div className="book-panel"><Cover/><h2>Clean Architecture</h2><p>Robert C. Martin</p><Progress value={pct}/><small>Pág. {page} de 432 · {pct}%</small><button className="outline" onClick={()=>{setPageInput(String(page));setShowProgress(true)}}>Atualizar progresso</button></div><div className="focus-center"><Segment value={mode} onChange={setMethod}/><Ring seconds={seconds} total={duration} large label="Leitura"/><Transport running={running} onToggle={toggle} onReset={reset} onStop={stop}/></div><aside className="focus-side"><Card title="Próximo compromisso" icon={CalendarDays}><AgendaRows single/></Card><Card title="Música · demo" icon={Music2}>{player()}<label className="volume"><Volume2 size={16}/><input type="range" min="0" max="100" value={volume} onChange={e=>setVolume(Number(e.target.value))} aria-label="Volume simulado"/></label></Card></aside></div><div className="landscape" aria-hidden="true"><svg viewBox="0 0 1200 180" preserveAspectRatio="none"><path d="M0 60Q130 95 240 70T470 85T720 68T950 94T1200 52V180H0Z" fill="#f6c9aa"/><path d="M0 108Q130 64 300 116T600 112T900 106T1200 100V180H0Z" fill="#d0bec6"/><path d="M0 131L130 95 230 135 395 113 590 155 820 108 1010 143 1200 116V180H0Z" fill="#a4aebc"/><path d="M0 160L180 145 360 161 560 145 780 169 990 143 1200 153V180H0Z" fill="#879495"/></svg></div></>:<>
+ <div className="mobile-brand"><Brand/><Bell size={20}/></div>
+ <header className="page-head"><div><h1>{editing?'Editar painel':view==='today'?'Meu dia':navigation.find(n=>n.id===view)?.title}</h1><p>{editing?'Personalize seu painel com widgets, tamanhos e posição.':fixtureDate}</p></div>{view==='today'&&<div className="head-actions"><Sun size={18} aria-hidden="true"/><button className="outline" onClick={startEdit}><LayoutGrid size={16}/> Editar painel</button></div>}{editing&&<div className="head-actions edit-header"><button className="outline" onClick={()=>{setDraft(defaultLayout(editKey==='mobile'));setSelected('focus')}}><RotateCcw size={15}/> Restaurar layout</button><button className="outline" onClick={()=>closeEdit(false)}>Cancelar</button><button className="primary" onClick={()=>closeEdit(true)}>Salvar painel</button></div>}</header>
+ {editing&&<div className="mobile-edit-tabs"><button className="outline" onClick={()=>setShowCatalogue(false)}>Seus widgets</button><button className="outline" onClick={()=>setShowCatalogue(true)}><Plus size={15}/> Adicionar</button></div>}
+ {(view==='today'||editing)&&<div className={'workspace '+(editing?'editing':'')}><div className="widget-grid">{widgets.map(renderWidget)}{editing&&<button className="add-slot" onClick={()=>{setShowCatalogue(true);document.querySelector<HTMLInputElement>('.search')?.focus()}}><Plus size={25}/><span>Adicionar widget</span></button>}{!widgets.length&&!editing&&<div className="empty">Seu painel está vazio. <button className="primary" onClick={startEdit}>Adicionar widgets</button></div>}</div>{editing&&<div className={'catalogue-wrap '+(showCatalogue?'visible':'')}>{cataloguePanel()}</div>}</div>}
+ {view==='calendar'&&<Card title="Agenda de hoje · dados simulados" icon={CalendarDays}><AgendaRows/></Card>}
+ {view==='activities'&&<><Card title="Leitura em andamento" icon={BookOpen}>{reading()}</Card><Card title="Tarefas" icon={Layers}>{widgetContent('tasks')}</Card></>}
+ {view==='history'&&<Card title="Histórico de demonstração" icon={History}>{widgetContent('recent')}<p>Sessões concluídas nesta prévia: {completed}</p></Card>}
+ {view==='settings'&&<Card title="Preferências do protótipo" icon={Settings}><p>Somente dados de demonstração. Integrações e tema escuro não implementados.</p><label>Duração do Pomodoro <select value={duration} disabled={running} onChange={e=>{const n=Number(e.target.value);setDuration(n);setSeconds(mode==='Livre'?0:n)}}><option value={1500}>25 minutos</option><option value={1800}>30 minutos</option><option value={3000}>50 minutos</option></select></label><button className="outline" onClick={()=>{const next={desktop:defaultLayout(),mobile:defaultLayout(true)};setLayouts(next);try{localStorage.setItem(STORAGE,JSON.stringify(next));setMessage('Layouts restaurados.')}catch{setMessage('Não foi possível persistir.')}}}>Restaurar painéis</button></Card>}
+ </>}
+ </main>
+ {view!=='focus'&&<nav className="bottom-nav">{navigation.map(n=><button key={n.id} className={view===n.id||editing&&n.id==='today'?'active':''} onClick={()=>navigate(n.id)}><n.icon size={20}/><span>{n.id==='settings'?'Ajustes':n.title}</span></button>)}</nav>}
+ {showProgress&&<div className="modal-backdrop" onClick={()=>setShowProgress(false)}><form className="modal" onClick={e=>e.stopPropagation()} onSubmit={e=>{e.preventDefault();const n=Number(pageInput);if(Number.isInteger(n)&&n>=0&&n<=432){setPage(n);setShowProgress(false)}}}><h2>Atualizar progresso</h2><label>Página atual <input required type="number" min="0" max="432" value={pageInput} onChange={e=>setPageInput(e.target.value)}/></label><div className="head-actions"><button type="button" className="outline" onClick={()=>setShowProgress(false)}>Cancelar</button><button className="primary">Salvar</button></div></form></div>}
+ {message&&<div className="toast" role="status">{message}<button aria-label="Dispensar aviso" onClick={()=>setMessage('')}><X size={15}/></button></div>}
+ </div>
+}

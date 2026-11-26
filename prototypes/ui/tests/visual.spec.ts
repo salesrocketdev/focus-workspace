@@ -1,0 +1,25 @@
+import { test, expect } from '@playwright/test';
+test('capture V4 screen candidates and validate basic flows',async({page},info)=>{
+ await page.goto('/');
+ await expect(page.getByRole('heading',{name:'Meu dia'})).toBeVisible();
+ await page.screenshot({path:info.outputPath('dashboard.png'),fullPage:true,animations:'disabled'});
+ await page.getByRole('button',{name:'Editar painel',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'Editar painel'})).toBeVisible();
+ await page.screenshot({path:info.outputPath('editor.png'),fullPage:true,animations:'disabled'});
+ await page.getByRole('button',{name:'Remover Tarefas',exact:true}).click();
+ await expect(page.locator('[data-widget=tasks]')).toHaveCount(0);
+ await page.getByRole('button',{name:'Cancelar',exact:true}).click();
+ await expect(page.locator('[data-widget=tasks]')).toHaveCount(1);
+ await page.getByRole('button',{name:'Editar painel',exact:true}).click();
+ await page.getByRole('button',{name:'Remover Tarefas',exact:true}).click();
+ await page.getByRole('button',{name:'Salvar painel',exact:true}).click();
+ await page.reload();
+ await expect(page.locator('[data-widget=tasks]')).toHaveCount(0);
+ await page.getByRole('button',{name:'Continuar leitura',exact:true}).click();
+ await expect(page.getByRole('button',{name:'Atualizar progresso'})).toBeVisible();
+ await page.screenshot({path:info.outputPath('focus.png'),fullPage:true,animations:'disabled'});
+ await page.getByRole('button',{name:'Atualizar progresso'}).click();
+ await page.getByRole('spinbutton').fill('90');
+ await page.getByRole('button',{name:'Salvar',exact:true}).click();
+ await expect(page.getByText('Pág. 90 de 432')).toBeVisible();
+});
