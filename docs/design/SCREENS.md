@@ -44,3 +44,7 @@ Immersive focus uses centered context title, grouped back/compact/close controls
 
 ## Book catalogue mock (#35)
 Readings offers manual entry and local catalogue search, edition review/import, details with page progress and independent chapter checklist. All catalogue data fictitious, no actual provider or EPUB import. See docs/features/BOOK_METADATA.md.
+
+
+## Appearance personalization
+Appearance supports six preset accents and custom color, four shared ring styles (classic, tick dial, segmented, minimal), immediate preview, local storage and reset. Accent tokens style primary controls, active states and progress. SVG ring transitions respect reduced motion. See chart follow-up for interactive analytics.

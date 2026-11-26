@@ -18,6 +18,7 @@ import './settings.css';
 import './quick-actions.css';
 import './motion.css';
 import './mobile.css';
+import './personalization.css';
 import { registerNotificationWorker } from './notifications';
 if(import.meta.env.PROD)void registerNotificationWorker();
 

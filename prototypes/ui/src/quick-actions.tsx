@@ -15,8 +15,8 @@ export function CompactFocus(p:MiniProps){
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;current.current?.close();current.current=null}},[]);
  useEffect(()=>{
   if(!pip)return;
-  const sync=()=>{const target=pip.document.documentElement;target.dataset.theme=document.documentElement.dataset.theme??'light';target.dataset.motion=document.documentElement.dataset.motion??'system'};
-  sync();const observer=new MutationObserver(sync);observer.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','data-motion']});return()=>observer.disconnect();
+  const sync=()=>{const target=pip.document.documentElement;target.dataset.theme=document.documentElement.dataset.theme??'light';target.dataset.motion=document.documentElement.dataset.motion??'system';target.dataset.accent=document.documentElement.dataset.accent??'#e8752b';target.style.cssText=document.documentElement.style.cssText};
+  sync();const observer=new MutationObserver(sync);observer.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','data-motion','data-accent','style']});return()=>observer.disconnect();
  },[pip]);
  async function detach(){
   const api=pipApi();if(!api||pending||current.current)return;

@@ -75,3 +75,7 @@ V4.21 hotfix Pages succeeded; CI 63 passed / 3 failed due to stale integration s
 
 ## Book catalogue prototype — #35
 V4.22 CI and Pages passed. Added local fictional edition search and review, editable metadata, duplicate detection, missing page/contents states, book details with independent chapter checklist and manual chapter addition. No external calls or durable storage; existing manual entry remains. See docs/features/BOOK_METADATA.md. New tests and deploy pending.
+
+
+## Appearance personalization
+Audit confirmed book mock CI and Pages passed; earlier color/ring/chart proposal was not implemented, not a missed deploy. Add persistent preset/custom accent, derived contrast-aware control tokens, four ring styles and previews, smooth SVG progress/tick transitions and reduced motion. Update PiP accent sync. No chart library migration in this change. CI pending.

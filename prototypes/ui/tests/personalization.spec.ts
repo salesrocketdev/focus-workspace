@@ -1,0 +1,28 @@
+import {test,expect} from '@playwright/test';
+test.beforeEach(async({page})=>{await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')))});
+test('accent and timer style persist across views and reload',async({page},info)=>{
+ await page.goto('/');
+ const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
+ const settings=async()=>{await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Aparência',exact:true}).click()};
+ await settings();
+ await page.getByRole('group',{name:'Cor principal'}).getByRole('button',{name:'Roxo',exact:true}).click();
+ await expect(page.locator('html')).toHaveAttribute('data-accent','#9064c4');
+ await page.getByRole('group',{name:'Estilo do círculo de foco'}).getByRole('button',{name:'Marcadores',exact:true}).click();
+ await expect(page.locator('html')).toHaveAttribute('data-ring','dial');
+ await page.screenshot({path:info.outputPath('personalization.png'),animations:'disabled'});
+ await nav.getByRole('button',{name:'Hoje',exact:true}).click();
+ const timer=page.locator('[data-widget=focus] .timer-ring');
+ await expect(timer.locator('.ring-dial')).toBeVisible();
+ await expect(timer.locator('.ring-classic')).toBeHidden();
+ await page.getByRole('button',{name:'Abrir sessão de foco',exact:true}).click();
+ await expect(page.locator('.ring-large .ring-dial')).toBeVisible();
+ await page.reload();
+ await expect(page.locator('html')).toHaveAttribute('data-accent','#9064c4');
+ await expect(page.locator('html')).toHaveAttribute('data-ring','dial');
+ await settings();
+ await page.getByLabel('Cor personalizada').fill('#2468ac');
+ await expect(page.locator('html')).toHaveAttribute('data-accent','#2468ac');
+ await page.getByRole('button',{name:'Restaurar cores e círculo'}).click();
+ await expect(page.locator('html')).toHaveAttribute('data-ring','classic');
+ await expect(page.locator('html')).toHaveAttribute('data-accent','#e8752b');
+});

@@ -1,0 +1,39 @@
+/* Semantic accent tokens override earlier hard-coded brand states. */
+:root{--accent-ink:var(--action);--accent-hover:var(--action)}
+:root[data-accent] .sidebar nav .active,:root[data-accent] .bottom-nav .active,:root[data-accent] .segment .selected,:root[data-accent] .calendar-week-day[aria-pressed=true],:root[data-accent] .calendar-month-day.selected-day,:root[data-accent] .edit-size-options button[aria-pressed=true]{background:var(--field-selected);color:var(--field-selected-ink)}
+:root[data-accent] .ui-button.ui-soft,:root[data-accent] .soft-button,:root[data-accent] .task-play{background:var(--field-selected);color:var(--field-selected-ink);border-color:var(--field-selected-edge)}
+:root[data-accent] .head-actions .outline,:root[data-accent] .card-more,:root[data-accent] .settings-section-header>svg,:root[data-accent] .appearance-choices button[aria-pressed=true]{color:var(--accent-ink)}
+:root[data-accent] .history-ranges button[aria-pressed=true],:root[data-accent] .calendar-view-switch button[aria-pressed=true],:root[data-accent] .activity-tabs button[aria-pressed=true]{color:var(--field-selected-ink)}
+:root[data-accent] .brand-symbol i{background:var(--accent)}
+:root[data-accent] .brand-symbol i:last-child{background:var(--action)}
+:root[data-accent] button.primary:hover,:root[data-accent] .ui-button.ui-primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+:root[data-accent] .mobile-widget-row.chosen{background:var(--field-selected);border-color:var(--field-selected-edge)}
+:root[data-accent] .progress>div{background:var(--accent)}
+.appearance-group{display:grid;gap:10px;min-width:0;padding-bottom:15px;border-bottom:1px solid var(--ui-line)}
+.appearance-group h3{font-size:14px;font-weight:650}
+.appearance-group p{font-size:12px;color:var(--ui-muted);line-height:1.5}
+.accent-options{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;max-width:540px}
+.accent-options button{display:grid;justify-items:center;gap:5px;padding:6px 2px;min-width:0;min-height:60px;border:1px solid transparent;border-radius:10px}
+.accent-options button[aria-pressed=true]{background:var(--field-selected);border-color:var(--field-selected-edge)}
+.accent-options small{font-size:10px;overflow-wrap:anywhere;text-align:center}
+.accent-swatch{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;box-shadow:inset 0 0 0 1px #0002}
+.accent-swatch svg{color:white;filter:drop-shadow(0 1px 2px #000)}
+.accent-custom{display:flex;align-items:center;gap:12px;min-height:54px;padding:8px 12px;border:1px solid var(--ui-line);border-radius:10px;background:var(--ui-paper);cursor:pointer}
+.accent-custom input{width:42px;height:36px;padding:2px;background:none;border:1px solid var(--ui-line);border-radius:8px;cursor:pointer}
+.accent-custom span{display:grid;gap:4px;font-size:13px}
+.ring-choices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;max-width:640px}
+.ring-choices button{position:relative;display:grid;justify-items:center;align-content:start;gap:5px;padding:12px 6px;min-width:0;border:1px solid var(--ui-line);border-radius:12px;background:var(--ui-paper)}
+.ring-choices button[aria-pressed=true]{background:var(--field-selected);border-color:var(--field-selected-edge)}
+.ring-choices .timer-ring{width:min(100%,100px)}
+.ring-choices .ring-copy strong{font-size:18px}
+.ring-choices b{font-size:12px}.ring-choices small{font-size:10px;line-height:1.3;text-align:center}
+.ring-selected-check{position:absolute;right:7px;top:7px;color:var(--field-selected-ink)}
+.ring-face{display:none}.ring-classic{display:inline}
+[data-ring=dial] .timer-ring:not([data-ring-variant]) .ring-classic,[data-ring=segmented] .timer-ring:not([data-ring-variant]) .ring-classic,[data-ring=minimal] .timer-ring:not([data-ring-variant]) .ring-classic,.timer-ring[data-ring-variant]:not([data-ring-variant=classic]) .ring-classic{display:none}
+[data-ring=dial] .timer-ring:not([data-ring-variant]) .ring-dial,.timer-ring[data-ring-variant=dial] .ring-dial,[data-ring=segmented] .timer-ring:not([data-ring-variant]) .ring-segmented,.timer-ring[data-ring-variant=segmented] .ring-segmented,[data-ring=minimal] .timer-ring:not([data-ring-variant]) .ring-minimal,.timer-ring[data-ring-variant=minimal] .ring-minimal{display:inline}
+.ring-progress{-webkit-transition:stroke-dashoffset 850ms linear,stroke 220ms ease;transition:stroke-dashoffset 850ms linear,stroke 220ms ease}
+.ring-tick{transition:opacity 650ms linear,stroke 220ms ease}
+.progress>div{transition:width 350ms ease,background-color 200ms ease}
+@media(max-width:759px){.accent-options{grid-template-columns:repeat(3,minmax(0,1fr))}.ring-choices{grid-template-columns:repeat(2,minmax(0,1fr))}.ring-choices button{min-height:132px}.ring-choices .timer-ring{width:96px}}
+@media(prefers-reduced-motion:reduce){.ring-progress,.ring-tick,.progress>div{transition:none!important}}
+[data-motion=reduced] .ring-progress,[data-motion=reduced] .ring-tick,[data-motion=reduced] .progress>div{transition:none!important}
