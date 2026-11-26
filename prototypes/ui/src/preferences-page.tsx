@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Timer, Coffee, Target, Link2, ShieldCheck, Check, ArrowRight, ArrowLeft, UserRound, LayoutGrid, Sparkles, Settings, Unplug } from 'lucide-react';
+import { Timer, Coffee, Monitor, Target, Link2, ShieldCheck, Check, ArrowRight, ArrowLeft, UserRound, LayoutGrid, Sparkles, Settings, Unplug } from 'lucide-react';
 import { Button,Dialog,Field,SelectField,ToggleCard } from './ui';
 import googleSignIn from './assets/providers/google-signin.svg';
 import { ProviderIcon,ProviderLabel,type ProviderId } from './provider-icons';
@@ -30,7 +30,7 @@ export function IntegrationPanel({connections,onChange}:{connections:ProviderId[
   {provider&&<ConnectionDialog provider={provider} connected={connections.includes(provider)} onDismiss={()=>setProvider(null)} onChange={on=>onChange(on?[...new Set([...connections,provider])]:connections.filter(p=>p!==provider))}/>}
  </section>;
 }
-export function FocusSettings({prefs,onChange,disabled=false}:{prefs:FocusPreferences;onChange:(p:FocusPreferences)=>void;disabled?:boolean}){
+export function FocusSettings({prefs,onChange,disabled=false,wakeStatus='off'}:{prefs:FocusPreferences;onChange:(p:FocusPreferences)=>void;disabled?:boolean;wakeStatus?:'off'|'active'|'unavailable'|'waiting'}){
  const opts=(values:number[],current:number)=>[...new Set([...values,current])].sort((a,b)=>a-b);
  const duration=(label:string,key:'focus'|'short'|'long',values:number[],hint?:string)=><SelectField label={label} hint={hint} value={prefs[key]} disabled={disabled} onValueChange={v=>onChange({...prefs,[key]:Number(v)})} options={opts(values,prefs[key]).map(n=>({value:String(n),label:n/60+(n===60?' minuto':' minutos')}))}/>;
  return <div className="focus-settings-fields">
@@ -40,7 +40,7 @@ export function FocusSettings({prefs,onChange,disabled=false}:{prefs:FocusPrefer
   {duration('Pausa longa','long',[60,600,900,1200,1800,2700])}
   <SelectField label="Ciclos até a pausa longa" value={prefs.cycles} disabled={disabled} onValueChange={v=>onChange({...prefs,cycles:Number(v)})} options={Array.from({length:12},(_,i)=>({value:String(i+1),label:(i+1)+' '+(i===0?'ciclo':'ciclos')}))}/>
   <SelectField label="Meta diária de foco" value={prefs.goal} disabled={disabled} onValueChange={v=>onChange({...prefs,goal:Number(v)})} options={opts([30,60,90,120,180,240,300,360,480],prefs.goal).map(n=>({value:String(n),label:n+' minutos'}))}/>
-  <div className="preference-toggles"><ToggleCard title="Iniciar pausas automaticamente" description="Ao terminar um período de foco." icon={<Coffee size={19}/>} checked={prefs.autoBreak} disabled={disabled} onChange={v=>onChange({...prefs,autoBreak:v})}/><ToggleCard title="Iniciar o próximo foco automaticamente" description="Ao terminar uma pausa." icon={<Timer size={19}/>} checked={prefs.autoFocus} disabled={disabled} onChange={v=>onChange({...prefs,autoFocus:v})}/></div>
+  <div className="preference-toggles"><ToggleCard title="Iniciar pausas automaticamente" description="Ao terminar um período de foco." icon={<Coffee size={19}/>} checked={prefs.autoBreak} disabled={disabled} onChange={v=>onChange({...prefs,autoBreak:v})}/><ToggleCard title="Iniciar o próximo foco automaticamente" description="Ao terminar uma pausa." icon={<Timer size={19}/>} checked={prefs.autoFocus} disabled={disabled} onChange={v=>onChange({...prefs,autoFocus:v})}/><ToggleCard title="Manter tela ligada" description="Durante o foco, solicite ao navegador que evite bloquear a tela. Pode aumentar o consumo de bateria." icon={<Monitor size={19}/>} checked={prefs.keepAwake===true} disabled={disabled} onChange={v=>onChange({...prefs,keepAwake:v})}/>{prefs.keepAwake&&<small role="status">{wakeStatus==='active'?'Tela mantida ligada.':wakeStatus==='unavailable'?'O navegador ou dispositivo não permitiu manter a tela ligada.':wakeStatus==='waiting'?'Proteção temporariamente suspensa.':'A proteção será solicitada ao iniciar o foco, quando suportada.'}</small>}</div>
   {disabled&&<small>Encerre ou reinicie a sessão atual para alterar as preferências.</small>}
  </div>;
 }

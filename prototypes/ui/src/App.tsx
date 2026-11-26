@@ -7,16 +7,18 @@ import { CompactFocus,CommandPalette,QuickActionButton,type QuickAction } from '
 import { CalendarPage } from './calendar-page';
 import { HistoryPage } from './history-page';
 import { MiniTrend } from './charts';
+import {loadWorkspace,saveWorkspace} from './workspace-storage';
+import {useScreenWakeLock} from './wake-lock';
 import { AppearancePanel,useAppearance } from './appearance';
 import { SettingsPage,type SettingsSection } from './settings-page';
 import { useNotifications,NotificationBell,NotificationCenter,NotificationSettings } from './notifications';
-import { initialRecords,recordSession,totalSeconds,durationLabel,filterPeriod,dailyTotals,newest,streak,type SessionStatus } from './history-model';
+import { recordSession,totalSeconds,durationLabel,filterPeriod,dailyTotals,newest,streak,type SessionStatus } from './history-model';
 import { FocusSettings,IntegrationPanel,Onboarding } from './preferences-page';
 import { FocusPicker } from './focus-picker';
 import { loadPreferences,loadConnections,loadProfile,writeStorage,PREFS_KEY,CONNECTIONS_KEY,ONBOARDING_KEY,nextPhase,phaseDuration,phaseName,suggestedLayout,type FocusPreferences,type Profile,type Preset,type Phase } from './preferences-model';
 import type { ProviderId } from './provider-icons';
 import { ActivitiesPage,CategoryMark } from './activities-page';
-import { initialCategories,initialTasks,initialBooks,initialContext,readingContext,sameContext,progressOf,type Book,type FocusContext } from './activity-model';
+import { readingContext,sameContext,progressOf,type Book,type FocusContext } from './activity-model';
 import { ProviderIcon, ProviderLabel } from './provider-icons';
 import { Button, Field, Dialog, SelectField, Notice, SearchField, TextareaField, ToggleCard } from './ui';
 import { available, changePreset, compactVertical, displaced, endRow, firstFree, GRID_BREAKPOINT, gridStyle, planPlacement, preset, resolveLayout } from './grid-model';
@@ -52,24 +54,25 @@ export function App(){
  const [query,setQuery]=useState('');
  const [showCatalogue,setShowCatalogue]=useState(false);
  const [message,setMessage]=useState('');
- const [mode,setMode]=useState<'Pomodoro'|'Livre'>('Pomodoro');
  const [prefs,setPrefs]=useState(loadPreferences);
+ const [restored]=useState(()=>loadWorkspace(prefs));
+ const [mode,setMode]=useState<'Pomodoro'|'Livre'>(restored.timer.mode);
  const [profile,setProfile]=useState(loadProfile);
  const [connections,setConnections]=useState(loadConnections);
  const [showOnboarding,setShowOnboarding]=useState(()=>loadProfile()===null);
  const [showFocusSettings,setShowFocusSettings]=useState(false);
  const [showFocusPicker,setShowFocusPicker]=useState(false);
- const [phase,setPhase]=useState<Phase>('focus');
- const [cycle,setCycle]=useState(0);
- const [duration,setDuration]=useState(prefs.focus);
- const [seconds,setSeconds]=useState(prefs.focus);
- const [running,setRunning]=useState(false);
- const clock=useRef<number>(0);
- const [tasks,setTasks]=useState(initialTasks);
- const [categories,setCategories]=useState(initialCategories);
- const [books,setBooks]=useState(initialBooks);
- const [readingId,setReadingId]=useState(initialBooks[0].id);
- const [focusContext,setFocusContext]=useState<FocusContext>(initialContext);
+ const [phase,setPhase]=useState<Phase>(restored.timer.phase);
+ const [cycle,setCycle]=useState(restored.timer.cycle);
+ const [duration,setDuration]=useState(restored.timer.duration);
+ const [seconds,setSeconds]=useState(restored.timer.seconds);
+ const [running,setRunning]=useState(restored.timer.running);
+ const clock=useRef<number>(restored.timer.startedAt);
+ const [tasks,setTasks]=useState(restored.tasks);
+ const [categories,setCategories]=useState(restored.categories);
+ const [books,setBooks]=useState(restored.books);
+ const [readingId,setReadingId]=useState(restored.timer.readingId);
+ const [focusContext,setFocusContext]=useState<FocusContext>(restored.timer.context);
  const readingBook=books.find(b=>b.id===readingId)??books[0];
  const page=readingBook.page;
  const setPage=(n:number)=>setBooks(old=>old.map(b=>b.id===readingBook.id?{...b,page:n}:b));
@@ -82,7 +85,7 @@ export function App(){
  const [noteDraft,setNoteDraft]=useState('');
  const [showProgress,setShowProgress]=useState(false);
  const [pageInput,setPageInput]=useState('72');
- const [records,setRecords]=useState(initialRecords);
+ const [records,setRecords]=useState(restored.records);
  const todayRecords=filterPeriod(records,1),todaySeconds=totalSeconds(todayRecords);
  const lastWeek=dailyTotals(records,7),yesterdaySeconds=lastWeek[lastWeek.length-2].seconds;
  const changePercent=yesterdaySeconds?Math.round((todaySeconds-yesterdaySeconds)/yesterdaySeconds*100):null;
@@ -98,11 +101,45 @@ export function App(){
  const activePreview=gesture.preview??cataloguePreview;
  const addPlacement=freeGrid&&editing?firstFree(3,3,widgets.flatMap(w=>w.placement?[w.placement]:[])):null;
  useEffect(()=>{const fn=()=>{setMobile(window.innerWidth<760);setWide(window.innerWidth>=GRID_BREAKPOINT)};window.addEventListener('resize',fn);return()=>window.removeEventListener('resize',fn)},[]);
- useEffect(()=>{if(!running)return;let finished=false;const tick=()=>{if(finished)return;const elapsed=Math.floor((Date.now()-clock.current)/1000);const value=mode==='Livre'?elapsed:Math.max(0,duration-elapsed);setSeconds(value);if(mode!=='Livre'&&value===0){finished=true;const next=nextPhase(phase,cycle,prefs);if(phase==='focus')saveFocusRecord(duration,'completed');setPhase(next.phase);setCycle(next.cyclesDone);const length=phaseDuration(next.phase,prefs);setDuration(length);setSeconds(length);clock.current=Date.now();setRunning(next.auto);setMessage(phase==='focus'?'Foco concluído. '+phaseName(next.phase)+' disponível.':'Pausa concluída. Próximo foco disponível.');notifications.publish(phase==='focus'?'focus':'break',phase==='focus'?'Sessão de foco concluída':'Pausa concluída',phase==='focus'?phaseName(next.phase)+' disponível.':'Pronto para retomar o foco.')}};const id=window.setInterval(tick,250);tick();return()=>window.clearInterval(id)},[running,mode,duration,phase,cycle,prefs,focusContext,notifications.prefs]);
+ const recoverExpired=useRef(restored.timer.running&&restored.timer.mode==='Pomodoro'&&restored.timer.seconds===0);
+ const tickRef=useRef<()=>void>(()=>{});
+ const storageWarning=useRef(false);
+ const wakeStatus=useScreenWakeLock(prefs.keepAwake===true,running&&phase==='focus');
+ useLayoutEffect(()=>{
+  const saved=saveWorkspace({version:1,timer:{mode,phase,cycle,duration,seconds,running,startedAt:clock.current,context:focusContext,readingId},tasks,categories,books,records});
+  if(!saved&&!storageWarning.current){storageWarning.current=true;setMessage('Armazenamento local indisponível. A sessão poderá ser perdida ao fechar.')}
+ },[mode,phase,cycle,duration,seconds,running,focusContext,readingId,tasks,categories,books,records]);
+ useEffect(()=>{
+  if(!running){tickRef.current=()=>{};return}
+  let finished=false;
+  const tick=()=>{
+   if(finished)return;
+   const elapsed=Math.max(0,Math.floor((Date.now()-clock.current)/1000));
+   const value=mode==='Livre'?elapsed:Math.max(0,duration-elapsed);
+   setSeconds(value);
+   if(mode!=='Livre'&&value===0){
+    finished=true;
+    const recovered=recoverExpired.current||elapsed-duration>5;
+    recoverExpired.current=false;
+    const next=nextPhase(phase,cycle,prefs);
+    if(phase==='focus')saveFocusRecord(duration,'completed');
+    setPhase(next.phase);setCycle(next.cyclesDone);
+    const length=phaseDuration(next.phase,prefs);
+    setDuration(length);setSeconds(length);clock.current=Date.now();setRunning(next.auto&&!recovered);
+    setMessage(recovered?'Sessão recuperada. '+phaseName(next.phase)+' pronta para iniciar.':phase==='focus'?'Foco concluído. '+phaseName(next.phase)+' disponível.':'Pausa concluída. Próximo foco disponível.');
+    notifications.publish(phase==='focus'?'focus':'break',phase==='focus'?'Sessão de foco concluída':'Pausa concluída',phase==='focus'?phaseName(next.phase)+' disponível.':'Pronto para retomar o foco.');
+   }
+  };
+  tickRef.current=tick;
+  const id=window.setInterval(tick,250);
+  const resume=()=>{if(document.visibilityState==='visible')tick()};
+  document.addEventListener('visibilitychange',resume);window.addEventListener('pageshow',resume);window.addEventListener('focus',resume);
+  return()=>{finished=true;window.clearInterval(id);document.removeEventListener('visibilitychange',resume);window.removeEventListener('pageshow',resume);window.removeEventListener('focus',resume);tickRef.current=()=>{}};
+ },[running,mode,duration,phase,cycle,prefs,focusContext,notifications.prefs]);
  function setMethod(value:'Pomodoro'|'Livre'){if(hasSession||value===mode)return;setMode(value);setPhase('focus');setCycle(0);setDuration(prefs.focus);setSeconds(value==='Livre'?0:prefs.focus)}
- function toggle(){if(running){const elapsed=Math.max(0,Math.floor((Date.now()-clock.current)/1000));setSeconds(mode==='Livre'?elapsed:Math.max(1,duration-elapsed));setRunning(false);return}if(mode==='Pomodoro'&&seconds===0){setSeconds(duration);clock.current=Date.now();setRunning(true);return}clock.current=Date.now()-(mode==='Livre'?seconds:duration-seconds)*1000;setRunning(true)}
- function reset(){setRunning(false);setPhase('focus');setCycle(0);setDuration(prefs.focus);setSeconds(mode==='Livre'?0:prefs.focus)}
- function stop(){setRunning(false);if(phase==='focus'){const elapsed=running?Math.max(0,Math.floor((Date.now()-clock.current)/1000)):mode==='Livre'?seconds:duration-seconds;saveFocusRecord(mode==='Livre'?elapsed:Math.min(duration,elapsed),mode==='Livre'||elapsed>=duration?'completed':'interrupted');}setPhase('focus');setCycle(0);setDuration(prefs.focus);setSeconds(mode==='Livre'?0:prefs.focus);setMessage('Sessão encerrada (demo).')}
+ function toggle(){if(running){const elapsed=Math.max(0,Math.floor((Date.now()-clock.current)/1000));if(mode==='Pomodoro'&&elapsed>=duration){tickRef.current();return}setSeconds(mode==='Livre'?elapsed:Math.max(0,duration-elapsed));setRunning(false);return}if(mode==='Pomodoro'&&seconds===0){setSeconds(duration);clock.current=Date.now();setRunning(true);return}clock.current=Date.now()-(mode==='Livre'?seconds:duration-seconds)*1000;setRunning(true)}
+ function reset(){recoverExpired.current=false;setRunning(false);setPhase('focus');setCycle(0);setDuration(prefs.focus);setSeconds(mode==='Livre'?0:prefs.focus)}
+ function stop(){recoverExpired.current=false;setRunning(false);if(phase==='focus'){const elapsed=running?Math.max(0,Math.floor((Date.now()-clock.current)/1000)):mode==='Livre'?seconds:duration-seconds;saveFocusRecord(mode==='Livre'?elapsed:Math.min(duration,elapsed),mode==='Livre'||elapsed>=duration?'completed':'interrupted');}setPhase('focus');setCycle(0);setDuration(prefs.focus);setSeconds(mode==='Livre'?0:prefs.focus);setMessage('Sessão encerrada (demo).')}
  function navigate(next:View){if(editing&&next!=='edit'){setMessage('Salve ou cancele a edição antes de sair.');return}if(next==='settings'){if(view!=='settings')setSettingsSection('focus');if(mobile)setMobileSettingsDetail(false)}setView(next)}
  function startEdit(){setCompact(false);setOpenMenu(null);setPushNeighbors(false);setCataloguePreview(null);catalogueDrag.current=null;setQuery('');setEditKey(key);setDraft((key==='desktop'?resolveLayout(layouts[key]):layouts[key]).map(w=>({...w,placement:w.placement?{...w.placement}:undefined})));setSelected(layouts[key][0]?.id??'');setShowCatalogue(false);setView('edit')}
  function closeEdit(save:boolean){setOpenMenu(null);setCataloguePreview(null);catalogueDrag.current=null;if(save&&draft){const next={...layouts,[editKey]:editKey==='desktop'?resolveLayout(draft):draft};try{localStorage.setItem(STORAGE,JSON.stringify(next))}catch{setMessage('Não foi possível salvar no navegador.');return}setLayouts(next);setMessage('Painel salvo.')}setDraft(null);setView('today')}
@@ -224,7 +261,7 @@ export function App(){
  {view==='calendar'&&<CalendarPage/>}
  {view==='activities'&&<ActivitiesPage categories={categories} tasks={tasks} books={books} onCategories={setCategories} onTasks={setTasks} onBooks={setBooks} onFocus={openContext} onReading={openReading}/>}
  {view==='history'&&<HistoryPage records={records} goal={prefs.goal} mobile={mobile}/>}
- {view==='settings'&&<SettingsPage section={settingsSection} mobile={mobile} detail={mobileSettingsDetail} onSection={section=>{setSettingsSection(section);setMobileSettingsDetail(true)}} onBack={()=>setMobileSettingsDetail(false)} summaries={{focus:prefs.focus/60+' min de foco · '+prefs.short/60+' min de pausa',notifications:(notifications.prefs.focus||notifications.prefs.breaks)?'Avisos de sessão ativos':'Avisos de sessão desativados',appearance:({light:'Tema claro',dark:'Tema escuro',system:'Tema do sistema'})[appearance.theme],integrations:connections.length?connections.length+' conexão(ões) de demonstração':'Nenhum serviço conectado',profile:profile==='google-demo'?'Perfil Google (demo)':'Modo visitante'}}>{settingsSection==='focus'&&<section className="settings-surface"><header className="settings-section-header"><Settings size={20}/><div><h2>Sessões de foco</h2><p>Personalize seu ritmo de concentração e descanso.</p></div></header><FocusSettings prefs={prefs} onChange={changePreferences} disabled={hasSession}/></section>}{settingsSection==='notifications'&&<NotificationSettings notifications={notifications}/>}{settingsSection==='integrations'&&<IntegrationPanel connections={connections} onChange={changeConnections}/>}{settingsSection==='appearance'&&<AppearancePanel appearance={appearance} onChange={updateAppearance}/>}{settingsSection==='profile'&&<section className="settings-surface"><header className="settings-section-header"><LayoutGrid size={20}/><div><h2>Perfil e personalização</h2><p>{profile==='google-demo'?'Perfil Google fictício':'Modo visitante'} · somente neste navegador.</p></div></header><div className="settings-action-group"><Button variant="secondary" disabled={hasSession} onClick={()=>setShowOnboarding(true)}>Refazer onboarding</Button><Button variant="secondary" onClick={()=>{const next={desktop:defaultLayout(),mobile:defaultLayout(true)};try{localStorage.setItem(STORAGE,JSON.stringify(next));setLayouts(next);setMessage('Layouts restaurados.')}catch{setMessage('Não foi possível persistir.')}}}><RotateCcw size={15}/> Restaurar painéis</Button></div><small>Os dados das atividades continuam em memória. Nenhuma autenticação real.</small></section>}</SettingsPage>}
+ {view==='settings'&&<SettingsPage section={settingsSection} mobile={mobile} detail={mobileSettingsDetail} onSection={section=>{setSettingsSection(section);setMobileSettingsDetail(true)}} onBack={()=>setMobileSettingsDetail(false)} summaries={{focus:prefs.focus/60+' min de foco · '+prefs.short/60+' min de pausa',notifications:(notifications.prefs.focus||notifications.prefs.breaks)?'Avisos de sessão ativos':'Avisos de sessão desativados',appearance:({light:'Tema claro',dark:'Tema escuro',system:'Tema do sistema'})[appearance.theme],integrations:connections.length?connections.length+' conexão(ões) de demonstração':'Nenhum serviço conectado',profile:profile==='google-demo'?'Perfil Google (demo)':'Modo visitante'}}>{settingsSection==='focus'&&<section className="settings-surface"><header className="settings-section-header"><Settings size={20}/><div><h2>Sessões de foco</h2><p>Personalize seu ritmo de concentração e descanso.</p></div></header><FocusSettings prefs={prefs} onChange={changePreferences} disabled={hasSession} wakeStatus={wakeStatus}/></section>}{settingsSection==='notifications'&&<NotificationSettings notifications={notifications}/>}{settingsSection==='integrations'&&<IntegrationPanel connections={connections} onChange={changeConnections}/>}{settingsSection==='appearance'&&<AppearancePanel appearance={appearance} onChange={updateAppearance}/>}{settingsSection==='profile'&&<section className="settings-surface"><header className="settings-section-header"><LayoutGrid size={20}/><div><h2>Perfil e personalização</h2><p>{profile==='google-demo'?'Perfil Google fictício':'Modo visitante'} · somente neste navegador.</p></div></header><div className="settings-action-group"><Button variant="secondary" disabled={hasSession} onClick={()=>setShowOnboarding(true)}>Refazer onboarding</Button><Button variant="secondary" onClick={()=>{const next={desktop:defaultLayout(),mobile:defaultLayout(true)};try{localStorage.setItem(STORAGE,JSON.stringify(next));setLayouts(next);setMessage('Layouts restaurados.')}catch{setMessage('Não foi possível persistir.')}}}><RotateCcw size={15}/> Restaurar painéis</Button></div><small>Atividades, sessões e preferências são salvas neste navegador. Nenhuma autenticação real.</small></section>}</SettingsPage>}
  </div>
  </>}
  </main>
@@ -234,7 +271,7 @@ export function App(){
  {showNotifications&&<NotificationCenter notifications={notifications} onDismiss={()=>setShowNotifications(false)} onSettings={()=>{setShowNotifications(false);if(!editing){setView('settings');setSettingsSection('notifications');setMobileSettingsDetail(true)}}}/>}
  {showOnboarding&&<Onboarding profile={profile} prefs={prefs} onFinish={finishOnboarding} onDismiss={skipOnboarding}/>}
  {showFocusPicker&&<FocusPicker categories={categories} tasks={tasks} books={books} current={focusContext} onChoose={chooseFocusContext} onDismiss={()=>setShowFocusPicker(false)}/>}
- {showFocusSettings&&<Dialog title="Configurar sessão de foco" description="Preferências para as próximas sessões." onDismiss={()=>setShowFocusSettings(false)}><FocusSettings prefs={prefs} onChange={changePreferences} disabled={hasSession}/><footer className="dialog-actions"><Button onClick={()=>setShowFocusSettings(false)}>Concluir</Button></footer></Dialog>}
+ {showFocusSettings&&<Dialog title="Configurar sessão de foco" description="Preferências para as próximas sessões." onDismiss={()=>setShowFocusSettings(false)}><FocusSettings prefs={prefs} onChange={changePreferences} disabled={hasSession} wakeStatus={wakeStatus}/><footer className="dialog-actions"><Button onClick={()=>setShowFocusSettings(false)}>Concluir</Button></footer></Dialog>}
  {showNotes&&<Dialog title="Notas rápidas" description="Edite sua anotação sem rolagem dentro do widget." onDismiss={()=>setShowNotes(false)}><form className="dialog-form" onSubmit={e=>{e.preventDefault();setNotes(noteDraft);setShowNotes(false)}}><TextareaField label="Anotação" value={noteDraft} onChange={e=>setNoteDraft(e.target.value)} rows={6} maxLength={4000}/><footer className="dialog-actions"><Button variant="secondary" onClick={()=>setShowNotes(false)}>Cancelar</Button><Button type="submit">Salvar</Button></footer></form></Dialog>}
  {showProgress&&<Dialog title="Atualizar progresso" description="Registre onde você parou na leitura." onDismiss={()=>setShowProgress(false)}>
  <form className="dialog-form" onSubmit={e=>{e.preventDefault();const n=Number(pageInput);if(Number.isInteger(n)&&n>=0&&n<=readingBook.pages){setPage(n);setShowProgress(false);setMessage('Progresso atualizado.')}}}>

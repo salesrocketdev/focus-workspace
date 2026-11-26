@@ -12,3 +12,6 @@ References:
 
 
 V4.17: iOS browser explicitly shows Home Screen installation steps; standalone detection uses display-mode and navigator.standalone. Permission request remains directly user-triggered. System notification test uses scoped registration.showNotification; optional Badging API mirrors unread count. No remote push subscription or iOS real-device delivery validation. See https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/.
+
+
+Local session recovery now reconciles elapsed time on reopening or visibility changes. This is not a background alarm: notifications for an expired session may be delivered only upon return. An overdue focus is logged once in a single running tab and the next phase awaits manual start; no fictional catch-up focus blocks. Multi-tab coordination remains a production requirement.

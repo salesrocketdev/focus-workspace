@@ -83,3 +83,7 @@ Audit confirmed book mock CI and Pages passed; earlier color/ring/chart proposal
 
 ## Interactive analytics — #36
 Appearance deploy 45903927119 succeeded. Replace basic history bars with interactive daily bars/line, in-flow detail tooltip (date, duration, session count, day-over-day comparison), category donut/legend selection, animated daily goal with details and dashboard summary points. Data derives from shared records and active filters; goal remains independent of history filters. Native React/SVG/CSS avoids new dependencies for this prototype; ECharts evaluation remains production follow-up. Add Chromium and WebKit interaction tests. Pending CI/device review.
+
+
+## Session recovery
+Charts deployment passed, CI had three strict selector failures because both SVG and parent shared chart-line. Rename parent chart type class and fix selected-day fallback. Add versioned workspace snapshot, recovery from elapsed wall-clock time and visibility events, no automatic catch-up cycles, local history and activities, optional wake lock. New tests for running/paused/expired reload, no duplicate completion and mocked wake lock. Real iPhone behavior, cross-tab concurrency and notification delivery while closed remain unverified/out of scope. CI pending.

@@ -52,3 +52,7 @@ Appearance supports six preset accents and custom color, four shared ring styles
 
 ## Interactive analytics (#36)
 History includes bars and line/area views, date selection by pointer/touch/keyboard and previous/next controls, category distribution donut with interactive legend and animated daily-goal details. Dashboard summary uses shared daily aggregates and touch/keyboard-selectable bars. Tooltips are in-flow to avoid clipping on small displays. Zero days remain visible, filtered aggregates remain consistent, goal ignores history filters. Respect accent, theme and reduced motion; data remains fixture plus current execution.
+
+
+## Session recovery and screen wake lock
+A versioned local workspace snapshot stores timer state, clock origin, context, library/tasks/categories and history. Running timers derive elapsed time from wall-clock timestamps and reconcile on visibility/pageshow/focus; paused sessions retain remaining time. An overdue countdown completes only the current phase and leaves the next phase ready without retroactively simulating focus. History persists with the existing fixed demo date. Opt-in screen wake lock requests only while running focus is visible and releases on pause/hidden/unmount. OS support and permission vary. Single-tab prototype; no background wakeup, server synchronization or cross-tab locking.
