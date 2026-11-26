@@ -227,7 +227,7 @@ export function App(){
  </div>
  </>}
  </main>
- {view!=='focus'&&<nav className="bottom-nav" aria-label="Navegação principal">{navigation.map(n=><button key={n.id} aria-current={view===n.id||(editing||view==='focus')&&n.id==='today'?'page':undefined} className={view===n.id||(editing||view==='focus')&&n.id==='today'?'active':''} onClick={()=>navigate(n.id)}><n.icon size={20} strokeWidth={1.8}/><span>{n.id==='settings'?'Ajustes':n.title}</span></button>)}</nav>}
+ {view!=='focus'&&<nav className="bottom-nav" aria-label="Navegação principal">{navigation.map(n=><button key={n.id} aria-current={view===n.id||editing&&n.id==='today'?'page':undefined} className={view===n.id||editing&&n.id==='today'?'active':''} onClick={()=>navigate(n.id)}><n.icon size={20} strokeWidth={1.8}/><span>{n.id==='settings'?'Ajustes':n.title}</span></button>)}</nav>}
  {compact&&!editing&&<CompactFocus title={focusContext.title} label={timerLabel} seconds={seconds} duration={duration} running={running} free={mode==='Livre'} onToggle={toggle} onReset={reset} onStop={stop} onExpand={()=>{setCompact(false);navigate('focus')}} onClose={()=>setCompact(false)} onError={setMessage}/>}
  {showCommands&&<CommandPalette actions={quickActions} onDismiss={()=>setShowCommands(false)}/>}
  {showNotifications&&<NotificationCenter notifications={notifications} onDismiss={()=>setShowNotifications(false)} onSettings={()=>{setShowNotifications(false);if(!editing){setView('settings');setSettingsSection('notifications');setMobileSettingsDetail(true)}}}/>}
