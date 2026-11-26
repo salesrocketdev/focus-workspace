@@ -95,3 +95,7 @@ Previous session recovery CI and Pages passed. Add opt-in DND reminder, accessib
 
 ## Opt-in iOS Shortcut on manual start (#38)
 Previous native guide CI and Pages passed. Extend the reminder preference with backward-compatible optional shortcut handoff, persist running timer before invoking user-created shortcut, no launch during recovery/automatic transitions, keep manual fallback. Automated test intercepts the URL handoff and asserts saved timer state; actual native execution requires a configured physical iPhone. CI pending.
+
+
+## Clean filters and focus trend card
+Previous iOS shortcut commit CI and Pages passed. Unify agenda day/week/month, history period, activity section/status controls as transparent text tabs with a thin accent underline. Compact today/date navigation, provider filters, category selector and history filter trigger; keep mobile 44px hit areas and existing accessible names/filter behaviors. Focus trend removes nested tooltip card, uses inline date/value/session/comparison, icon-only chart type controls with accessible labels, taller chart with subtle guides and selected day emphasis, compact day navigation. Remove plot gaps and use CSS markers for exact line/point alignment without stretched SVG dots. Add narrow viewport regressions and screenshots. CI and physical-device review pending.

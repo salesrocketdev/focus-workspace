@@ -18,6 +18,7 @@ import '../src/mobile.css';
 import '../src/personalization.css';
 import '../src/charts.css';
 import '../src/distraction-shield.css';
+import '../src/filter-polish.css';
 import type { Preview } from '@storybook/react';
 const preview:Preview={parameters:{layout:'centered'}};
 export default preview;

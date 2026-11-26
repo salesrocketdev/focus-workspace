@@ -63,3 +63,6 @@ Notification settings contain an opt-in reminder. Immersive focus and command pa
 
 
 On iOS the optional automatic shortcut preference runs the user-created timed shortcut when manually starting a new focus. The timer is persisted first; pausing, resuming, reload and automatic phase transitions do not invoke it. Manual guide and duration override remain available.
+
+
+Agenda, History and Activities use lightweight text filters with an underline rather than filled segmented cards. Focus trend uses an inline selected-day readout, accessible icon chart switch, grid-aligned interactive bars/line and compact day navigation. Keep full-size mobile hit targets and existing filter behavior.

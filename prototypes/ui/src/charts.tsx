@@ -1,5 +1,5 @@
 import {useState,type KeyboardEvent} from 'react';
-import {ChevronLeft,ChevronRight} from 'lucide-react';
+import {ChevronLeft,ChevronRight,ChartNoAxesColumn,ChartNoAxesCombined} from 'lucide-react';
 import {dateLabel,DEMO_DAY} from './calendar-model';
 import {durationLabel} from './history-model';
 type Day={day:string;seconds:number;count:number};
@@ -33,12 +33,18 @@ export function FocusTrend({days}:{days:Day[]}){
  const line=points.map(p=>p.join(',')).join(' ');
  const area=points.length?points[0][0]+',140 '+line+' '+points[points.length-1][0]+',140':'';
  return <div className="focus-trend">
- <div className="chart-heading"><div className="chart-tooltip" role="status" aria-label="Detalhes do dia">{day&&<><small>{longDate(day.day)}{day.day===DEMO_DAY?' · Hoje':''}</small><strong>{durationLabel(day.seconds)}</strong><small>{sessionLabel(day.count)} · {changeLabel(day.seconds,days[index-1]?.seconds)}</small></>}</div><div className="chart-type" role="group" aria-label="Tipo de gráfico"><button type="button" aria-pressed={kind==='bar'} onClick={()=>setKind('bar')}>Barras</button><button type="button" aria-pressed={kind==='line'} onClick={()=>setKind('line')}>Linha</button></div></div>
- <div className={'history-bars '+(days.length>7?'dense-bars':'')}><div className="history-axis" aria-hidden="true"><span>{Math.round(max/60)} min</span><span>{Math.round(max/120)} min</span><span>0</span></div><div className={'history-plot interactive-plot plot-kind-'+kind} role="group" aria-label="Tempo de foco por dia" onPointerLeave={()=>setHover(null)}>
- {kind==='line'&&<svg className="chart-line" viewBox="0 0 600 140" preserveAspectRatio="none" aria-hidden="true"><polygon points={area} fill="var(--field-selected)"/><polyline points={line} fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke"/>{points.map((p,i)=><circle key={days[i].day} cx={p[0]} cy={p[1]} r={i===index?5:2.5} fill="var(--accent)"/>)}</svg>}
- {days.map((d,i)=><button type="button" data-chart-point key={d.day} className="history-bar-column" aria-pressed={i===index} aria-label={longDate(d.day)+': '+durationLabel(d.seconds)+', '+sessionLabel(d.count)} tabIndex={i===index?0:-1} onPointerEnter={e=>{if(e.pointerType==='mouse')setHover(d.day)}} onFocus={()=>pick(i)} onClick={()=>pick(i)} onKeyDown={e=>navigatePoint(e,i,days.length,pick)}><span className="history-bar-track"><i style={{height:d.seconds/max*100+'%'}} className={d.day===DEMO_DAY?'today-bar':''}/></span><small aria-hidden="true">{days.length<=7||i%5===0||i===days.length-1?shortDate(d.day):''}</small></button>)}
- </div></div>
- <div className="chart-point-controls"><button type="button" aria-label="Dia anterior no gráfico" disabled={index===0} onClick={()=>pick(index-1)}><ChevronLeft size={18}/></button><small>Toque em um dia para ver os detalhes</small><button type="button" aria-label="Próximo dia no gráfico" disabled={index===days.length-1} onClick={()=>pick(index+1)}><ChevronRight size={18}/></button></div>
+ <div className="chart-heading">
+  <div className="chart-tooltip" role="status" aria-label="Detalhes do dia">{day&&<><small className="chart-date">{longDate(day.day)}{day.day===DEMO_DAY?' · Hoje':''}</small><strong>{durationLabel(day.seconds)}</strong><div className="chart-meta"><small>{sessionLabel(day.count)}</small><small className="chart-comparison">{changeLabel(day.seconds,days[index-1]?.seconds)}</small></div></>}</div>
+  <div className="chart-type" role="group" aria-label="Tipo de gráfico"><button type="button" aria-label="Barras" title="Barras" aria-pressed={kind==='bar'} onClick={()=>setKind('bar')}><ChartNoAxesColumn size={17}/></button><button type="button" aria-label="Linha" title="Linha" aria-pressed={kind==='line'} onClick={()=>setKind('line')}><ChartNoAxesCombined size={17}/></button></div>
+ </div>
+ <div className={'history-bars '+(days.length>7?'dense-bars':'')}>
+  <div className="history-axis" aria-hidden="true"><span>{Math.round(max/60)}m</span><span>{Math.round(max/120)}m</span><span>0</span></div>
+  <div className={'history-plot interactive-plot plot-kind-'+kind} role="group" aria-label="Tempo de foco por dia" onPointerLeave={()=>setHover(null)}>
+  {kind==='line'&&<svg className="chart-line" viewBox="0 0 600 140" preserveAspectRatio="none" aria-hidden="true"><polygon points={area} fill="var(--field-selected)"/><polyline points={line} fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke"/></svg>}
+  {days.map((d,i)=><button type="button" data-chart-point key={d.day} className="history-bar-column" aria-pressed={i===index} aria-label={longDate(d.day)+': '+durationLabel(d.seconds)+', '+sessionLabel(d.count)} tabIndex={i===index?0:-1} onPointerEnter={e=>{if(e.pointerType==='mouse')setHover(d.day)}} onFocus={()=>pick(i)} onClick={()=>pick(i)} onKeyDown={e=>navigatePoint(e,i,days.length,pick)}><span className="history-bar-track"><i style={{height:d.seconds/max*100+'%'}} className={d.day===DEMO_DAY?'today-bar':''}/>{kind==='line'&&<span className="chart-dot" style={{bottom:d.seconds/max*100+'%'}}/>}</span><small aria-hidden="true">{days.length<=7||i%5===0||i===days.length-1?shortDate(d.day):''}</small></button>)}
+  </div>
+ </div>
+ <div className="chart-point-controls"><small><span className="chart-key"/> Tempo de foco</small><div className="chart-day-navigation"><button type="button" aria-label="Dia anterior no gráfico" disabled={index===0} onClick={()=>pick(index-1)}><ChevronLeft size={17}/></button><small>{day?shortDate(day.day):'—'}</small><button type="button" aria-label="Próximo dia no gráfico" disabled={index===days.length-1} onClick={()=>pick(index+1)}><ChevronRight size={17}/></button></div></div>
  </div>
 }
 export function CategoryChart({groups,total,color}:{groups:Group[];total:number;color:(id:string)=>string}){

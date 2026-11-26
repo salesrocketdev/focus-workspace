@@ -33,7 +33,7 @@ export function CalendarPage(){
  return <div className="calendar-page">
   <section className="calendar-surface">
    <div className="calendar-toolbar">
-    <div className="calendar-date-controls"><Button variant="secondary" size="sm" onClick={()=>setDay(DEMO_DAY)}>Hoje (demo)</Button><div className="calendar-arrows"><button className="ui-icon-button" aria-label="Período anterior" onClick={()=>step(-1)}><ChevronLeft size={18}/></button><button className="ui-icon-button" aria-label="Próximo período" onClick={()=>step(1)}><ChevronRight size={18}/></button></div><h2 className="calendar-period" aria-live="polite">{label}</h2></div>
+    <div className="calendar-date-controls"><Button className="calendar-today" variant="secondary" size="sm" aria-label="Hoje (demo)" onClick={()=>setDay(DEMO_DAY)}>Hoje</Button><div className="calendar-arrows"><button className="ui-icon-button" aria-label="Período anterior" onClick={()=>step(-1)}><ChevronLeft size={18}/></button><button className="ui-icon-button" aria-label="Próximo período" onClick={()=>step(1)}><ChevronRight size={18}/></button></div><h2 className="calendar-period" aria-live="polite">{label}</h2></div>
     <div className="calendar-view-switch" role="group" aria-label="Visualização da agenda">{views.map(v=><button key={v.id} aria-pressed={view===v.id} onClick={()=>setView(v.id)}>{v.label}</button>)}</div>
    </div>
    <div className="calendar-filters"><span><CalendarRange size={15}/> Calendários</span>{sources.map(source=><label key={source}><input type="checkbox" checked={active.includes(source)} onChange={()=>toggle(source)}/><ProviderLabel provider={source} size={16}/></label>)}<small className="calendar-demo"><Info size={13}/> Dados de demonstração</small></div>
