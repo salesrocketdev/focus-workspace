@@ -9,5 +9,6 @@ import './icons.css';
 import './ui.css';
 import './grid.css';
 import './calendar.css';
+import './activities.css';
 
 createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>);
