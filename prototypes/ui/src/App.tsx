@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Home, CalendarDays, Layers, History, Settings, Sun, Moon, LayoutGrid, ArrowLeft, Plus, X, Grip, ChevronUp, ChevronDown, RotateCcw, Play, Pause, SkipBack, SkipForward, Heart, Volume2, BookOpen, Flame, Timer, Music2, Bell, Check, Maximize2, Minimize2, Ellipsis, ChevronRight } from 'lucide-react';
 import { Brand, Ring, Segment, Card, Cover, Progress, AgendaRows, Transport, icons } from './components';
 import { EditIconButton, EditTextButton, EditCardToolbar, WidgetSizeOptions, EditPreview, AddWidgetTile } from './editor';
@@ -153,7 +153,7 @@ export function App(){
   if(!hasSession){setDuration(prefs.focus);setSeconds(mode==='Livre'?0:prefs.focus)}
   navigate('focus');
  }
- useEffect(()=>{
+ useLayoutEffect(()=>{
   const keydown=(event:KeyboardEvent)=>{
    if(event.defaultPrevented||event.repeat||event.isComposing)return;
    if((event.ctrlKey||event.metaKey)&&!event.altKey&&event.key.toLowerCase()==='k'){

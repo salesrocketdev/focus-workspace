@@ -7,10 +7,10 @@ test('compact timer shares session across navigation and can be closed without s
  await page.getByRole('button',{name:'Abrir foco compacto',exact:true}).click();
  const mini=page.getByRole('region',{name:'Foco compacto'});
  await expect(mini).toBeVisible();
- await mini.getByRole('button',{name:'Iniciar foco compacto'}).click();
+ await mini.getByRole('button',{name:'Iniciar foco compacto',exact:true}).click();
  await page.clock.fastForward(10000);
- await expect(mini.getByRole('img',{name:'Tempo compacto: 24:50'})).toBeVisible();
- await expect(page.getByRole('img',{name:'24:50 · Leitura'})).toBeVisible();
+ await expect(mini.getByRole('img',{name:'Tempo compacto: 24:50',exact:true})).toBeVisible();
+ await expect(page.getByRole('img',{name:'24:50 · Leitura',exact:true})).toBeVisible();
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
  await nav.getByRole('button',{name:'Agenda',exact:true}).click();
  await expect(mini).toBeVisible();
@@ -23,6 +23,8 @@ test('compact timer shares session across navigation and can be closed without s
 });
 test('quick actions search and keyboard navigation do not discard panel edits',async({page},info)=>{
  await page.goto('/');
+ // Wait for React to mount before dispatching the global shortcut.
+ await expect(page.getByRole('button',{name:'Abrir ações rápidas',exact:true})).toBeVisible();
  await page.keyboard.press('Control+k');
  const dialog=page.getByRole('dialog',{name:'Ações rápidas'});
  await expect(dialog).toBeVisible();
