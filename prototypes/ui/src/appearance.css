@@ -34,3 +34,12 @@
 [data-theme=dark] .oauth-account:hover,[data-theme=dark] .onboarding-choice:hover,[data-theme=dark] .onboarding-choice[aria-pressed=true]{background:#49382b;border-color:#ad734b}
 [data-theme=dark] .landscape{opacity:.45}
 [data-theme=dark] .widget .task-list .done span,[data-theme=dark] .task-completed .activity-task-title{color:#c0b3a8}
+
+[data-theme=dark] .ui-field :disabled{background:#403630;color:var(--muted)}
+[data-theme=dark] .head-actions .outline,[data-theme=dark] .book-info strong,[data-theme=dark] .widget .card-more,[data-theme=dark] .catalogue-item>svg:first-child,[data-theme=dark] .settings-section-header>svg{color:#ffc093}
+[data-theme=dark] .activity-search,[data-theme=dark] .activity-category-filter,[data-theme=dark] .calendar-arrows button{color:var(--text);background:var(--ui-paper);border-color:var(--border)}
+[data-theme=dark] .appearance-choices button[aria-pressed=true]{color:#ffd0aa}
+[data-theme=dark] .editing .catalogue-item:disabled small{color:var(--muted)}
+[data-theme=dark] .history-session:hover,[data-theme=dark] .ui-icon-button:hover{background:#443830}
+[data-theme=dark] .gauge svg path:first-child{stroke:#59483c}
+[data-theme=dark] .activity-task-row,[data-theme=dark] .widget[data-widget=goal] .goal-body footer{border-color:var(--border)}

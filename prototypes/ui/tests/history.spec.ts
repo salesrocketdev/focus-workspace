@@ -54,3 +54,24 @@ test('appearance preference persists and system motion is respected',async({page
  await page.emulateMedia({colorScheme:'light'});
  await expect(page.locator('html')).toHaveAttribute('data-theme','light');
 });
+
+test('interrupted focus is logged, pauses are excluded and reset discards time',async({page},info)=>{
+ await page.goto('/');
+ const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
+ await page.clock.install();
+ await page.getByRole('button',{name:'Abrir sessão de foco',exact:true}).click();
+ await page.getByRole('button',{name:'Iniciar',exact:true}).click();
+ await page.clock.fastForward(70000);
+ await page.getByRole('button',{name:'Encerrar',exact:true}).click();
+ await page.getByRole('button',{name:'Iniciar',exact:true}).click();
+ await page.clock.fastForward(15000);
+ await page.getByRole('button',{name:'Reiniciar',exact:true}).click();
+ await page.getByRole('button',{name:'Voltar',exact:true}).click();
+ await nav.getByRole('button',{name:'Histórico',exact:true}).click();
+ const history=page.locator('.history-page');
+ await history.getByRole('button',{name:'Hoje',exact:true}).click();
+ await history.getByLabel('Status do histórico').selectOption('interrupted');
+ await expect(history.locator('.history-session')).toHaveCount(1);
+ await expect(history.locator('.history-session').first()).toContainText('1 min');
+ await expect(history.locator('.history-session').first()).toContainText('Interrompida');
+});

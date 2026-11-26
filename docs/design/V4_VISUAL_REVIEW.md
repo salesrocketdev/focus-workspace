@@ -38,3 +38,4 @@ V4.12 follow-up: separated Google identity mark from Gmail, moved notes editing 
 
 ## Iteration 13 — History and appearance
 V4.12 latest CI [45890926045](https://github.com/salesrocketdev/focus-workspace/actions/runs/45890926045) and Pages succeeded. Replaced placeholder history and dashboard metrics with shared deterministic fixtures plus current-execution focus records; added responsive charts, filters, details and pagination. Added light/dark/system preference and reduced-motion toggle, using scoped theme overrides without changing provider artwork. Added Storybook and browser checks. History data remains in-memory and fixed-date for demo; dark theme still requires visual and contrast audit. Current CI and screenshots pending.
+V4.13 follow-up: honor app-level reduced motion in JS FLIP as well as CSS, improve dark palette contrast in editor/settings, add interrupted/reset history regression. Full theme contrast audit remains pending.

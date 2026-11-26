@@ -70,7 +70,8 @@ export function useGridMotion(gridRef:RefObject<HTMLDivElement>,enabled:boolean)
   const element=gridRef.current,width=element?.clientWidth??0;
   const sameGrid=previousGrid.current.element===element&&previousGrid.current.width===width;
   previousGrid.current={element,width};
-  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce=document.documentElement.dataset.motion==='reduced'||window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce){animations.current.forEach(a=>a.cancel());animations.current.clear()}
   for(const node of nodes){
    const id=node.dataset.widget!,rect=node.getBoundingClientRect(),old=before.current.get(id);
    next.set(id,rect);
