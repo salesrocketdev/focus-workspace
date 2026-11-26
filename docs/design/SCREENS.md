@@ -66,3 +66,6 @@ On iOS the optional automatic shortcut preference runs the user-created timed sh
 
 
 Agenda, History and Activities use lightweight text filters with an underline rather than filled segmented cards. Focus trend uses an inline selected-day readout, accessible icon chart switch, grid-aligned interactive bars/line and compact day navigation. Keep full-size mobile hit targets and existing filter behavior.
+
+
+Mobile immersive focus uses a prominent labeled start/pause button, quiet reset/stop controls, underline method tabs, compact activity picker and secondary Ajustes/Não Perturbe actions. Method changes are explicitly disabled during active sessions. Desktop transport keeps its original icon layout.

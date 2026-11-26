@@ -22,6 +22,7 @@ import './personalization.css';
 import './charts.css';
 import './distraction-shield.css';
 import './filter-polish.css';
+import './focus-mobile.css';
 import { registerNotificationWorker } from './notifications';
 if(import.meta.env.PROD)void registerNotificationWorker();
 

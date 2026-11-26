@@ -1,0 +1,38 @@
+/* Only the primary action carries a solid fill. Desktop transport stays unchanged. */
+.transport-label,.focus-action-mobile{display:none}
+@media(max-width:759px){
+ .immersive-grid>.focus-center{gap:12px}
+ .focus-center .focus-context-picker{width:min(100%,320px);min-height:48px;padding:4px 6px;gap:9px;border:0;background:transparent;border-radius:8px;box-shadow:none}
+ .focus-center .focus-context-picker>span:first-child{width:30px;height:30px;border-radius:8px}
+ .focus-center .focus-context-picker>span:nth-child(2){gap:2px}
+ .focus-center .focus-context-picker small{font-size:10px}
+ .focus-center .focus-context-picker b{font-size:13px}
+ .focus-center .focus-context-picker:disabled{opacity:.85}
+ .focus-center .focus-context-picker:disabled>svg{visibility:hidden}
+ .focus-center .segment,[data-theme=dark] .focus-center .segment{width:min(100%,230px);max-width:230px;border:0;border-bottom:1px solid var(--ui-line);padding:0;gap:0;background:transparent;border-radius:0}
+ .focus-center .segment>button{position:relative;min-width:0;height:44px;min-height:44px;padding:0 10px;border-radius:0;background:transparent;color:var(--ui-muted);font-size:13px;font-weight:500}
+ :root[data-accent] .focus-center .segment>button.selected,[data-theme=dark] .focus-center .segment>button.selected,.focus-center .segment>button.selected{background:transparent;color:var(--field-selected-ink);font-weight:650}
+ .focus-center .segment>button.selected::after{content:'';position:absolute;bottom:0;left:15%;right:15%;height:2px;background:var(--field-focus);border-radius:2px 2px 0 0}
+ .focus-center .segment>button:disabled{opacity:.38}
+ .focus-center .segment>button:focus-visible{outline-offset:-3px;border-radius:6px}
+ .focus-center .transport{display:grid;grid-template-columns:64px minmax(112px,144px) 64px;align-items:center;justify-content:center;gap:9px;width:100%;max-width:310px}
+ .focus-center .transport>.circle-button:not(.big),[data-theme=dark] .focus-center .transport>.circle-button:not(.big){display:flex;flex-direction:column;gap:4px;min-width:44px;width:64px;height:52px;min-height:52px;color:var(--ui-muted);background:transparent;border:0;border-radius:10px;box-shadow:none}
+ .focus-center .transport>.circle-button:not(.big) svg{width:19px;height:19px}
+ .focus-center .transport>.circle-button:not(.big):active{background:var(--field-selected);color:var(--field-selected-ink)}
+ .focus-center .transport>.circle-button.big{width:100%;height:52px;min-height:52px;border-radius:14px;gap:7px;box-shadow:none;background:var(--action);border-color:var(--action)}
+ .focus-center .transport>.circle-button.big svg{width:19px;height:19px}
+ .focus-center .transport .transport-label{display:block;font-size:10px;line-height:1.25}
+ .focus-center .transport>.circle-button.big .transport-label{font-size:14px;font-weight:650}
+ .focus-center .immersive-actions{display:flex;justify-content:center;align-items:center;gap:6px;width:100%;max-width:320px}
+ .focus-center .immersive-actions>.ui-button{min-height:44px;height:44px;width:auto;flex:0 1 auto;white-space:nowrap;background:transparent;border-color:transparent;box-shadow:none;color:var(--ui-muted);font-size:12px;font-weight:500;padding:0 12px;gap:6px}
+ .focus-center .immersive-actions>.ui-button:active{background:var(--field-selected);color:var(--field-selected-ink)}
+ .focus-action-desktop{display:none}.focus-action-mobile{display:inline}
+ .focus-top .ui-icon-button{border-color:transparent;background:transparent;box-shadow:none;color:var(--ui-muted)}
+ .focus-top .ui-icon-button:active{background:var(--field-selected);color:var(--field-selected-ink)}
+ .immersive-grid>.book-panel .ui-button,.immersive-grid>.focus-activity-panel .ui-button{border-color:transparent;background:transparent;color:var(--field-selected-ink);box-shadow:none;padding:0 4px;min-height:44px;font-size:12px}
+ .focus-side .player-controls .circle-button{width:44px;min-width:44px;height:44px;min-height:44px}
+ .widget[data-widget=focus] .focus-start>.timer-start{min-height:44px;border-radius:10px}
+ .compact-transport>.ui-icon-button{border-color:transparent;background:transparent;box-shadow:none;color:var(--ui-muted)}
+ .compact-focus header .ui-icon-button{border-color:transparent;background:transparent;box-shadow:none}
+}
+@media(max-width:359px){.focus-center .transport{grid-template-columns:56px minmax(100px,132px) 56px;gap:6px}.focus-center .transport>.circle-button:not(.big){width:56px}.focus-center .immersive-actions>.ui-button{padding-inline:8px}}

@@ -57,3 +57,17 @@ test('WebKit: interactive history plots respond to touch and reduced motion',asy
  await page.emulateMedia({reducedMotion:'reduce'});
  expect(await page.locator('.chart-line').evaluate(el=>getComputedStyle(el).animationName)).toBe('none');
 });
+
+test('WebKit: clean focus controls preserve touch targets and timer actions',async({page})=>{
+ await page.goto('/');
+ await page.getByRole('button',{name:'Abrir sessão de foco',exact:true}).tap();
+ const transport=page.locator('.focus-center .transport');
+ const sizes=await transport.getByRole('button').evaluateAll(nodes=>nodes.map(n=>[n.getBoundingClientRect().width,n.getBoundingClientRect().height]));
+ expect(sizes.every(([w,h])=>w>=44&&h>=44)).toBeTruthy();
+ await transport.getByRole('button',{name:'Iniciar',exact:true}).tap();
+ await expect(transport.getByRole('button',{name:'Pausar',exact:true})).toBeVisible();
+ await transport.getByRole('button',{name:'Pausar',exact:true}).tap();
+ await transport.getByRole('button',{name:'Reiniciar',exact:true}).tap();
+ await expect(transport.getByRole('button',{name:'Iniciar',exact:true})).toBeVisible();
+ await expect(page.getByRole('navigation',{name:'Navegação principal'})).toHaveCount(0);
+});

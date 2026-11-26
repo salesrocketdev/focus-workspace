@@ -99,3 +99,7 @@ Previous native guide CI and Pages passed. Extend the reminder preference with b
 
 ## Clean filters and focus trend card
 Previous iOS shortcut commit CI and Pages passed. Unify agenda day/week/month, history period, activity section/status controls as transparent text tabs with a thin accent underline. Compact today/date navigation, provider filters, category selector and history filter trigger; keep mobile 44px hit areas and existing accessible names/filter behaviors. Focus trend removes nested tooltip card, uses inline date/value/session/comparison, icon-only chart type controls with accessible labels, taller chart with subtle guides and selected day emphasis, compact day navigation. Remove plot gaps and use CSS markers for exact line/point alignment without stretched SVG dots. Add narrow viewport regressions and screenshots. CI and physical-device review pending.
+
+
+## Mobile immersive focus controls
+Previous filter/chart CI and Pages passed. Mobile-only transport adopts a single filled start/pause pill with readable labels and quiet reset/stop icon actions, compact text method tabs, borderless context/secondary actions, retained 44px touch targets and centered header. Disable unavailable method changes during a session rather than silently ignoring them. Desktop controls retain layout. Add mobile and WebKit tests for alignment and timer actions. CI pending.
