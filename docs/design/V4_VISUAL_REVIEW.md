@@ -1,0 +1,7 @@
+# V4 visual review — iteration 2
+
+Reviewed the approved raster concept and six actual Playwright screenshot candidates from [CI run 45868355699](https://github.com/salesrocketdev/focus-workspace/actions/runs/45868355699). Desktop 1366px and mobile 390px evidence confirms basic composition and interaction flow; not yet a pixel-identical baseline. Live deployment was confirmed by maintainer.
+
+Observed differences: stronger/darker orange buttons, nearly uniform ring, smaller and clipped book cover typography, player controls below metadata in wide card, mobile editor header crowded, mobile focus view taller than reference. This iteration adjusts ring gradient (without inventing timer progress), accent, music layout, reading artwork dimensions, editor selection and mobile density. Mobile focus hides next commitment and volume in this compact mockup; full calendar remains accessible elsewhere. Desktop editor keeps summary widget because removing it would change the dashboard default.
+
+New test candidates cover adding notes, changing size, ordering, saved layouts independent of screen size, and desktop-to-mobile width matrix. Screenshots are not approved baselines. Exact original PNG still pending upload (#3); artwork and provider symbols are placeholders. Use no real provider data or secrets. Review new CI evidence before closing #28–#33 or starting production.
