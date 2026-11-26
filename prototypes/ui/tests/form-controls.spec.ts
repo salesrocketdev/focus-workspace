@@ -4,6 +4,7 @@ test('custom select supports pointer, keyboard and top layer in a dialog',async(
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
  await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ if(info.project.name==='mobile')await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Sessões de foco',exact:true}).click();
  const select=page.getByRole('combobox',{name:'Duração do Pomodoro'});
  await select.focus();await page.keyboard.press('ArrowDown');
  await expect(select).toHaveAttribute('aria-expanded','true');
@@ -26,14 +27,17 @@ test('toggle cards persist and search fields can be cleared',async({page},info)=
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
  await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ if(info.project.name==='mobile')await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Sessões de foco',exact:true}).click();
  const toggle=page.getByRole('switch',{name:'Iniciar pausas automaticamente'});
  await expect(toggle).toHaveAttribute('aria-checked','false');
  await toggle.focus();await page.keyboard.press('Space');await expect(toggle).toHaveAttribute('aria-checked','true');
  await page.screenshot({path:info.outputPath('toggle-cards-light.png'),animations:'disabled',scale:'css'});
+ if(info.project.name==='mobile')await page.getByRole('button',{name:'Voltar às configurações'}).click();
  await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Aparência',exact:true}).click();
  await page.getByRole('button',{name:'Escuro',exact:true}).click();
  await page.screenshot({path:info.outputPath('toggle-cards-dark.png'),animations:'disabled',scale:'css'});
  await page.reload();await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ if(info.project.name==='mobile')await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Sessões de foco',exact:true}).click();
  await expect(toggle).toHaveAttribute('aria-checked','true');
  await nav.getByRole('button',{name:'Atividades',exact:true}).click();
  const search=page.getByRole('searchbox',{name:'Buscar atividades'});

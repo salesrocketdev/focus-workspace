@@ -5,8 +5,10 @@ test('settings section navigation and notification center',async({page},info)=>{
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
  await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
  const sections=page.getByRole('navigation',{name:'Seções de configurações'});
- await expect(sections.getByRole('button',{name:'Sessões de foco'})).toHaveAttribute('aria-current','page');
+ if(info.project.name==='mobile')await sections.getByRole('button',{name:'Sessões de foco',exact:true}).click();
+ else await expect(sections.getByRole('button',{name:'Sessões de foco'})).toHaveAttribute('aria-current','page');
  await expect(page.getByRole('combobox',{name:'Duração do Pomodoro'})).toBeVisible();
+ if(info.project.name==='mobile')await page.getByRole('button',{name:'Voltar às configurações'}).click();
  await sections.getByRole('button',{name:'Notificações',exact:true}).click();
  await expect(page.getByRole('combobox',{name:'Duração do Pomodoro'})).toHaveCount(0);
  await expect(page.getByRole('switch',{name:'Fim do período de foco'})).toHaveAttribute('aria-checked','true');
@@ -22,8 +24,10 @@ test('settings section navigation and notification center',async({page},info)=>{
  await page.getByRole('button',{name:'Abrir notificações'}).click();
  await expect(dialog).toContainText('Notificação de teste');
  await dialog.getByRole('button',{name:'Preferências',exact:true}).click();
- await expect(sections.getByRole('button',{name:'Notificações',exact:true})).toHaveAttribute('aria-current','page');
+ if(info.project.name==='mobile')await expect(page.getByRole('button',{name:'Voltar às configurações'})).toBeVisible();
+ else await expect(sections.getByRole('button',{name:'Notificações',exact:true})).toHaveAttribute('aria-current','page');
  await page.getByRole('switch',{name:'Fim do período de foco'}).click();
+ if(info.project.name==='mobile')await page.getByRole('button',{name:'Voltar às configurações'}).click();
  await sections.getByRole('button',{name:'Sessões de foco'}).click();
  await page.getByRole('combobox',{name:'Duração do Pomodoro'}).click();
  await page.getByRole('option',{name:'1 minuto',exact:true}).click();

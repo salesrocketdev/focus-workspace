@@ -151,7 +151,7 @@ test('provider artwork is local, legible and consistent across views',async({pag
  const list=page.locator('.integration-preview-list');
  await expect(list.locator('.provider-mark')).toHaveCount(6);
  for(const img of await list.locator('img').all()){
-  expect(await img.evaluate((el:HTMLImageElement)=>el.complete&&el.naturalWidth>0&&el.getBoundingClientRect().width===24&&el.getBoundingClientRect().height===24)).toBeTruthy();
+  expect(await img.evaluate((el:HTMLImageElement)=>el.complete&&el.naturalWidth>0&&el.offsetWidth===24&&el.offsetHeight===24)).toBeTruthy();
  }
  await expect(page.getByText('Nenhum provedor conectado nesta prévia.')).toBeVisible();
  await page.screenshot({path:info.outputPath('provider-icons.png'),animations:'disabled',scale:'css'});
@@ -194,6 +194,7 @@ test('local Inter font and settings field render consistently',async({page},info
  expect(await page.evaluate(()=>document.fonts.check('14px "Inter Variable"'))).toBeTruthy();
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
  await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ if(info.project.name==='mobile')await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Sessões de foco',exact:true}).click();
  const select=page.getByLabel('Duração do Pomodoro');
  await expect(select).toBeVisible();
  const size=await select.boundingBox();

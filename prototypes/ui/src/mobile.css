@@ -64,3 +64,48 @@
 @media(max-width:359px){.mobile-widget-name small{display:none}.workspace-page-header .page-action{font-size:10px;padding-inline:6px}.mobile-widget-row>button.edit-icon-button{flex-basis:44px}.bottom-nav button{font-size:9px}.compact-transport{gap:1px}}
 @media(prefers-reduced-motion:reduce){.ui-dialog[open]{animation:none!important}}
 [data-motion=reduced] .ui-dialog[open]{animation:none!important}
+
+/* Native-style mobile settings: grouped disclosure rows and dedicated detail screens. */
+@media(max-width:759px){
+ .workspace-page-header:not(.edit-page-head){align-items:start}
+ .settings-page.settings-mobile{border-top:0;padding:0;gap:0}
+ .settings-mobile .settings-navigation{display:grid;gap:24px;padding:0;border:0;position:static}
+ .settings-mobile .settings-nav-group{display:grid;gap:8px;min-width:0}
+ .settings-mobile .settings-nav-group h3{padding:0 4px;margin:0;font-size:11px;letter-spacing:.07em}
+ .settings-row-group{border:1px solid var(--ui-line);border-radius:15px;background:var(--ui-paper);overflow:hidden}
+ .settings-mobile .settings-nav-group button{display:flex;width:100%;min-height:76px;gap:12px;padding:12px;text-align:left;border:0;border-radius:0;background:transparent;color:var(--ui-ink);justify-content:flex-start}
+ .settings-mobile .settings-nav-group button+button{border-top:1px solid var(--ui-line)}
+ .settings-mobile .settings-nav-group button:hover,.settings-mobile .settings-nav-group button:active{background:var(--field-selected)}
+ .settings-mobile .settings-nav-group button .settings-row-icon{display:grid;place-items:center;width:40px;height:40px;flex:0 0 40px;border-radius:11px;background:var(--field-selected);color:var(--field-selected-ink)}
+ .settings-mobile .settings-nav-group button .settings-tone-notifications{background:#f8e8d9;color:#9d521f}
+ .settings-mobile .settings-nav-group button .settings-tone-appearance{background:#eee7f7;color:#735c99}
+ .settings-mobile .settings-nav-group button .settings-tone-integrations{background:#e4edf7;color:#496b9b}
+ .settings-mobile .settings-nav-group button .settings-tone-profile{background:#e5eee3;color:#53765b}
+ .settings-mobile .settings-nav-group button .settings-row-copy{display:grid;flex:1;min-width:0;gap:5px}
+ .settings-row-copy b{font-size:14px;font-weight:600;line-height:1.3}
+ .settings-row-copy small{font-size:12px;line-height:1.4;color:var(--ui-muted);overflow-wrap:anywhere}
+ .settings-mobile .settings-nav-group button .settings-row-chevron{display:block!important;color:var(--ui-muted);flex-shrink:0}
+ .settings-local-note{text-align:center;font-size:11px;color:var(--ui-muted);line-height:1.6;padding:6px 0}
+ .settings-mobile-detail{display:grid;gap:16px;min-width:0;animation:settings-detail-in 260ms var(--motion-ease)}
+ .settings-back{display:flex;justify-self:start;align-items:center;gap:4px;min-height:44px;padding:0 8px 0 0;font-size:14px;color:var(--field-selected-ink);font-weight:600}
+ .settings-mobile .settings-section-content{border:0;padding:0;max-width:none;min-width:0}
+ .settings-mobile .settings-section-body{animation:none}
+ .settings-mobile .settings-surface{gap:20px}
+ .settings-mobile .settings-section-header{padding:0 0 14px;align-items:flex-start}
+ .settings-mobile .settings-section-header h2{font-size:21px;line-height:1.3}
+ .settings-mobile .settings-section-header p{font-size:13px;line-height:1.5}
+ .settings-mobile .focus-settings-fields{gap:17px}
+ .settings-mobile .settings-action-group{display:grid;grid-template-columns:1fr}
+ .settings-mobile .settings-action-group>.ui-button{min-height:44px}
+ .settings-mobile .integration-preview-row{gap:8px;padding:13px 0}
+ .settings-mobile .integration-preview-row .provider-label{min-width:0}
+ .settings-mobile .integration-preview-row .provider-label>span{overflow-wrap:anywhere}
+ .settings-mobile .appearance-choices button{min-height:90px}
+ [data-theme=dark] .settings-mobile .settings-nav-group button .settings-tone-notifications{background:#513728;color:#ffd0aa}
+ [data-theme=dark] .settings-mobile .settings-nav-group button .settings-tone-appearance{background:#443a55;color:#ddd0f3}
+ [data-theme=dark] .settings-mobile .settings-nav-group button .settings-tone-integrations{background:#344455;color:#c3d8f1}
+ [data-theme=dark] .settings-mobile .settings-nav-group button .settings-tone-profile{background:#344638;color:#c6e2c9}
+}
+@keyframes settings-detail-in{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
+@media(prefers-reduced-motion:reduce){.settings-mobile-detail{animation:none!important}}
+[data-motion=reduced] .settings-mobile-detail{animation:none!important}

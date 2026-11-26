@@ -40,3 +40,6 @@ Use shared Field, SearchField, TextareaField and SelectField (select-only combob
 
 ## Mobile ergonomics (V4.18)
 Prefer 44px touch targets for primary controls; compact widget header exceptions may be narrower to preserve content. Keep bottom navigation available with safe-area inset and reserve page space; reset scroll when navigating between pages. Mobile dialogs use bottom-sheet presentation with native focus semantics and content scrolling when needed. Text inputs use at least 16px on mobile to avoid Safari focus zoom; selects keep custom options. The mobile layout editor uses explicit move buttons, no decorative drag grip, and a single save action. Weekly calendar displays per-day event counts even when event cards are hidden. Test narrow widths and reduced motion; actual iPhone Safari/installed PWA remains a separate release gate.
+
+## V4.19 — Mobile settings navigation
+Mobile enters a grouped index with full-width disclosure rows, current-value summaries, icon tiles and explicit return from individual sections. Keep desktop rail intact. The index contains no hidden form controls; section changes start at top and restore focus to the previous row on return. All existing preferences remain shared; direct notification preferences shortcut opens the detail. Theme-aware styling, reduced motion, 44px minimum primary targets.
