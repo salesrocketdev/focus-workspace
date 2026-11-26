@@ -16,3 +16,7 @@
 
 ## State checklist per screen
 Loading/initial, ready, empty, recoverable error, offline where meaningful, permission denied, narrow viewport and keyboard-only. Destructive actions require confirmation when irreversible; widget removal is not destructive. Dialogs return focus to opener. Timer status is announced at transitions rather than every second. Default dashboard follows V4: timer and agenda top, tasks/reading/goal next, music/summary below. Unavailable phase widgets are not fake live data; use an explicit demo or omit. 
+
+
+## Calendar prototype — V4.10
+The Agenda route uses the common PageHeader and a warm calendar surface with day/week/month controls, previous/next period and Today (demo) reset. Fixed 29 January 2025 fixtures intentionally match the V4 dashboard; no live date, accounts or API calls. Day is an ordered event list, week is a seven-day overview with selected-day detail (mobile uses day strip + detail), month is a six-week grid with selectable days and compact markers. Provider filters affect displayed events only; suggested free windows use all fixture calendars to avoid false availability. Event details use the shared native Dialog; no fake join buttons, write permissions or automatic focus starts. Calendar date arithmetic uses UTC civil-day operations solely for the deterministic fixture, not the final timezone model.

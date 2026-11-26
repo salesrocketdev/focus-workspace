@@ -62,15 +62,19 @@ export function GridGhost({preview}:{preview:Preview}){
 // Animation is on a nested visual wrapper so grid geometry remains measurable.
 export function useGridMotion(gridRef:RefObject<HTMLDivElement>,enabled:boolean){
  const before=useRef<Map<string,DOMRect>>(new Map());
+ const previousGrid=useRef<{element:HTMLDivElement|null;width:number}>({element:null,width:0});
  const animations=useRef<Map<string,Animation>>(new Map());
  useLayoutEffect(()=>{
   const nodes=Array.from(gridRef.current?.querySelectorAll<HTMLElement>(':scope > .widget[data-widget]')??[]);
   const next=new Map<string,DOMRect>();
+  const element=gridRef.current,width=element?.clientWidth??0;
+  const sameGrid=previousGrid.current.element===element&&previousGrid.current.width===width;
+  previousGrid.current={element,width};
   const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   for(const node of nodes){
    const id=node.dataset.widget!,rect=node.getBoundingClientRect(),old=before.current.get(id);
    next.set(id,rect);
-   if(!enabled||reduce||!old)continue;
+   if(!enabled||reduce||!old||!sameGrid)continue;
    const dx=old.x-rect.x,dy=old.y-rect.y;
    if(Math.abs(dx)<1&&Math.abs(dy)<1)continue;
    const card=node.querySelector<HTMLElement>(':scope > .card');

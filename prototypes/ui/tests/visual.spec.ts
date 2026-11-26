@@ -71,7 +71,7 @@ test('editor controls share dimensions and previews are inert',async({page},info
  await page.goto('/');
  await page.getByRole('button',{name:'Editar painel',exact:true}).click();
  const mobile=info.project.name==='mobile';
- const controls=await page.locator('.editing .edit-icon-button:visible').evaluateAll(nodes=>nodes.map(n=>{const r=n.getBoundingClientRect();return [r.width,r.height]}));
+ const controls=await page.locator('.editing .edit-icon-button:visible').evaluateAll(nodes=>nodes.map(n=>{const el=n as HTMLElement;return [el.offsetWidth,el.offsetHeight]}));
  expect(controls.length).toBeGreaterThan(0);
  for(const [w,h] of controls){expect(w).toBe(mobile?32:28);expect(h).toBe(w)}
  const heights=await page.locator('.edit-header .edit-text-button').evaluateAll(nodes=>nodes.map(n=>n.getBoundingClientRect().height));
@@ -280,6 +280,7 @@ test('desktop opt-in push previews and commits neighbors, compact closes vertica
  await page.getByRole('button',{name:'Restaurar layout',exact:true}).click();
  await page.getByRole('button',{name:'Remover Foco (Pomodoro)',exact:true}).click();
  const before=await p('tasks');
+ expect(before.y).toBeGreaterThan(0);
  await page.getByRole('button',{name:'Compactar espaços',exact:true}).click();
  const after=await p('tasks');
  expect(after.y).toBeLessThan(before.y);
