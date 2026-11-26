@@ -127,3 +127,8 @@
  .catalogue .mobile-only{display:inline-flex}
 }
 @media(min-width:760px){.catalogue .mobile-only{display:none}}
+
+/* Preserve legible card labels without resizing adjacent controls. */
+.editing .card-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.25}
+@container(max-width:260px){.editing .card-title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;overflow-wrap:anywhere}.editing .widget .card-head>span{white-space:normal}}
+.mobile-size-options.edit-size-options button>span:not(.size-shape){border:0;border-radius:0}
