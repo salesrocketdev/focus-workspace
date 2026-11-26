@@ -2,10 +2,10 @@ import { test, expect } from '@playwright/test';
 test('capture V4 screen candidates and validate basic flows',async({page},info)=>{
  await page.goto('/');
  await expect(page.getByRole('heading',{name:'Meu dia'})).toBeVisible();
- await page.screenshot({path:info.outputPath('dashboard.png'),fullPage:true,animations:'disabled'});
+ await page.screenshot({path:info.outputPath('dashboard.png'),fullPage:false,animations:'disabled',scale:'css'});
  await page.getByRole('button',{name:'Editar painel',exact:true}).click();
  await expect(page.getByRole('heading',{name:'Editar painel'})).toBeVisible();
- await page.screenshot({path:info.outputPath('editor.png'),fullPage:true,animations:'disabled'});
+ await page.screenshot({path:info.outputPath('editor.png'),fullPage:false,animations:'disabled',scale:'css'});
  await page.getByRole('button',{name:'Remover Tarefas',exact:true}).click();
  await expect(page.locator('[data-widget=tasks]')).toHaveCount(0);
  await page.getByRole('button',{name:'Cancelar',exact:true}).click();
@@ -17,7 +17,7 @@ test('capture V4 screen candidates and validate basic flows',async({page},info)=
  await expect(page.locator('[data-widget=tasks]')).toHaveCount(0);
  await page.getByRole('button',{name:'Continuar leitura',exact:true}).click();
  await expect(page.getByRole('button',{name:'Atualizar progresso'})).toBeVisible();
- await page.screenshot({path:info.outputPath('focus.png'),fullPage:true,animations:'disabled'});
+ await page.screenshot({path:info.outputPath('focus.png'),fullPage:false,animations:'disabled',scale:'css'});
  await page.getByRole('button',{name:'Atualizar progresso'}).click();
  await page.getByRole('spinbutton').fill('90');
  await page.getByRole('button',{name:'Salvar',exact:true}).click();
@@ -51,6 +51,17 @@ test('dashboard fits supported widths without page-level horizontal scrolling',a
    await page.goto('/');
    await expect(page.getByRole('heading',{name:'Meu dia'})).toBeVisible();
    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy();
-   await page.screenshot({path:info.outputPath('dashboard-'+width+'.png'),animations:'disabled'});
+   await page.screenshot({path:info.outputPath('dashboard-'+width+'.png'),animations:'disabled',scale:'css'});
  }
+});
+
+test('timer starts on dashboard and stays active when opening focus', async({page})=>{
+ await page.goto('/');
+ await page.getByRole('button',{name:'Iniciar foco',exact:true}).click();
+ await expect(page.getByRole('button',{name:'Pausar foco',exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Abrir sessão de foco',exact:true}).click();
+ await expect(page.getByRole('button',{name:'Pausar',exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Pausar',exact:true}).click();
+ await page.getByRole('button',{name:'Voltar',exact:true}).click();
+ await expect(page.getByRole('button',{name:'Iniciar foco',exact:true})).toBeVisible();
 });

@@ -66,3 +66,88 @@
  .immersive .main{padding-bottom:55px}
  .landscape{height:70px;opacity:.55}
 }
+
+/* Iteration 3: measured visual hierarchy of the approved V4 reference. */
+.card-icon-action{padding:3px;min-width:24px;min-height:24px;border-radius:6px}.card-icon-action:hover{background:var(--soft);color:var(--action)}
+.timer-start span{display:inline}
+@media(min-width:1151px){
+ .app{grid-template-columns:clamp(220px,17.2vw,285px) minmax(0,1fr)}
+ .main{padding:26px 22px 20px}
+ .widget-grid{grid-template-columns:repeat(12,minmax(0,1fr));gap:13px}
+ .widget.small{grid-column:span 2}.widget.medium{grid-column:span 4}.widget.large{grid-column:span 6}
+ .widget[data-widget=reading].medium{grid-column:span 5}
+ .widget[data-widget=goal].medium{grid-column:span 3}
+ .widget[data-widget=music].large{grid-column:span 8}
+ .widget[data-widget=focus],.widget[data-widget=agenda]{min-height:258px}
+ .widget[data-widget=tasks],.widget[data-widget=reading],.widget[data-widget=goal]{min-height:218px}
+ .widget[data-widget=music],.widget[data-widget=summary]{min-height:115px}
+ .widget[data-widget=goal] .gauge{max-width:195px}
+ .widget[data-widget=goal] .goal-body footer{padding-top:10px;border-top:1px solid #eae2db}
+ .widget[data-widget=reading] .book{width:clamp(65px,30cqw,112px)}
+ .widget[data-widget=reading] .book-info{gap:10px}
+ .workspace.editing{grid-template-columns:minmax(0,1fr) minmax(220px,25%);gap:12px}
+ .editing .widget-grid{gap:11px;padding:12px;align-content:start}
+ .editing .widget[data-widget=focus],.editing .widget[data-widget=agenda]{min-height:225px}
+ .editing .widget[data-widget=tasks],.editing .widget[data-widget=reading],.editing .widget[data-widget=goal]{min-height:194px}
+ .editing .widget[data-widget=music].large{grid-column:span 6}
+ .editing .widget[data-widget=summary].medium{grid-column:span 4}
+ .editing .add-slot{grid-column:span 2;min-height:105px;align-self:stretch;padding:6px;font-size:11px}
+ .editing .add-slot svg{width:20px}
+ .editing .catalogue{gap:6px;padding:12px}
+ .editing .catalogue-item{padding:8px}
+ .editing .widget .card{padding:11px}
+ .editing .widget[data-widget=focus] .focus-widget{flex-direction:row;gap:9px}
+ .editing .widget[data-widget=focus] .timer-ring{width:min(43%,136px)}
+ .editing .widget[data-widget=focus] .focus-controls{gap:7px}
+ .editing .widget[data-widget=focus] .focus-start{flex-wrap:wrap}
+ .editing .widget[data-widget=reading] .book{width:clamp(45px,25cqw,84px)}
+ .editing .widget[data-widget=reading] .reading-body{gap:7px}
+ .editing .widget[data-widget=goal] .gauge strong{font-size:17px}
+}
+@media(min-width:760px){
+ .focus-side .music-info .player-controls{justify-content:center;gap:15px}
+ .focus-side .music-body{align-items:center}
+ .focus-side .volume input{appearance:none;height:5px;border-radius:8px;background:#e6ddd4}
+ .focus-side .volume input::-webkit-slider-thumb{appearance:none;width:12px;height:12px;background:var(--accent);border-radius:50%}
+ .focus-side .volume input::-moz-range-thumb{width:12px;height:12px;background:var(--accent);border:0;border-radius:50%}
+}
+@media(max-width:759px){
+ .mobile-brand-edit{display:none}
+ .edit-page-head{margin-bottom:10px}
+ .edit-page-head h1{text-align:center}
+ .edit-page-head p{text-align:center;line-height:1.35}
+ .edit-page-head .head-actions{justify-content:center;gap:5px}
+ .mobile-layout h3{font-size:13px}
+ .mobile-widget-row{min-height:43px;background:#fffcf9;box-shadow:0 1px 3px #52391d07}
+ .mobile-size-options button{height:67px}
+ .widget[data-widget=focus]:not(.small) .focus-widget{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;padding:4px 14px}
+ .widget[data-widget=focus]:not(.small) .timer-ring{width:118px;justify-self:center}
+ .widget[data-widget=focus]:not(.small) .focus-controls{display:contents}
+ .widget[data-widget=focus]:not(.small) .focus-controls>.activity-tag,.widget[data-widget=focus]:not(.small) .focus-controls>.segment,.widget[data-widget=focus]:not(.small) .focus-controls>small,.widget[data-widget=focus]:not(.small) .focus-start>.icon-btn{display:none}
+ .widget[data-widget=focus]:not(.small) .timer-start{width:44px;height:44px;border-radius:50%;padding:0}
+ .widget[data-widget=focus]:not(.small) .timer-start span{display:none}
+ .widget[data-widget=agenda] .event{gap:7px;padding-top:5px;padding-bottom:5px}
+ .widget[data-widget=agenda] .event .provider{display:none}
+ .widget[data-widget=agenda] .agenda-list{gap:6px}
+ .widget[data-widget=reading] .reading-body{gap:11px}
+ .widget[data-widget=reading] .book{width:72px}
+ .widget[data-widget=reading] .book-info{gap:6px}
+ .widget[data-widget=reading] .book-info .soft-button{align-self:start;justify-self:start}
+ .focus-top .focus-breadcrumb{font-size:15px;font-weight:650;gap:0}
+ .focus-top .focus-breadcrumb>svg,.desktop-focus-title{display:none}
+ .focus-top{justify-content:space-between}
+ .focus-top .focus-breadcrumb{margin:0}
+ .immersive .main{padding-bottom:95px}
+ .immersive .bottom-nav{display:flex}
+ .immersive .landscape{display:none}
+ .focus-center .ring-large{width:min(66vw,255px)}
+ .focus-center .ring-large .ring-copy strong{font-size:44px}
+ .focus-center .segment{width:100%;max-width:300px}
+ .focus-center .transport{gap:23px}
+ .focus-side .card-head{display:none}
+ .focus-side .card{padding:10px}
+ .focus-side .card .album{width:48px;height:48px}
+ .focus-side .player-controls button[aria-label="Anterior"],.focus-side .player-controls button[aria-label="Próxima música"],.focus-side .player-controls button[aria-label="Favoritar"]{display:none}
+ .focus-side .card:first-child{display:none}
+ .focus-side .music-body .music-info{column-gap:8px}
+}
