@@ -197,7 +197,8 @@ test('local Inter font and settings field render consistently',async({page},info
  await expect(select).toBeVisible();
  const size=await select.boundingBox();
  expect(size?.height).toBe(info.project.name==='mobile'?44:42);
- await select.selectOption('3000');
+ await select.click();
+ await page.getByRole('option',{name:'50 minutos',exact:true}).click();
  await nav.getByRole('button',{name:'Hoje',exact:true}).click();
  await expect(page.getByRole('img',{name:'50:00 · Leitura'})).toBeVisible();
 });
@@ -268,7 +269,7 @@ test('desktop opt-in push previews and commits neighbors, compact closes vertica
  const grip=page.getByRole('button',{name:'Arrastar Foco (Pomodoro)',exact:true});
  await grip.focus();await page.keyboard.press('ArrowRight');
  expect((await p('focus')).x).toBe(0);
- await page.getByLabel('Deslocar vizinhos').check();
+ await page.getByRole('switch',{name:'Deslocar vizinhos'}).click();
  const box=(await grip.boundingBox())!;
  const step=await grid.evaluate(el=>(el.clientWidth-parseFloat(getComputedStyle(el).paddingLeft)-parseFloat(getComputedStyle(el).paddingRight)+parseFloat(getComputedStyle(el).columnGap))/12);
  await page.mouse.move(box.x+box.width/2,box.y+box.height/2);

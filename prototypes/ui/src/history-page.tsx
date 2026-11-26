@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Timer,Target,CheckCircle2,Flame,ChartNoAxesColumn,History,ChevronRight,CalendarDays,Filter,Clock } from 'lucide-react';
-import { Button,Dialog } from './ui';
+import { Button,Dialog,SelectField } from './ui';
 import { dateLabel,DEMO_DAY } from './calendar-model';
 import { categoryTotals,dailyTotals,durationLabel,filterPeriod,newest,streak,totalSeconds,type FocusRecord } from './history-model';
 const colors:Record<string,string>={work:'#8ba9d1',study:'#b2a0d1',reading:'#79b384',personal:'#e7a16e'};
@@ -24,7 +24,7 @@ export function HistoryPage({records,goal}:{records:FocusRecord[];goal:number}){
  function resetLimit(){setLimit(8)}
  return <div className="history-page">
   <div className="history-toolbar"><div className="history-ranges" role="group" aria-label="Período do histórico">{ranges.map(r=><button key={r.value} aria-pressed={range===r.value} onClick={()=>{setRange(r.value);resetLimit()}}>{r.label}</button>)}</div><small><CalendarDays size={15}/> Até {dateLabel(DEMO_DAY,{day:'numeric',month:'long',year:'numeric'})} · demonstração</small></div>
-  <div className="history-filters"><span><Filter size={15}/> Filtros</span><label>Categoria<select aria-label="Categoria do histórico" value={category} onChange={e=>{setCategory(e.target.value);resetLimit()}}><option value="all">Todas</option>{allCategories.map(c=><option key={c.id} value={c.id}>{c.label}</option>)}</select></label><label>Método<select aria-label="Método do histórico" value={mode} onChange={e=>{setMode(e.target.value);resetLimit()}}><option value="all">Todos</option><option>Pomodoro</option><option>Livre</option></select></label><label>Status<select aria-label="Status do histórico" value={status} onChange={e=>{setStatus(e.target.value);resetLimit()}}><option value="all">Todos</option><option value="completed">Concluídas</option><option value="interrupted">Interrompidas</option></select></label></div>
+  <div className="history-filters"><span><Filter size={15}/> Filtros</span><SelectField label="Categoria do histórico" compact value={category} onValueChange={v=>{setCategory(v);resetLimit()}} options={[{value:'all',label:'Todas'},...allCategories.map(c=>({value:c.id,label:c.label}))]}/><SelectField label="Método do histórico" compact value={mode} onValueChange={v=>{setMode(v);resetLimit()}} options={[{value:'all',label:'Todos'},{value:'Pomodoro',label:'Pomodoro'},{value:'Livre',label:'Livre'}]}/><SelectField label="Status do histórico" compact value={status} onValueChange={v=>{setStatus(v);resetLimit()}} options={[{value:'all',label:'Todos'},{value:'completed',label:'Concluídas'},{value:'interrupted',label:'Interrompidas'}]}/></div>
   <div className="history-stats">
    {[{label:'Tempo de foco',value:durationLabel(total),Icon:Timer,tone:'orange'},{label:'Sessões registradas',value:String(items.length),Icon:CheckCircle2,tone:'green'},{label:'Média por dia',value:durationLabel(Math.floor(total/range)),Icon:ChartNoAxesColumn,tone:'lavender'},{label:'Sequência atual',value:streak(records)+' dias',Icon:Flame,tone:'orange'}].map(s=><article className="history-stat" key={s.label}><span className={'activity-stat-icon tone-'+s.tone}><s.Icon size={20}/></span><div><small>{s.label}</small><strong>{s.value}</strong></div></article>)}
   </div>

@@ -13,5 +13,6 @@ import './activities.css';
 import './preferences.css';
 import './history.css';
 import './appearance.css';
+import './form-controls.css';
 
 createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>);

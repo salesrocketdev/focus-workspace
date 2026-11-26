@@ -6,18 +6,21 @@ test('onboarding, simulated OAuth and focus preferences persist locally',async({
  await dialog.getByRole('button',{name:/Entrar com Google/}).click();
  await dialog.getByRole('button',{name:'Continuar',exact:true}).click();
  await dialog.getByRole('button',{name:/Trabalho e reuniões/}).click();
- await dialog.getByLabel('Aplicar painel sugerido').uncheck();
+ await dialog.getByRole('switch',{name:'Aplicar painel sugerido'}).click();
  await dialog.getByRole('button',{name:'Continuar',exact:true}).click();
- await dialog.getByLabel('Duração do Pomodoro').selectOption('60');
- await dialog.getByLabel('Pausa curta').selectOption('180');
- await dialog.getByLabel('Ciclos até a pausa longa').selectOption('2');
+ await dialog.getByRole('combobox',{name:'Duração do Pomodoro'}).click();
+ await page.getByRole('option',{name:'1 minutos',exact:true}).click();
+ await dialog.getByRole('combobox',{name:'Pausa curta'}).click();
+ await page.getByRole('option',{name:'3 minutos',exact:true}).click();
+ await dialog.getByRole('combobox',{name:'Ciclos até a pausa longa'}).click();
+ await page.getByRole('option',{name:'2 ciclos',exact:true}).click();
  await dialog.getByRole('button',{name:'Continuar',exact:true}).click();
  await page.screenshot({path:info.outputPath('onboarding-ready.png'),animations:'disabled',scale:'css'});
  await dialog.getByRole('button',{name:'Começar',exact:true}).click();
  await expect(dialog).toHaveCount(0);
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
  await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
- await expect(page.getByLabel('Duração do Pomodoro')).toHaveValue('60');
+ await expect(page.getByRole('combobox',{name:'Duração do Pomodoro'})).toHaveText('1 minutos');
  for(const provider of ['Google Agenda','Microsoft Outlook','Spotify','Gmail','Google Meet','Microsoft Teams']){
   await page.getByRole('button',{name:'Conectar '+provider,exact:true}).click();
   await expect(dialog).toContainText('Simulação OAuth');
@@ -30,7 +33,7 @@ test('onboarding, simulated OAuth and focus preferences persist locally',async({
  await page.reload();
  await expect(dialog).toHaveCount(0);
  await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
- await expect(page.getByLabel('Duração do Pomodoro')).toHaveValue('60');
+ await expect(page.getByRole('combobox',{name:'Duração do Pomodoro'})).toHaveText('1 minutos');
  await page.getByRole('button',{name:'Gerenciar Spotify',exact:true}).click();
  await dialog.getByRole('button',{name:'Desconectar',exact:true}).click();
  await expect(page.getByRole('button',{name:'Conectar Spotify',exact:true})).toBeVisible();

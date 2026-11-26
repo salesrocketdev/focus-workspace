@@ -16,7 +16,8 @@ test('activities share tasks, categories, books and timer context with dashboard
  await hub.getByRole('button',{name:'Tarefas',exact:true}).click();
  await hub.getByRole('button',{name:'Nova tarefa',exact:true}).click();
  await page.getByLabel('Título da tarefa').fill('Praticar conversação');
- await page.getByLabel('Categoria',{exact:true}).selectOption({label:'Inglês'});
+ await page.getByRole('combobox',{name:'Categoria',exact:true}).click();
+ await page.getByRole('option',{name:'Inglês',exact:true}).click();
  await page.getByRole('button',{name:'Salvar',exact:true}).click();
  const task=hub.locator('.activity-task-row').filter({hasText:'Praticar conversação'});
  await expect(task).toBeVisible();
