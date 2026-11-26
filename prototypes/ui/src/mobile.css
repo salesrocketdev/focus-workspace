@@ -206,3 +206,33 @@
 }
 @media(prefers-reduced-motion:reduce){.activity-topbar>.activity-tabs>button::after{transition:none}}
 [data-motion=reduced] .activity-topbar>.activity-tabs>button::after{transition:none}
+
+/* Book catalogue and reading plan: shared mobile sheets and desktop dialogs. */
+.book-manual-action{display:flex;justify-content:flex-end}
+.book-import{display:grid;gap:14px;min-width:0}
+.book-search-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end}
+.book-search-form>.ui-button{min-height:44px}
+.book-import-results{display:grid;gap:8px}
+.book-import-result,.book-import-edition{display:flex;align-items:center;gap:12px;text-align:left;padding:10px;border:1px solid var(--ui-line);border-radius:10px;background:var(--ui-surface);min-width:0}
+.book-import-result{width:100%;justify-content:flex-start}
+.book-import-result:hover:not(:disabled){background:var(--field-selected)}
+.book-import-result>.cover.book,.book-import-edition>.cover.book{width:55px;height:80px;flex:0 0 55px}
+.book-import-result>.cover.book b,.book-import-edition>.cover.book b{font-size:8px}
+.book-import-result>span,.book-import-edition>div:last-child{display:grid;gap:5px;flex:1;min-width:0}
+.book-import-result>span>b,.book-import-edition>div:last-child>b{font-size:14px;overflow-wrap:anywhere}
+.book-import-result small,.book-import-edition small{font-size:11px;line-height:1.4;overflow-wrap:anywhere}
+.book-import-result>svg{color:var(--ui-muted)}
+.book-import-added{display:flex;align-items:center;gap:5px;color:var(--field-selected-ink)}
+.book-import-back{min-height:44px;justify-self:start;color:var(--field-selected-ink);font-size:13px}
+.book-import-index,.book-chapters{display:grid;gap:10px;border:1px solid var(--ui-line);border-radius:10px;padding:12px;min-width:0}
+.book-import-index label,.book-chapters label{display:flex;align-items:center;gap:9px;font-size:13px;min-height:44px}
+.book-import-index input,.book-chapters input[type=checkbox]{width:18px;height:18px;flex:0 0 18px;accent-color:var(--action)}
+.book-import-index ol{margin:0;padding-left:24px;color:var(--ui-muted);font-size:12px;line-height:1.7}
+.book-chapters h3{font-size:14px}
+.book-chapters header{display:grid;gap:4px}
+.book-chapters label+label{border-top:1px solid var(--ui-line)}
+.book-chapters label span{overflow-wrap:anywhere}
+.book-chapters .chapter-done span{text-decoration:line-through;color:var(--ui-muted)}
+.book-chapter-form{display:grid;gap:8px}
+.book-chapter-form>.ui-button{justify-self:start}
+@media(max-width:759px){.book-search-form{grid-template-columns:1fr}.book-search-form>.ui-button{width:100%}.book-import-result{min-height:100px}.book-manual-action{justify-content:flex-start}.book-import .dialog-actions .ui-button{min-height:44px}}

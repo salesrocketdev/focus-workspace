@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { BookOpen, BriefcaseBusiness, GraduationCap, Layers, CheckCircle2, ListTodo, Search, Plus, Play, Pencil, Folder, Clock } from 'lucide-react';
 import { Cover,Progress } from './components';
+import { BookImport,BookDetails } from './book-import';
 import { Button,Dialog,Field,SelectField,SearchField } from './ui';
 import { nextTaskId,progressOf,readingContext,type Book,type Category,type Task,type FocusContext } from './activity-model';
 
@@ -18,6 +19,9 @@ export function ActivitiesPage({categories,tasks,books,onCategories,onTasks,onBo
  const [status,setStatus]=useState<'all'|'pending'|'done'>('all');
  const [search,setSearch]=useState('');
  const [form,setForm]=useState<FormKind|null>(null);
+ const [showImport,setShowImport]=useState(false);
+ const [detailsId,setDetailsId]=useState<string|null>(null);
+ const detailsBook=books.find(b=>b.id===detailsId);
  const [editing,setEditing]=useState<number|null>(null);
  const [name,setName]=useState('');
  const [category,setCategory]=useState('work');
@@ -52,8 +56,8 @@ export function ActivitiesPage({categories,tasks,books,onCategories,onTasks,onBo
   <div className="activity-task-filters"><div className="activity-tabs small-tabs" role="group" aria-label="Status das tarefas">{([{id:'all',label:'Todas'},{id:'pending',label:'Pendentes'},{id:'done',label:'Concluídas'}] as const).map(s=><button key={s.id} aria-pressed={status===s.id} onClick={()=>setStatus(s.id)}>{s.label}</button>)}</div><SelectField label="Filtrar por categoria" hideLabel compact value={filter} onValueChange={setFilter} options={[{value:'all',label:'Todas as categorias'},...categories.map(c=>({value:c.id,label:c.name}))]}/></div>
   <div className="activity-task-list">{visibleTasks.length?visibleTasks.map(t=>{const c=categories.find(x=>x.id===t.categoryId)!;return <div className={'activity-task-row '+(t.done?'task-completed':'')} key={t.id}><label><input type="checkbox" checked={t.done} onChange={()=>onTasks(tasks.map(x=>x.id===t.id?{...x,done:!x.done}:x))}/><span className="activity-task-title">{t.title}</span></label><span className={'category-pill tone-'+c.tone}>{c.name}</span><div className="activity-row-actions"><button className="ui-icon-button" aria-label={'Editar '+t.title} onClick={()=>open('task',t)}><Pencil size={15}/></button><button className="ui-icon-button task-play" aria-label={'Focar em '+t.title} disabled={t.done} onClick={()=>focusTask(t)}><Play size={15} fill="currentColor"/></button></div></div>}):<div className="activity-empty"><CheckCircle2 size={28} strokeWidth={1.5}/><b>Nenhuma tarefa encontrada</b><small>Altere os filtros ou crie uma nova tarefa.</small></div>}</div>
  </section>}
- function renderBooks(){return <section className="activity-surface"><header className="activity-section-head"><div><h2><BookOpen size={18}/> Biblioteca de leitura</h2><small>{books.length} livros na biblioteca</small></div><Button variant="secondary" size="sm" onClick={()=>open('book')}><Plus size={15}/> Adicionar livro</Button></header>
-  <div className="activity-library">{visibleBooks.length?visibleBooks.map(b=><article className="activity-book" key={b.id}><Cover title={b.title}/><div className="activity-book-copy"><b>{b.title}</b><small>{b.author}</small><Progress value={progressOf(b)}/><small>Pág. {b.page} de {b.pages} · {progressOf(b)}%</small><Button variant="soft" size="sm" onClick={()=>onReading(b)}><Play size={13}/> {b.page>0?'Continuar leitura':'Iniciar leitura'}</Button></div></article>):<div className="activity-empty"><BookOpen size={28}/><b>Nenhuma leitura encontrada</b></div>}</div>
+ function renderBooks(){return <section className="activity-surface"><header className="activity-section-head"><div><h2><BookOpen size={18}/> Biblioteca de leitura</h2><small>{books.length} livros na biblioteca</small></div><Button variant="secondary" size="sm" onClick={()=>setShowImport(true)}><Search size={15}/> Buscar livro</Button></header><div className="book-manual-action"><Button variant="secondary" size="sm" onClick={()=>open('book')}><Plus size={15}/> Adicionar livro</Button></div>
+  <div className="activity-library">{visibleBooks.length?visibleBooks.map(b=><article className="activity-book" key={b.id}><Cover title={b.title} coverStyle={b.metadata?.coverStyle}/><div className="activity-book-copy"><b>{b.title}</b><small>{b.author}</small>{b.metadata&&<small>{b.metadata.language} · {b.metadata.year} · demo</small>}<Progress value={progressOf(b)}/><small>Pág. {b.page} de {b.pages} · {progressOf(b)}%</small><Button variant="soft" size="sm" onClick={()=>onReading(b)}><Play size={13}/> {b.page>0?'Continuar leitura':'Iniciar leitura'}</Button><Button variant="secondary" size="sm" aria-label={'Detalhes de '+b.title} onClick={()=>setDetailsId(b.id)}>Detalhes e capítulos</Button></div></article>):<div className="activity-empty"><BookOpen size={28}/><b>Nenhuma leitura encontrada</b></div>}</div>
  </section>}
  return <div className="activities-page">
   <div className="activity-topbar"><div className="activity-tabs" role="group" aria-label="Seções de atividades">{tabs.map(t=><button key={t.id} aria-pressed={tab===t.id} onClick={()=>{setTab(t.id);setSearch('')}}>{t.label}</button>)}</div><SearchField className="activity-search-control" label="Buscar atividades" placeholder="Buscar atividades..." value={search} onValueChange={setSearch}/></div>
@@ -62,6 +66,8 @@ export function ActivitiesPage({categories,tasks,books,onCategories,onTasks,onBo
   {(tab==='overview'||tab==='tasks')&&renderTasks()}
   {(tab==='overview'||tab==='books')&&renderBooks()}
   <small className="activity-demo"><Clock size={13}/> Dados de demonstração · alterações mantidas nesta sessão do aplicativo.</small>
+  {showImport&&<BookImport books={books} onImport={book=>{onBooks([...books,book]);setSearch('');setShowImport(false)}} onManual={()=>{setShowImport(false);open('book')}} onDismiss={()=>setShowImport(false)}/>}
+  {detailsBook&&<BookDetails book={detailsBook} onChange={book=>onBooks(books.map(b=>b.id===book.id?book:b))} onDismiss={()=>setDetailsId(null)}/>}
   {form&&<Dialog title={form==='category'?'Nova categoria':form==='book'?'Adicionar livro':editing!==null?'Editar tarefa':'Nova tarefa'} description="Organize o que você quer realizar." onDismiss={()=>setForm(null)}><form className="dialog-form" onSubmit={e=>{e.preventDefault();save()}}>
   <Field label={form==='book'?'Título do livro':form==='category'?'Nome da categoria':'Título da tarefa'} value={name} onChange={e=>setName(e.target.value)} required maxLength={80}/>
   {form==='task'&&<SelectField label="Categoria" value={category} onValueChange={setCategory} options={categories.map(c=>({value:c.id,label:c.name}))}/>}

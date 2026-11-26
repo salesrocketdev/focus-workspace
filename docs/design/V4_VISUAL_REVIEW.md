@@ -71,3 +71,7 @@ V4.21 hotfix: CI 45900036075 and Pages 45900027946 failed at TypeScript compilat
 
 ## V4.22 — minimal mobile activity tabs
 V4.21 hotfix Pages succeeded; CI 63 passed / 3 failed due to stale integration summary and mobile autofocus expectations. Update those assertions to verify the actual new UI and deliberate input focus. Replace mobile activity section segmented boxes with transparent text tabs and a thin animated active underline; preserve 44px touch targets, accessible pressed state, dark theme and reduced motion. Desktop and task-status filters unchanged. New mobile geometry regression and screenshot; CI pending.
+
+
+## Book catalogue prototype — #35
+V4.22 CI and Pages passed. Added local fictional edition search and review, editable metadata, duplicate detection, missing page/contents states, book details with independent chapter checklist and manual chapter addition. No external calls or durable storage; existing manual entry remains. See docs/features/BOOK_METADATA.md. New tests and deploy pending.

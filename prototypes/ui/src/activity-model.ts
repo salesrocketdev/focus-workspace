@@ -2,7 +2,10 @@ import { tasksInitial } from './model';
 
 export interface Category { id:string; name:string; tone:'blue'|'lavender'|'green'|'orange' }
 export interface Task { id:number; title:string; done:boolean; categoryId:string }
-export interface Book { id:string; title:string; author:string; pages:number; page:number }
+export interface BookChapter {id:string;title:string;done:boolean}
+export type BookCoverStyle='indigo'|'forest'|'sand';
+export interface BookMetadata {source:'mock';editionId:string;isbn:string;publisher:string;year:number;language:string;coverStyle?:BookCoverStyle}
+export interface Book { id:string; title:string; author:string; pages:number; page:number; metadata?:BookMetadata;chapters?:BookChapter[] }
 export type FocusContext =
  | {kind:'reading';id:string;title:string;label:'Leitura'}
  | {kind:'task'|'activity';id:string;title:string;label:string;categoryId:string};

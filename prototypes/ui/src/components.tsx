@@ -15,13 +15,13 @@ export function Ring({seconds=1500,total=1500,label='Leitura',large=false,cycleL
 }
 export function Segment({value,onChange}:{value:'Pomodoro'|'Livre';onChange:(v:'Pomodoro'|'Livre')=>void}){return <div className="segment" aria-label="Método de foco">{(['Pomodoro','Livre'] as const).map(v=><button key={v} aria-pressed={value===v} className={value===v?'selected':''} onClick={()=>onChange(v)}>{v}</button>)}</div>}
 export function Card({title,icon:Icon,children,actions,provider}:{title:string;icon:LucideIcon;children:ReactNode;actions?:ReactNode;provider?:ProviderId}){return <section className="card"><header className="card-head"><span>{provider?<ProviderIcon provider={provider} size={16}/>:<Icon size={16} strokeWidth={1.8}/>}<span className="card-title" title={title}>{title}</span></span>{actions??<Ellipsis size={16} aria-hidden="true"/>}</header><div className="card-body">{children}</div></section>}
-export function Cover({album=false,title='Clean Architecture'}:{album?:boolean;title?:string}){
+export function Cover({album=false,title='Clean Architecture',coverStyle}:{album?:boolean;title?:string;coverStyle?:'indigo'|'forest'|'sand'}){
  const id=useId();
- return <div className={'cover '+(album?'album':'book')} aria-hidden="true">
+ return <div className={'cover '+(album?'album':'book')+(coverStyle?' mock-cover-'+coverStyle:'')} aria-hidden="true">
  {!album&&<b className={title==='Clean Architecture'?'':'alternate-cover-title'}>{title==='Clean Architecture'?<>Clean<br/>Architecture</>:title}</b>}
  <svg viewBox={album?'0 0 100 100':'0 0 100 145'} preserveAspectRatio="xMidYMid slice">
  <defs>
-  <linearGradient id={id+'sky'} x1="0%" y1="0%" x2="0%" y2="100%"><stop stopColor={album?'#756784':'#a5c0ae'}/><stop offset=".55" stopColor={album?'#dcb0a1':'#e3d6aa'}/><stop offset="1" stopColor="#f9d3a1"/></linearGradient>
+  <linearGradient id={id+'sky'} x1="0%" y1="0%" x2="0%" y2="100%"><stop stopColor={album?'#756784':coverStyle==='indigo'?'#777baf':coverStyle==='sand'?'#d4a175':'#a5c0ae'}/><stop offset=".55" stopColor={album?'#dcb0a1':coverStyle==='indigo'?'#c3bddc':coverStyle==='sand'?'#e8c79c':'#e3d6aa'}/><stop offset="1" stopColor="#f9d3a1"/></linearGradient>
   <linearGradient id={id+'warm'} x1="0%" y1="0%" x2="0%" y2="100%"><stop stopColor="#f7c783"/><stop offset="1" stopColor="#cb9d77"/></linearGradient>
  </defs>
  <rect width="100" height="145" fill={'url(#'+id+'sky)'}/>
