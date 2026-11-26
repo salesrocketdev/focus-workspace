@@ -35,3 +35,6 @@ Reference-inspired desktop settings secondary navigation (Preferences: focus, no
 
 ## V4.16 — compact focus and quick actions
 A single shared timer can be controlled from a compact dock across routes. Closing the dock does not stop a session; expand returns to immersive focus. On supported secure desktop browsers, a user gesture can request Document Picture-in-Picture and render the same controls in a floating window; the app remains open and unsupported browsers retain the in-app dock. The palette opens with Ctrl/Cmd+K or header search, searches accent-insensitively, supports arrows/Enter/Escape, and disables navigation/timer changes while editing. Native PiP delivery is not guaranteed and needs real desktop testing.
+
+## V4.20 — Focus presets and activity selection
+Shared settings display three optional focus rhythms. Applying a preset replaces focus, short/long break and cycle length only, preserving daily goal and auto-start preferences. Custom settings remain editable. The immersive focus screen exposes a searchable activity picker with pending tasks, books and categories. Context changes do not start the clock and are disabled while a session is active or paused. Selection of a book updates the shared reading context.

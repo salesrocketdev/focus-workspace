@@ -29,3 +29,10 @@ export function suggestedLayout(preset:Preset):Layouts{
  const filter=(mobile:boolean)=>defaultLayout(mobile).filter(w=>preset==='balanced'||(preset==='work'?w.type!=='reading':w.type!=='summary'));
  return {desktop:filter(false),mobile:filter(true)};
 }
+
+export const focusPresets=[
+ {id:'classic',label:'Clássico',description:'Equilíbrio entre foco e descanso.',focus:1500,short:300,long:900,cycles:4},
+ {id:'deep',label:'Foco profundo',description:'Blocos maiores para tarefas complexas.',focus:3000,short:600,long:1200,cycles:3},
+ {id:'quick',label:'Foco rápido',description:'Para começar sem pressão.',focus:900,short:180,long:600,cycles:3},
+] as const;
+export function matchesFocusPreset(p:FocusPreferences,preset:typeof focusPresets[number]){return p.focus===preset.focus&&p.short===preset.short&&p.long===preset.long&&p.cycles===preset.cycles}

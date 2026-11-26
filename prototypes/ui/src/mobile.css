@@ -109,3 +109,36 @@
 @keyframes settings-detail-in{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
 @media(prefers-reduced-motion:reduce){.settings-mobile-detail{animation:none!important}}
 [data-motion=reduced] .settings-mobile-detail{animation:none!important}
+
+/* Focus presets and activity picker are shared by desktop and mobile. */
+.focus-preset-group{display:grid;gap:8px;grid-column:1/-1;min-width:0}
+.focus-preset-group h3{font-size:13px;font-weight:650}
+.focus-preset-group>p{font-size:12px;color:var(--ui-muted)}
+.focus-presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.focus-preset{display:grid;align-content:start;justify-content:stretch;justify-items:start;text-align:left;gap:7px;min-width:0;padding:11px 9px;min-height:105px;border:1px solid var(--field-edge);background:var(--ui-paper);border-radius:11px;color:var(--ui-ink);transition:background-color 160ms,border-color 160ms}
+.focus-preset[aria-pressed=true]{border-color:var(--field-selected-edge);background:var(--field-selected)}
+.focus-preset-title{display:flex;align-items:center;justify-content:space-between;gap:3px;width:100%;font-size:12px;line-height:1.3}
+.focus-preset-title svg{color:var(--field-selected-ink)}
+.focus-preset-time{font-size:22px;line-height:1.2;font-weight:650;letter-spacing:-.04em}
+.focus-preset-time small,.focus-preset-time>span{font-size:10px;letter-spacing:0;font-weight:400;color:var(--ui-muted)}
+.focus-preset-time>span{display:block;margin-top:3px}
+.focus-preset>small{font-size:11px;line-height:1.35}
+.focus-context-picker{display:flex;align-items:center;justify-content:flex-start;gap:10px;min-height:54px;width:min(100%,320px);padding:8px 12px;border:1px solid var(--field-edge);border-radius:11px;background:var(--ui-paper);text-align:left}
+.focus-context-picker>span:first-child{display:grid;place-items:center;width:34px;height:34px;border-radius:8px;background:var(--field-selected);color:var(--field-selected-ink);flex-shrink:0}
+.focus-context-picker>span:nth-child(2){display:grid;gap:3px;flex:1;min-width:0}
+.focus-context-picker b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.focus-context-picker small{font-size:11px}
+.focus-context-picker>svg{color:var(--ui-muted)}
+.focus-picker{display:grid;gap:15px}
+.focus-picker section{display:grid;gap:7px}
+.focus-picker h3{font-size:12px;color:var(--ui-muted)}
+.focus-picker-rows{border:1px solid var(--ui-line);border-radius:11px;overflow:hidden}
+.focus-picker-row{display:flex;align-items:center;text-align:left;justify-content:flex-start;gap:10px;width:100%;min-height:58px;padding:9px 10px;background:var(--ui-paper)}
+.focus-picker-row+.focus-picker-row{border-top:1px solid var(--ui-line)}
+.focus-picker-row[aria-pressed=true],.focus-picker-row:hover{background:var(--field-selected)}
+.focus-picker-icon{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border-radius:8px;background:var(--ui-surface);color:var(--field-selected-ink)}
+.focus-picker-copy{display:grid;gap:4px;flex:1;min-width:0}.focus-picker-copy b{font-size:13px;overflow-wrap:anywhere}.focus-picker-copy small{font-size:11px}
+.focus-picker-row>svg{color:var(--ui-muted)}
+.focus-picker-empty{display:grid;justify-items:center;gap:8px;padding:20px;color:var(--ui-muted);font-size:13px}
+@media(max-width:759px){.focus-presets{grid-template-columns:1fr}.focus-preset{grid-template-columns:minmax(0,1fr) auto;min-height:72px;align-items:center;gap:4px 10px;padding:10px 12px}.focus-preset-title{grid-column:1;grid-row:1;font-size:13px;justify-content:flex-start;gap:6px}.focus-preset>small{grid-column:1;grid-row:2}.focus-preset-time{grid-column:2;grid-row:1/span 2;text-align:right}.focus-context-picker{min-height:58px}.edit-page-head .head-actions.edit-header{grid-template-columns:repeat(3,minmax(0,1fr));min-width:0;width:100%}.edit-page-head .edit-header .edit-text-button{min-width:0;white-space:normal;overflow-wrap:anywhere;line-height:1.2;gap:3px}.mobile-widget-name>svg{flex-shrink:0}.mobile-widget-name small{max-width:40px;overflow:hidden;text-overflow:ellipsis}.mobile-layout,.mobile-widget-row{min-width:0}}
+@media(min-width:760px) and (max-width:950px){.workspace.editing,.workspace.editing .widget-grid,.workspace.editing .catalogue-wrap{min-width:0}.workspace.editing .widget-grid{grid-template-columns:repeat(6,minmax(0,1fr))}.editing .widget .card-head{min-width:0}.editing .widget .card-title{min-width:0}.editing .card-head>span{min-width:0}.editing .edit-card-toolbar{flex-shrink:0}}

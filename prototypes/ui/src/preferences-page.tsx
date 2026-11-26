@@ -3,7 +3,7 @@ import { Timer, Coffee, Target, Link2, ShieldCheck, Check, ArrowRight, ArrowLeft
 import { Button,Dialog,Field,SelectField,ToggleCard } from './ui';
 import googleSignIn from './assets/providers/google-signin.svg';
 import { ProviderIcon,ProviderLabel,type ProviderId } from './provider-icons';
-import { type FocusPreferences,type Profile,type Preset,providerKeys } from './preferences-model';
+import { type FocusPreferences,type Profile,type Preset,providerKeys , focusPresets,matchesFocusPreset } from './preferences-model';
 
 const details:Record<ProviderId,{title:string;account:string;permissions:string[];description:string;planned?:boolean}>={
  'google-calendar':{title:'Google Agenda',account:'agenda.demo@example.com',permissions:['Consultar calendários disponíveis','Consultar horários e títulos dos eventos'],description:'Veja compromissos e intervalos de foco no painel.'},
@@ -33,6 +33,7 @@ export function FocusSettings({prefs,onChange,disabled=false}:{prefs:FocusPrefer
  const opts=(values:number[],current:number)=>[...new Set([...values,current])].sort((a,b)=>a-b);
  const duration=(label:string,key:'focus'|'short'|'long',values:number[],hint?:string)=><SelectField label={label} hint={hint} value={prefs[key]} disabled={disabled} onValueChange={v=>onChange({...prefs,[key]:Number(v)})} options={opts(values,prefs[key]).map(n=>({value:String(n),label:n/60+(n===60?' minuto':' minutos')}))}/>;
  return <div className="focus-settings-fields">
+  <div className="focus-preset-group"><h3>Ritmos de foco</h3><p>Escolha um ponto de partida e ajuste como preferir.</p><div className="focus-presets" role="group" aria-label="Presets de concentração">{focusPresets.map(preset=><button type="button" className="focus-preset" key={preset.id} aria-pressed={matchesFocusPreset(prefs,preset)} disabled={disabled} onClick={()=>onChange({...prefs,focus:preset.focus,short:preset.short,long:preset.long,cycles:preset.cycles})}><span className="focus-preset-title"><b>{preset.label}</b>{matchesFocusPreset(prefs,preset)&&<Check size={15}/>}</span><span className="focus-preset-time">{preset.focus/60}<small> min</small><span> / {preset.short/60} min pausa</span></span><small>{preset.description}</small></button>)}</div><small>{focusPresets.some(p=>matchesFocusPreset(prefs,p))?'A meta diária e os inícios automáticos são mantidos.':'Ritmo personalizado · suas alterações são mantidas.'}</small></div>
   {duration('Duração do Pomodoro','focus',[60,900,1200,1500,1800,2700,3000,3600,5400,7200], 'Duração da próxima sessão. 1 minuto permite testar a demo.')}
   {duration('Pausa curta','short',[60,180,300,600,900])}
   {duration('Pausa longa','long',[60,600,900,1200,1800,2700])}

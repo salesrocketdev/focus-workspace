@@ -60,3 +60,6 @@ V4.17 deployed but CI 45896222716 had 28 failures: duplicated DOM from sibling R
 
 ## Iteration 19 — mobile settings
 V4.18 Pages succeeded; CI 58 passed / 3 failed (heading alignment and transformed provider geometry). Align mobile heading at start, measure provider icon layout dimensions. Mobile settings now uses a grouped index, live preference summaries, dedicated detail, back/focus restoration and direct notification shortcut. Desktop rail unchanged. Updated tests for changed mobile navigation and added mobile-only screenshots/summary persistence. New CI and real device visual review pending.
+
+## V4.20 — focus presets and contextual picker
+V4.19 Pages passed; CI left one compact/tablet editor width regression. Tightened editor sizing and wrap rules. Added Classic 25/5/15 x4, Deep 50/10/20 x3, Quick 15/3/10 x3 presets to shared focus settings; preserve daily goal and automation flags, custom changes remain editable, active/paused sessions locked. Added searchable focus context picker for pending tasks, books and categories, available in immersive focus, desktop dashboard activity label and quick actions. Reading changes synchronize reading widget selection. New browser tests; device audit and CI pending.
