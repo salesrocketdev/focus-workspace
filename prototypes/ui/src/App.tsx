@@ -5,8 +5,8 @@ import { EditIconButton, EditTextButton, EditCardToolbar, WidgetSizeOptions, Edi
 import { PageHeader, MobileMasthead } from './layout';
 import { ProviderIcon, ProviderLabel } from './provider-icons';
 import { Button, Field, Dialog, SelectField, Notice } from './ui';
-import { available, changePreset, endRow, firstFree, GRID_BREAKPOINT, gridStyle, place, resolveLayout } from './grid-model';
-import { GridGhost, useGridGesture } from './grid-editor';
+import { available, changePreset, compactVertical, displaced, endRow, firstFree, GRID_BREAKPOINT, gridStyle, planPlacement, preset, resolveLayout } from './grid-model';
+import { GridGhost, pointerPlacement, useGridGesture, useGridMotion, type Preview } from './grid-editor';
 import { catalogue, defaultLayout, loadLayouts, move, STORAGE, tasksInitial, type Widget, type Size, type WidgetType } from './model';
 
 type View='today'|'edit'|'focus'|'calendar'|'activities'|'history'|'settings';
@@ -24,6 +24,9 @@ export function App(){
  const [editKey,setEditKey]=useState<'desktop'|'mobile'>('desktop');
  const [selected,setSelected]=useState('focus');
  const [openMenu,setOpenMenu]=useState<string|null>(null);
+ const [pushNeighbors,setPushNeighbors]=useState(false);
+ const [cataloguePreview,setCataloguePreview]=useState<Preview|null>(null);
+ const catalogueDrag=useRef<Widget|null>(null);
  const [query,setQuery]=useState('');
  const [showCatalogue,setShowCatalogue]=useState(false);
  const [message,setMessage]=useState('');
@@ -47,7 +50,9 @@ export function App(){
  const rawWidgets=editing && draft ? draft : layouts[key];
  const freeGrid=wide&&(!editing||editKey==='desktop');
  const widgets=freeGrid?resolveLayout(rawWidgets):rawWidgets;
- const gesture=useGridGesture(widgets,editing&&freeGrid,(id,p)=>setDraft(old=>old?place(resolveLayout(old),id,p):old),()=>setMessage('Espaço ocupado. O widget permaneceu na posição anterior.'));
+ const gesture=useGridGesture(widgets,editing&&freeGrid,pushNeighbors,setDraft,()=>setMessage('Espaço ocupado. O widget permaneceu na posição anterior.'));
+ useGridMotion(gesture.gridRef,editing&&freeGrid&&!gesture.preview&&!cataloguePreview);
+ const activePreview=gesture.preview??cataloguePreview;
  const addPlacement=freeGrid&&editing?firstFree(3,3,widgets.flatMap(w=>w.placement?[w.placement]:[])):null;
  useEffect(()=>{const fn=()=>{setMobile(window.innerWidth<760);setWide(window.innerWidth>=GRID_BREAKPOINT)};window.addEventListener('resize',fn);return()=>window.removeEventListener('resize',fn)},[]);
  useEffect(()=>{if(!running)return;const tick=()=>{const elapsed=Math.floor((Date.now()-clock.current)/1000);const value=mode==='Livre'?elapsed:Math.max(0,duration-elapsed);setSeconds(value);if(mode!=='Livre'&&value===0){setRunning(false);setCompleted(c=>c+1);setMessage('Sessão concluída.')}};const id=window.setInterval(tick,250);tick();return()=>window.clearInterval(id)},[running,mode,duration]);
@@ -56,12 +61,39 @@ export function App(){
  function reset(){setRunning(false);setSeconds(mode==='Livre'?0:duration)}
  function stop(){setRunning(false);if((mode==='Livre'&&seconds>0)||(mode!=='Livre'&&seconds<duration))setCompleted(c=>c+1);reset();setMessage('Sessão encerrada (demo).')}
  function navigate(next:View){if(editing&&next!=='edit'){setMessage('Salve ou cancele a edição antes de sair.');return}setView(next)}
- function startEdit(){setOpenMenu(null);setQuery('');setEditKey(key);setDraft((key==='desktop'?resolveLayout(layouts[key]):layouts[key]).map(w=>({...w,placement:w.placement?{...w.placement}:undefined})));setSelected(layouts[key][0]?.id??'');setShowCatalogue(false);setView('edit')}
- function closeEdit(save:boolean){setOpenMenu(null);if(save&&draft){const next={...layouts,[editKey]:editKey==='desktop'?resolveLayout(draft):draft};try{localStorage.setItem(STORAGE,JSON.stringify(next))}catch{setMessage('Não foi possível salvar no navegador.');return}setLayouts(next);setMessage('Painel salvo.')}setDraft(null);setView('today')}
+ function startEdit(){setOpenMenu(null);setPushNeighbors(false);setCataloguePreview(null);catalogueDrag.current=null;setQuery('');setEditKey(key);setDraft((key==='desktop'?resolveLayout(layouts[key]):layouts[key]).map(w=>({...w,placement:w.placement?{...w.placement}:undefined})));setSelected(layouts[key][0]?.id??'');setShowCatalogue(false);setView('edit')}
+ function closeEdit(save:boolean){setOpenMenu(null);setCataloguePreview(null);catalogueDrag.current=null;if(save&&draft){const next={...layouts,[editKey]:editKey==='desktop'?resolveLayout(draft):draft};try{localStorage.setItem(STORAGE,JSON.stringify(next))}catch{setMessage('Não foi possível salvar no navegador.');return}setLayouts(next);setMessage('Painel salvo.')}setDraft(null);setView('today')}
  function resize(id:string,size:Size){setDraft(old=>old?(editKey==='desktop'?changePreset(old,id,size):old.map(w=>w.id===id?{...w,size}:w)):null)}
- function nudge(id:string,dx:number,dy:number,resize=false){const current=widgets.find(w=>w.id===id);if(!current?.placement)return;const p=current.placement;const next=resize?{...p,w:p.w+dx,h:p.h+dy}:{...p,x:p.x+dx,y:p.y+dy};if(!available(next,current.type,widgets,id)){setMessage('Limite da grade ou espaço ocupado.');return}setDraft(old=>old?place(resolveLayout(old),id,next):old)}
+ function nudge(id:string,dx:number,dy:number,resize=false){const current=widgets.find(w=>w.id===id);if(!current?.placement)return;const p=current.placement;const next=resize?{...p,w:p.w+dx,h:p.h+dy}:{...p,x:p.x+dx,y:p.y+dy};const plan=planPlacement(widgets,current,next,pushNeighbors);if(!plan){setMessage('Limite da grade ou espaço ocupado.');return}setDraft(plan)}
  function shift(id:string,delta:number){if(freeGrid){nudge(id,0,delta);return}setDraft(old=>{if(!old)return old;const i=old.findIndex(w=>w.id===id);return old[i+delta]?move(old,id,old[i+delta].id).map(w=>({...w,placement:undefined})):old})}
  function add(type:WidgetType){if(draft?.some(w=>w.type===type)){setMessage('Este widget já está no painel.');return}const w={id:type,type,size:catalogue.find(c=>c.type===type)!.size};setDraft(old=>editKey==='desktop'?resolveLayout([...(old??[]),w]):[...(old??[]),w]);setSelected(w.id);setOpenMenu(null)}
+
+ function startCatalogueDrag(e:React.DragEvent<HTMLButtonElement>,type:WidgetType){
+  if(!freeGrid||draft?.some(w=>w.type===type)){e.preventDefault();return}
+  catalogueDrag.current={id:type,type,size:catalogue.find(c=>c.type===type)!.size};
+  e.dataTransfer.setData('application/x-focus-widget',type);
+  e.dataTransfer.effectAllowed='copy';setOpenMenu(null);
+ }
+ function cataloguePlan(e:React.DragEvent<HTMLDivElement>){
+  const item=catalogueDrag.current;if(!item||!gesture.gridRef.current||!freeGrid||!editing)return null;
+  const p=pointerPlacement(gesture.gridRef.current,e.clientX,e.clientY,preset(item.type,item.size));
+  const plan=planPlacement(widgets,item,p,pushNeighbors);
+  return {item,p,plan};
+ }
+ function previewCatalogue(e:React.DragEvent<HTMLDivElement>){
+  const result=cataloguePlan(e);if(!result)return;
+  e.preventDefault();e.dataTransfer.dropEffect=result.plan?'copy':'none';
+  setCataloguePreview({id:result.item.id,kind:'add',placement:result.p,valid:!!result.plan,displaced:result.plan?displaced(widgets,result.plan,result.item.id):[]});
+ }
+ function dropCatalogue(e:React.DragEvent<HTMLDivElement>){
+  const result=cataloguePlan(e);if(!result)return;
+  e.preventDefault();setCataloguePreview(null);catalogueDrag.current=null;
+  if(result.plan){setDraft(result.plan);setSelected(result.item.id);setOpenMenu(null)}
+  else setMessage('Espaço ocupado. Nenhum widget foi adicionado.');
+ }
+ function compactGrid(){
+  if(!freeGrid)return;setOpenMenu(null);setDraft(compactVertical(widgets));setMessage('Espaços verticais compactados.');
+ }
  function remove(id:string){setOpenMenu(null);setDraft(old=>old?.filter(w=>w.id!==id)??null);if(selected===id)setSelected('')}
  function beginResize(e:React.PointerEvent<HTMLButtonElement>,id:string,size:Size){e.stopPropagation();e.preventDefault();const start=e.clientX;const el=e.currentTarget as HTMLButtonElement;el.setPointerCapture(e.pointerId);const finish=(ev:PointerEvent)=>{const delta=ev.clientX-start;if(Math.abs(delta)>24){const index=Math.max(0,Math.min(2,sizes.indexOf(size)+(delta>0?1:-1)));resize(id,sizes[index])}el.removeEventListener('pointerup',finish);el.removeEventListener('pointercancel',cancel)};const cancel=()=>{el.removeEventListener('pointerup',finish);el.removeEventListener('pointercancel',cancel)};el.addEventListener('pointerup',finish);el.addEventListener('pointercancel',cancel)}
  const pct=Math.round(page/432*100);
@@ -86,7 +118,7 @@ export function App(){
  <div ref={el=>{if(el)el.inert=editing}} aria-hidden={editing?true:undefined} className={editing?'preview-content':''}>{editing?<EditPreview type={w.type} seconds={seconds} duration={duration} mode={mode} page={page} tasks={tasks} track={['Deep Focus','Quiet Morning','Evening Flow'][track]} running={running} music={music}>{widgetContent(w.type)}</EditPreview>:widgetContent(w.type)}</div>
  </Card>{editing&&selected===w.id&&<><button className="resize-handle" aria-label={'Redimensionar '+titles[w.type]} onPointerDown={e=>freeGrid?gesture.begin(e,w,'resize'):beginResize(e,w.id,w.size)} onKeyDown={e=>{const offsets:Record<string,[number,number]>={ArrowRight:[1,0],ArrowLeft:[-1,0],ArrowDown:[0,1],ArrowUp:[0,-1]};const d=offsets[e.key];if(!d)return;e.preventDefault();if(freeGrid)nudge(w.id,...d,true);else if(d[0])resize(w.id,sizes[Math.max(0,Math.min(2,sizes.indexOf(w.size)+d[0]))])}}/><span className="selection-handle handle-tl"/><span className="selection-handle handle-tm"/><span className="selection-handle handle-tr"/><span className="selection-handle handle-ml"/>{freeGrid?<button className="selection-handle handle-mr axis-handle" aria-label={'Alterar largura de '+titles[w.type]} onPointerDown={e=>gesture.begin(e,w,'width')} onKeyDown={e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();nudge(w.id,e.key==='ArrowRight'?1:-1,0,true)}}}/>:<span className="selection-handle handle-mr"/>}<span className="selection-handle handle-bl"/>{freeGrid?<button className="selection-handle handle-bm axis-handle" aria-label={'Alterar altura de '+titles[w.type]} onPointerDown={e=>gesture.begin(e,w,'height')} onKeyDown={e=>{if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();nudge(w.id,0,e.key==='ArrowDown'?1:-1,true)}}}/>:<span className="selection-handle handle-bm"/>}</>}</div>}
  function mobileEditor(){const current=widgets.find(w=>w.id===selected);return <section className="mobile-layout"><h3>Seus widgets ({widgets.length})</h3>{widgets.map(w=>{const Icon=icons[w.type];return <div className={'mobile-widget-row '+(selected===w.id?'chosen':'')} key={w.id} data-widget={w.type}><Grip size={15}/><button className="mobile-widget-name" onClick={()=>setSelected(w.id)}>{w.type==='music'?<ProviderIcon provider="spotify" size={16}/>:<Icon size={16} strokeWidth={1.8}/>}<span className="mobile-widget-title">{titles[w.type]}</span><small>{w.size==='small'?'1 × 1':w.size==='medium'?'2 × 1':'2 × 2'}</small></button><EditIconButton label={'Mover acima '+titles[w.type]} icon={ChevronUp} disabled={widgets[0]?.id===w.id} onClick={()=>shift(w.id,-1)}/><EditIconButton label={'Mover abaixo '+titles[w.type]} icon={ChevronDown} disabled={widgets[widgets.length-1]?.id===w.id} onClick={()=>shift(w.id,1)}/><EditIconButton label={'Remover '+titles[w.type]} icon={X} onClick={()=>remove(w.id)}/></div>})}{current&&<><h3>Tamanho do widget</h3><WidgetSizeOptions value={current.size} onChange={size=>resize(current.id,size)} visual/></>}<EditTextButton className="mobile-save" variant="primary" onClick={()=>closeEdit(true)}>Salvar layout</EditTextButton></section>}
- function cataloguePanel(){return <aside className="catalogue"><header><h3>Adicionar widgets</h3><EditIconButton label="Fechar catálogo" icon={X} className="mobile-only" onClick={()=>setShowCatalogue(false)}/></header><input className="search" aria-label="Buscar widgets" placeholder="Buscar widgets..." value={query} onChange={e=>setQuery(e.target.value)}/>{catalogue.filter(c=>c.title.toLowerCase().includes(query.toLowerCase())).map(c=>{const Icon=icons[c.type];const exists=draft?.some(w=>w.type===c.type);return <button className="catalogue-item" key={c.type} disabled={exists} onClick={()=>add(c.type)}>{c.type==='music'?<ProviderIcon provider="spotify" size={20}/>:<Icon size={18} strokeWidth={1.8}/>}<span><b>{c.title}</b><small>{c.description}</small></span>{exists?<Check size={15}/>:<Plus size={17}/>}</button>})}</aside>}
+ function cataloguePanel(){return <aside className="catalogue"><header><h3>Adicionar widgets</h3><EditIconButton label="Fechar catálogo" icon={X} className="mobile-only" onClick={()=>setShowCatalogue(false)}/></header><input className="search" aria-label="Buscar widgets" placeholder="Buscar widgets..." value={query} onChange={e=>setQuery(e.target.value)}/>{catalogue.filter(c=>c.title.toLowerCase().includes(query.toLowerCase())).map(c=>{const Icon=icons[c.type];const exists=draft?.some(w=>w.type===c.type);return <button className="catalogue-item" key={c.type} disabled={exists} draggable={freeGrid&&!exists} onDragStart={e=>startCatalogueDrag(e,c.type)} onDragEnd={()=>{catalogueDrag.current=null;setCataloguePreview(null)}} onClick={()=>add(c.type)}>{c.type==='music'?<ProviderIcon provider="spotify" size={20}/>:<Icon size={18} strokeWidth={1.8}/>}<span><b>{c.title}</b><small>{c.description}</small></span>{exists?<Check size={15}/>:<Plus size={17}/>}</button>})}</aside>}
  return <div className={'app '+(view==='focus'?'immersive':'')}>
  {view!=='focus'&&<aside className="sidebar"><Brand/><nav>{navigation.map(n=><button key={n.id} className={view===n.id||editing&&n.id==='today'?'active':''} onClick={()=>navigate(n.id)}><n.icon size={18} strokeWidth={1.8}/>{n.title}</button>)}</nav><div className="connection"><span><i/> Dados de demonstração</span><ProviderLabel provider="google-calendar" size={16}/><ProviderLabel provider="outlook" size={16}/></div></aside>}
  <main className={"main "+(view==='focus'?'focus-main':'workspace-main')}>
@@ -97,7 +129,8 @@ export function App(){
  editing={editing}
  actions={view==='today'?<div className="head-actions"><Sun size={18} aria-hidden="true"/><button className="outline page-action" onClick={startEdit}><LayoutGrid size={16}/> Editar painel</button></div>:editing?<div className="head-actions edit-header"><EditTextButton onClick={()=>{setDraft(defaultLayout(editKey==='mobile'));setSelected('focus');setOpenMenu(null)}}><RotateCcw size={15}/> Restaurar layout</EditTextButton><EditTextButton onClick={()=>closeEdit(false)}>Cancelar</EditTextButton><EditTextButton variant="primary" onClick={()=>closeEdit(true)}>Salvar painel</EditTextButton></div>:undefined}/>
  {editing&&<div className="mobile-edit-tabs segment"><button aria-pressed={!showCatalogue} className={!showCatalogue?"selected":""} onClick={()=>setShowCatalogue(false)}>Seus widgets</button><button aria-pressed={showCatalogue} className={showCatalogue?"selected":""} onClick={()=>setShowCatalogue(true)}><Plus size={15}/> Adicionar</button></div>}
- {(view==='today'||editing)&&<div className={'workspace '+(editing?'editing':'')}>{editing&&mobile?(!showCatalogue&&mobileEditor()):<div ref={gesture.gridRef} className={'widget-grid '+(freeGrid?'coordinate-grid ':'')+(gesture.preview?'grid-gesturing':'')}>{widgets.map(renderWidget)}{gesture.preview&&freeGrid&&<GridGhost preview={gesture.preview}/>}{editing&&<AddWidgetTile style={addPlacement?gridStyle(addPlacement):freeGrid?{gridColumn:'1 / -1',gridRow:(endRow(widgets)+1)+' / span 3'}:undefined} onClick={()=>{setShowCatalogue(true);document.querySelector<HTMLInputElement>('.search')?.focus()}}/>}{!widgets.length&&!editing&&<div className="empty">Seu painel está vazio. <button className="primary" onClick={startEdit}>Adicionar widgets</button></div>}</div>}{editing&&<div className={'catalogue-wrap '+(showCatalogue?'visible':'')}>{cataloguePanel()}</div>}</div>}
+ {editing&&freeGrid&&<div className="grid-tools"><span className="grid-tools-hint"><LayoutGrid size={15}/> Grade de 12 colunas</span><label className="grid-push"><input type="checkbox" checked={pushNeighbors} onChange={e=>setPushNeighbors(e.target.checked)}/> Deslocar vizinhos</label><EditTextButton className="compact-grid-button" onClick={compactGrid}><Layers size={15}/> Compactar espaços</EditTextButton></div>}
+ {(view==='today'||editing)&&<div className={'workspace '+(editing?'editing':'')}>{editing&&mobile?(!showCatalogue&&mobileEditor()):<div ref={gesture.gridRef} className={'widget-grid '+(freeGrid?'coordinate-grid ':'')+(activePreview?'grid-gesturing':'')} onDragOver={previewCatalogue} onDrop={dropCatalogue} onDragLeave={e=>{if(!e.currentTarget.contains(e.relatedTarget as Node|null))setCataloguePreview(null)}}>{widgets.map(renderWidget)}{activePreview&&freeGrid&&<GridGhost preview={activePreview}/>}{editing&&<AddWidgetTile style={addPlacement?gridStyle(addPlacement):freeGrid?{gridColumn:'1 / -1',gridRow:(endRow(widgets)+1)+' / span 3'}:undefined} onClick={()=>{setShowCatalogue(true);document.querySelector<HTMLInputElement>('.search')?.focus()}}/>}{!widgets.length&&!editing&&<div className="empty">Seu painel está vazio. <button className="primary" onClick={startEdit}>Adicionar widgets</button></div>}</div>}{editing&&<div className={'catalogue-wrap '+(showCatalogue?'visible':'')}>{cataloguePanel()}</div>}</div>}
  <div className="route-content" hidden={view==='today'||editing}>
  {view==='calendar'&&<Card title="Agenda de hoje · dados simulados" icon={CalendarDays}><AgendaRows/></Card>}
  {view==='activities'&&<><Card title="Leitura em andamento" icon={BookOpen}>{reading()}</Card><Card title="Tarefas" icon={Layers}>{widgetContent('tasks')}</Card></>}

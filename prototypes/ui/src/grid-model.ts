@@ -67,3 +67,47 @@ export function changePreset(widgets:Widget[],id:string,size:Size):Widget[]{
 }
 export function gridStyle(p:Placement){return {gridColumn:(p.x+1)+' / span '+p.w,gridRow:(p.y+1)+' / span '+p.h}}
 export function endRow(widgets:Widget[]){return Math.max(0,...widgets.map(w=>w.placement?w.placement.y+w.placement.h:0))}
+
+// Preview and commit share this planner. Push only colliding cards downward,
+// preserving each neighbor's width, height and column. Never partially commit.
+export function planPlacement(widgets:Widget[],item:Widget,p:Placement,push=false):Widget[]|null{
+ if(!valid(p,item.type))return null;
+ const others=widgets.filter(w=>w.id!==item.id);
+ if(!push){
+  if(!available(p,item.type,others))return null;
+  const placed={...item,placement:p};
+  return widgets.some(w=>w.id===item.id)?widgets.map(w=>w.id===item.id?placed:w):[...widgets,placed];
+ }
+ const placed:Widget[]=[{...item,placement:p}];
+ const sorted=[...others].sort((a,b)=>(a.placement?.y??0)-(b.placement?.y??0)||(a.placement?.x??0)-(b.placement?.x??0)||a.id.localeCompare(b.id));
+ for(const w of sorted){
+  if(!w.placement)return null;
+  const next={...w.placement};
+  for(;;){
+   const collisions=placed.flatMap(o=>o.placement&&overlap(o.placement,next)?[o.placement]:[]);
+   if(!collisions.length)break;
+   next.y=Math.max(...collisions.map(o=>o.y+o.h));
+   if(!valid(next,w.type))return null;
+  }
+  placed.push({...w,placement:next});
+ }
+ const byId=new Map(placed.map(w=>[w.id,w]));
+ return (widgets.some(w=>w.id===item.id)?widgets:[...widgets,item]).map(w=>byId.get(w.id)!);
+}
+export function compactVertical(widgets:Widget[]):Widget[]{
+ const sorted=[...widgets].sort((a,b)=>(a.placement?.y??0)-(b.placement?.y??0)||(a.placement?.x??0)-(b.placement?.x??0)||a.id.localeCompare(b.id));
+ const placed:Widget[]=[];
+ for(const w of sorted){
+  if(!w.placement)return widgets;
+  const p={...w.placement};
+  // Check both settled and unprocessed widgets: do not jump across a card.
+  const others=[...placed,...sorted.slice(placed.length+1)];
+  while(p.y>0&&available({...p,y:p.y-1},w.type,others))p.y--;
+  placed.push({...w,placement:p});
+ }
+ const byId=new Map(placed.map(w=>[w.id,w]));
+ return widgets.map(w=>byId.get(w.id)!);
+}
+export function displaced(before:Widget[],after:Widget[],except:string){
+ return after.filter(w=>w.id!==except&&before.some(o=>o.id===w.id&&o.placement?.y!==w.placement?.y));
+}

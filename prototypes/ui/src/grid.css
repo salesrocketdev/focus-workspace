@@ -24,3 +24,29 @@
  .coordinate-grid .widget[data-widget=music] .edit-card-toolbar svg{color:var(--edit-ink)}
  .coordinate-grid .empty{grid-column:1/-1;grid-row:1 / span 4}
 }
+
+/* V4.09 — explicit editing tools, not extra per-card controls. */
+.grid-tools{display:flex;align-items:center;gap:12px;margin:-6px 0 12px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.grid-tools-hint{display:flex;align-items:center;gap:6px;margin-right:auto}
+.grid-push{display:flex;align-items:center;gap:7px;min-height:32px;cursor:pointer;color:var(--edit-ink)}
+.grid-push input{width:15px;height:15px;margin:0;accent-color:var(--action)}
+.grid-tools .compact-grid-button{height:32px;min-height:32px;font-size:12px}
+@media(min-width:1151px){
+ .catalogue-item[draggable=true]:not(:disabled){cursor:grab}
+ .catalogue-item[draggable=true]:active{cursor:grabbing}
+ .coordinate-grid>.grid-neighbor-ghost{display:grid;place-items:center;pointer-events:none;z-index:4;min-width:0;min-height:0;border:1px dashed #aa917b;background:#f0e3d5a0;border-radius:10px}
+ .grid-neighbor-ghost span{font-size:11px;color:#735c49;background:#fffcf9;padding:4px 7px;border-radius:5px}
+ .coordinate-grid .widget .card-body{overscroll-behavior:contain}
+ .coordinate-grid .widget .preview-content{min-width:0}
+ .coordinate-grid .widget .edit-reading-details,.coordinate-grid .widget .edit-track{flex:1;min-width:0}
+}
+@container(max-width:255px){
+ .coordinate-grid .widget .edit-focus-preview{grid-template-columns:1fr}
+ .coordinate-grid .widget .edit-focus-preview .timer-ring{width:min(104px,100%)}
+ .coordinate-grid .widget .edit-focus-details{gap:5px}
+ .coordinate-grid .widget .edit-reading-preview{gap:6px}
+ .coordinate-grid .widget .edit-preview-transport{gap:1px}
+ .coordinate-grid .widget .edit-preview-transport>span{width:22px;height:22px}
+ .coordinate-grid .widget .edit-preview-transport>span>svg{width:12px;height:12px}
+ .coordinate-grid .widget .edit-passive-preview .event b{overflow-wrap:anywhere}
+}
