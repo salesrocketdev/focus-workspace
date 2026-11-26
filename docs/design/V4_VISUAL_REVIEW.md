@@ -79,3 +79,7 @@ V4.22 CI and Pages passed. Added local fictional edition search and review, edit
 
 ## Appearance personalization
 Audit confirmed book mock CI and Pages passed; earlier color/ring/chart proposal was not implemented, not a missed deploy. Add persistent preset/custom accent, derived contrast-aware control tokens, four ring styles and previews, smooth SVG progress/tick transitions and reduced motion. Update PiP accent sync. No chart library migration in this change. CI pending.
+
+
+## Interactive analytics — #36
+Appearance deploy 45903927119 succeeded. Replace basic history bars with interactive daily bars/line, in-flow detail tooltip (date, duration, session count, day-over-day comparison), category donut/legend selection, animated daily goal with details and dashboard summary points. Data derives from shared records and active filters; goal remains independent of history filters. Native React/SVG/CSS avoids new dependencies for this prototype; ECharts evaluation remains production follow-up. Add Chromium and WebKit interaction tests. Pending CI/device review.

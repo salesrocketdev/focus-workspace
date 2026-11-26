@@ -48,3 +48,7 @@ Readings offers manual entry and local catalogue search, edition review/import, 
 
 ## Appearance personalization
 Appearance supports six preset accents and custom color, four shared ring styles (classic, tick dial, segmented, minimal), immediate preview, local storage and reset. Accent tokens style primary controls, active states and progress. SVG ring transitions respect reduced motion. See chart follow-up for interactive analytics.
+
+
+## Interactive analytics (#36)
+History includes bars and line/area views, date selection by pointer/touch/keyboard and previous/next controls, category distribution donut with interactive legend and animated daily-goal details. Dashboard summary uses shared daily aggregates and touch/keyboard-selectable bars. Tooltips are in-flow to avoid clipping on small displays. Zero days remain visible, filtered aggregates remain consistent, goal ignores history filters. Respect accent, theme and reduced motion; data remains fixture plus current execution.

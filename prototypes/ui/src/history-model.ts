@@ -37,7 +37,7 @@ export function durationLabel(seconds:number){
 }
 export function periodDays(days:number){return Array.from({length:days},(_,i)=>addDays(DEMO_DAY,i-days+1))}
 export function filterPeriod(records:FocusRecord[],days:number){const from=addDays(DEMO_DAY,1-days);return records.filter(r=>r.day>=from&&r.day<=DEMO_DAY)}
-export function dailyTotals(records:FocusRecord[],days:number){return periodDays(days).map(day=>({day,seconds:totalSeconds(records.filter(r=>r.day===day))}))}
+export function dailyTotals(records:FocusRecord[],days:number){return periodDays(days).map(day=>{const items=records.filter(r=>r.day===day);return {day,seconds:totalSeconds(items),count:items.length}})}
 export function categoryTotals(records:FocusRecord[]){
  const groups=new Map<string,{id:string;label:string;seconds:number}>();
  for(const r of records){const old=groups.get(r.categoryId);groups.set(r.categoryId,{id:r.categoryId,label:r.category,seconds:(old?.seconds??0)+r.seconds})}

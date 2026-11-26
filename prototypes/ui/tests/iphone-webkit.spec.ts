@@ -44,3 +44,16 @@ test('WebKit mobile: sheet opens without focusing text and fits resized visual v
  expect(await sheet.evaluate(el=>el.getBoundingClientRect().bottom)).toBeLessThanOrEqual(402);
  await page.screenshot({path:info.outputPath('iphone-keyboard-sheet.png'),animations:'disabled'});
 });
+
+test('WebKit: interactive history plots respond to touch and reduced motion',async({page})=>{
+ await page.goto('/');
+ await page.getByRole('navigation',{name:'Navegação principal'}).getByRole('button',{name:'Histórico',exact:true}).click();
+ await page.getByRole('button',{name:'Dia anterior no gráfico'}).tap();
+ await expect(page.getByRole('status',{name:'Detalhes do dia'})).toContainText('1h 42min');
+ await page.getByRole('button',{name:'Linha',exact:true}).tap();
+ await expect(page.locator('.chart-line')).toBeVisible();
+ await page.getByRole('group',{name:'Categorias do gráfico'}).getByRole('button',{name:/Leitura/}).tap();
+ await expect(page.getByRole('status',{name:'Detalhes da categoria'})).toContainText('Leitura');
+ await page.emulateMedia({reducedMotion:'reduce'});
+ expect(await page.locator('.chart-line').evaluate(el=>getComputedStyle(el).animationName)).toBe('none');
+});

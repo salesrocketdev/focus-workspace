@@ -19,6 +19,7 @@ import './quick-actions.css';
 import './motion.css';
 import './mobile.css';
 import './personalization.css';
+import './charts.css';
 import { registerNotificationWorker } from './notifications';
 if(import.meta.env.PROD)void registerNotificationWorker();
 

@@ -6,6 +6,7 @@ import { PageHeader, MobileMasthead } from './layout';
 import { CompactFocus,CommandPalette,QuickActionButton,type QuickAction } from './quick-actions';
 import { CalendarPage } from './calendar-page';
 import { HistoryPage } from './history-page';
+import { MiniTrend } from './charts';
 import { AppearancePanel,useAppearance } from './appearance';
 import { SettingsPage,type SettingsSection } from './settings-page';
 import { useNotifications,NotificationBell,NotificationCenter,NotificationSettings } from './notifications';
@@ -85,7 +86,7 @@ export function App(){
  const todayRecords=filterPeriod(records,1),todaySeconds=totalSeconds(todayRecords);
  const lastWeek=dailyTotals(records,7),yesterdaySeconds=lastWeek[lastWeek.length-2].seconds;
  const changePercent=yesterdaySeconds?Math.round((todaySeconds-yesterdaySeconds)/yesterdaySeconds*100):null;
- const maxDay=Math.max(1,...lastWeek.map(d=>d.seconds));
+ const [summaryPoint,setSummaryPoint]=useState<{day:string;seconds:number;count:number}|null>(null);
  function saveFocusRecord(elapsed:number,status:SessionStatus){if(elapsed<=0)return;const record=recordSession(focusContext,elapsed,mode,status);setRecords(old=>[record,...old]);}
  const key=mobile?'mobile':'desktop';
  const editing=view==='edit';
@@ -193,9 +194,9 @@ export function App(){
    case 'agenda':return <AgendaRows/>;
    case 'tasks':return <div className="task-list">{tasks.slice(0,5).map(t=><label key={t.id} className={t.done?'done':''}><input type="checkbox" checked={t.done} onChange={()=>setTasks(ts=>ts.map(x=>x.id===t.id?{...x,done:!x.done}:x))}/><span>{t.title}</span></label>)}{tasks.length>5&&<button className="card-more" onClick={()=>navigate('activities')}>Ver todas ({tasks.length})</button>}</div>;
    case 'reading':return reading();
-   case 'goal':return <div className="goal-body"><div className="gauge"><svg viewBox="0 0 140 80"><path d="M12 70 A58 58 0 0 1 128 70" fill="none" stroke="#e5ded8" strokeWidth="8" strokeLinecap="round"/><path d="M12 70 A58 58 0 0 1 128 70" fill="none" stroke="#79b384" strokeWidth="8" pathLength="100" strokeDasharray={Math.min(100,todaySeconds/(prefs.goal*60)*100)+' 100'} strokeLinecap="round"/></svg><div><strong>{durationLabel(todaySeconds)}</strong><small>de {prefs.goal%60===0?prefs.goal/60+' horas':prefs.goal+' min'}</small></div></div><footer><span><Timer size={13}/> {todayRecords.length} sessões</span><span><Flame size={13} color="#df702c"/> {streak(records)} dias seguidos</span></footer></div>;
+   case 'goal':return <div className="goal-body"><div className="gauge"><svg viewBox="0 0 140 80"><path d="M12 70 A58 58 0 0 1 128 70" fill="none" stroke="#e5ded8" strokeWidth="8" strokeLinecap="round"/><path d="M12 70 A58 58 0 0 1 128 70" fill="none" className="goal-chart-progress" stroke="var(--accent)" strokeWidth="8" pathLength="100" strokeDasharray="100 100" strokeDashoffset={100-Math.min(100,todaySeconds/(prefs.goal*60)*100)} strokeLinecap="round"/></svg><div><strong>{durationLabel(todaySeconds)}</strong><small>de {prefs.goal%60===0?prefs.goal/60+' horas':prefs.goal+' min'}</small></div></div><footer><span><Timer size={13}/> {todayRecords.length} sessões</span><span><Flame size={13} color="#df702c"/> {streak(records)} dias seguidos</span></footer></div>;
    case 'music':return player();
-   case 'summary':return <div className="summary-body"><div><strong>{durationLabel(todaySeconds)} {changePercent!==null&&<em>{changePercent>=0?'+':''}{changePercent}%</em>}</strong><small>de foco · vs. ontem</small></div><div className="bars" aria-label="Gráfico ilustrativo">{lastWeek.slice(-5).map(d=><i key={d.day} style={{height:d.seconds/maxDay*100+'%'}}/>)}</div></div>;
+   case 'summary':return <div className="summary-body"><div><strong>{durationLabel(todaySeconds)} {changePercent!==null&&<em>{changePercent>=0?'+':''}{changePercent}%</em>}</strong><small>{summaryPoint?summaryPoint.day.slice(8)+'/'+summaryPoint.day.slice(5,7)+' · '+durationLabel(summaryPoint.seconds)+' · '+summaryPoint.count+' sessão(ões)':'de foco · vs. ontem'}</small></div><MiniTrend days={lastWeek.slice(-5)} onSelect={setSummaryPoint}/></div>;
    case 'notes':return <div className="notes-preview"><p>{notes||'Escreva uma nota rápida…'}</p><Button variant="soft" size="sm" onClick={()=>{setNoteDraft(notes);setShowNotes(true)}}>Editar nota</Button></div>;
    case 'next':return <AgendaRows single/>;
    case 'recent':return <div className="recent-preview">{newest(records).slice(0,3).map(r=><div key={r.id}><span>{r.title}</span><small>{durationLabel(r.seconds)}</small></div>)}</div>;
