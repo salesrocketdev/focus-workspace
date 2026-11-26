@@ -46,3 +46,6 @@ V4.14 follow-up: guarded popover fallback cleanup and corrected singular minute 
 
 ## Iteration 15 — settings information architecture and notifications
 V4.14 Pages succeeded; CI [45894102580](https://github.com/salesrocketdev/focus-workspace/actions/runs/45894102580) had 42 passes and two failures caused by the required label marker in the book author field. Move the visual marker to CSS so the label text is stable. Based on the user's settings reference, add a secondary settings rail, grouped section navigation, mobile compact sections and notification center with persistent preferences/inbox, real opt-in system notification path, test action, PWA manifest and notification-only worker. No closed-app schedule or real calendar reminders. Latest CI, installability and OS delivery require verification.
+
+## Iteration 16 — compact focus and quick actions
+V4.15 CI and Pages passed. Implemented shared-state mini timer, desktop Document Picture-in-Picture feature detection and safe fallback, header action palette with keyboard search, edit-session guard, responsive compact styling and Playwright tests. No second timer or independent session state. PiP requires supported secure browser, user activation and opener lifetime. Current CI and device verification pending.
