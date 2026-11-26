@@ -131,3 +131,30 @@ test('editor title stays aligned at tablet and compact widths',async({page},info
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
  }
 });
+
+test('provider artwork is local, legible and consistent across views',async({page},info)=>{
+ await page.goto('/');
+ const marks=page.locator('.provider-mark:visible');
+ expect(await marks.count()).toBeGreaterThan(2);
+ for(const provider of ['google-calendar','outlook','spotify']){
+  const mark=page.locator('.provider-mark[data-provider="'+provider+'"]:visible').first();
+  await expect(mark).toBeVisible();
+  expect(await mark.evaluate((el:HTMLImageElement)=>el.complete&&el.naturalWidth>0)).toBeTruthy();
+ }
+ const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
+ await nav.getByRole('button',{name:'Agenda',exact:true}).click();
+ await expect(page.locator('.agenda-list .provider-mark[data-provider="outlook"]')).toBeVisible();
+ await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ const list=page.locator('.integration-preview-list');
+ await expect(list.locator('.provider-mark')).toHaveCount(6);
+ for(const img of await list.locator('img').all()){
+  expect(await img.evaluate((el:HTMLImageElement)=>el.complete&&el.naturalWidth>0&&el.getBoundingClientRect().width===24&&el.getBoundingClientRect().height===24)).toBeTruthy();
+ }
+ await expect(page.getByText('Nenhum provedor conectado nesta prévia.')).toBeVisible();
+ await page.screenshot({path:info.outputPath('provider-icons.png'),animations:'disabled',scale:'css'});
+ await nav.getByRole('button',{name:'Hoje',exact:true}).click();
+ await page.getByRole('button',{name:'Editar painel',exact:true}).click();
+ if(info.project.name==='mobile')await page.getByRole('button',{name:'Adicionar',exact:true}).click();
+ await expect(page.locator('.catalogue-item .provider-mark[data-provider="spotify"]')).toBeVisible();
+ await page.screenshot({path:info.outputPath('provider-catalogue.png'),animations:'disabled',scale:'css'});
+});

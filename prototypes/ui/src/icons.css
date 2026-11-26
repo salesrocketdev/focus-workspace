@@ -1,0 +1,25 @@
+/* Separate functional Lucide iconography from third-party provider artwork. */
+.provider-mark{display:inline-block;flex-shrink:0;object-fit:contain;vertical-align:middle;max-width:none}
+.provider-label{display:inline-flex;align-items:center;gap:8px;min-width:0}
+.provider-label>span{min-width:0}
+.connection .provider-label{display:flex;gap:8px;line-height:1.35}
+.connection .provider-label .provider-mark{flex:0 0 16px}
+.event .provider-mark{flex:0 0 19px}
+.event>div{min-width:0}
+.card-head>span>.provider-mark{flex:0 0 16px}
+.catalogue-item>.provider-mark{flex:0 0 20px}
+.catalogue-item>svg:first-child{flex:0 0 18px}
+.mobile-widget-name>.provider-mark,.mobile-widget-name>svg{flex:0 0 16px}
+.mobile-widget-title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mobile-widget-name>small{flex-shrink:0}
+.integration-preview-list{display:grid;gap:0}
+.integration-preview-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--border)}
+.integration-preview-row:last-child{border-bottom:0}
+.integration-preview-row>.provider-label{font-weight:550;font-size:13px;flex-shrink:0}
+.integration-preview-row>small{text-align:right}
+@container(max-width:205px){.event .provider-mark{width:15px;height:15px;flex-basis:15px}}
+@media(max-width:759px){
+ .event .provider-mark{width:16px;height:16px;flex-basis:16px}
+ .integration-preview-row{gap:10px}
+ .integration-preview-row>small{max-width:48%;font-size:11px}
+}
