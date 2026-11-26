@@ -9,7 +9,7 @@ test('onboarding, simulated OAuth and focus preferences persist locally',async({
  await dialog.getByRole('switch',{name:'Aplicar painel sugerido'}).click();
  await dialog.getByRole('button',{name:'Continuar',exact:true}).click();
  await dialog.getByRole('combobox',{name:'Duração do Pomodoro'}).click();
- await page.getByRole('option',{name:'1 minutos',exact:true}).click();
+ await page.getByRole('option',{name:'1 minuto',exact:true}).click();
  await dialog.getByRole('combobox',{name:'Pausa curta'}).click();
  await page.getByRole('option',{name:'3 minutos',exact:true}).click();
  await dialog.getByRole('combobox',{name:'Ciclos até a pausa longa'}).click();
@@ -20,7 +20,7 @@ test('onboarding, simulated OAuth and focus preferences persist locally',async({
  await expect(dialog).toHaveCount(0);
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
  await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
- await expect(page.getByRole('combobox',{name:'Duração do Pomodoro'})).toHaveText('1 minutos');
+ await expect(page.getByRole('combobox',{name:'Duração do Pomodoro'})).toHaveText('1 minuto');
  for(const provider of ['Google Agenda','Microsoft Outlook','Spotify','Gmail','Google Meet','Microsoft Teams']){
   await page.getByRole('button',{name:'Conectar '+provider,exact:true}).click();
   await expect(dialog).toContainText('Simulação OAuth');
@@ -33,7 +33,7 @@ test('onboarding, simulated OAuth and focus preferences persist locally',async({
  await page.reload();
  await expect(dialog).toHaveCount(0);
  await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
- await expect(page.getByRole('combobox',{name:'Duração do Pomodoro'})).toHaveText('1 minutos');
+ await expect(page.getByRole('combobox',{name:'Duração do Pomodoro'})).toHaveText('1 minuto');
  await page.getByRole('button',{name:'Gerenciar Spotify',exact:true}).click();
  await dialog.getByRole('button',{name:'Desconectar',exact:true}).click();
  await expect(page.getByRole('button',{name:'Conectar Spotify',exact:true})).toBeVisible();

@@ -31,7 +31,7 @@ export function IntegrationPanel({connections,onChange}:{connections:ProviderId[
 }
 export function FocusSettings({prefs,onChange,disabled=false}:{prefs:FocusPreferences;onChange:(p:FocusPreferences)=>void;disabled?:boolean}){
  const opts=(values:number[],current:number)=>[...new Set([...values,current])].sort((a,b)=>a-b);
- const duration=(label:string,key:'focus'|'short'|'long',values:number[],hint?:string)=><SelectField label={label} hint={hint} value={prefs[key]} disabled={disabled} onValueChange={v=>onChange({...prefs,[key]:Number(v)})} options={opts(values,prefs[key]).map(n=>({value:String(n),label:n/60+' minutos'}))}/>;
+ const duration=(label:string,key:'focus'|'short'|'long',values:number[],hint?:string)=><SelectField label={label} hint={hint} value={prefs[key]} disabled={disabled} onValueChange={v=>onChange({...prefs,[key]:Number(v)})} options={opts(values,prefs[key]).map(n=>({value:String(n),label:n/60+(n===60?' minuto':' minutos')}))}/>;
  return <div className="focus-settings-fields">
   {duration('Duração do Pomodoro','focus',[60,900,1200,1500,1800,2700,3000,3600,5400,7200], 'Duração da próxima sessão. 1 minuto permite testar a demo.')}
   {duration('Pausa curta','short',[60,180,300,600,900])}

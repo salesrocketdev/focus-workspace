@@ -46,9 +46,9 @@ export function SelectField({label,value,defaultValue,options,onValueChange,hint
   }
   position();
   const outside=(event:PointerEvent)=>{const node=event.target as Node;if(!button.contains(node)&&!menu.contains(node))close()};
-  const scroll=(event:Event)=>{if(!menu.contains(event.target as Node))position()};
+  const scroll=(event:Event)=>{if(!(event.target instanceof Node)||!menu.contains(event.target))position()};
   document.addEventListener('pointerdown',outside,true);window.addEventListener('resize',position);document.addEventListener('scroll',scroll,true);window.visualViewport?.addEventListener('resize',position);window.visualViewport?.addEventListener('scroll',position);
-  return()=>{document.removeEventListener('pointerdown',outside,true);window.removeEventListener('resize',position);document.removeEventListener('scroll',scroll,true);window.visualViewport?.removeEventListener('resize',position);window.visualViewport?.removeEventListener('scroll',position);if(menu.matches(':popover-open'))menu.hidePopover()};
+  return()=>{document.removeEventListener('pointerdown',outside,true);window.removeEventListener('resize',position);document.removeEventListener('scroll',scroll,true);window.visualViewport?.removeEventListener('resize',position);window.visualViewport?.removeEventListener('scroll',position);if(typeof menu.hidePopover==='function'&&menu.matches(':popover-open'))menu.hidePopover()};
  },[open]);
  useEffect(()=>{if(open&&active>=0){const menu=popup.current,item=menu?.querySelector<HTMLElement>('[data-option-index="'+active+'"]');if(menu&&item){if(item.offsetTop<menu.scrollTop)menu.scrollTop=item.offsetTop;else if(item.offsetTop+item.offsetHeight>menu.scrollTop+menu.clientHeight)menu.scrollTop=item.offsetTop+item.offsetHeight-menu.clientHeight}}},[open,active]);
  const portalTarget=trigger.current?.closest('dialog')??(typeof document!=='undefined'?document.body:null);

@@ -58,3 +58,6 @@
 .toggle-compact[aria-checked=true] .ui-switch-track i{transform:translateX(12px)}
 .preference-toggles{gap:8px}
 @media(max-width:759px){.ui-select-option{min-height:44px}.field-compact .ui-select-trigger{height:40px;min-height:40px}.activity-search-control{max-width:none;flex-basis:100%}.activity-task-filters>.ui-field{max-width:none;width:100%}.history-filters>.ui-field{min-width:85px;max-width:none}.history-filters>.ui-field>label{font-size:10px}.ui-toggle-card{min-height:76px;padding:11px;gap:8px}.ui-toggle-icon{width:30px;height:30px;flex-basis:30px}.ui-toggle-copy b{font-size:12px}.ui-toggle-copy small{font-size:11px}}
+
+/* The native input stays semantic; selection and option states use the same palette. */
+.ui-select-trigger:disabled>svg{opacity:.6}.ui-search-field:has(.ui-search-clear:focus-visible){box-shadow:0 0 0 3px var(--field-halo)}

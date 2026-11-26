@@ -42,3 +42,4 @@ V4.13 follow-up: honor app-level reduced motion in JS FLIP as well as CSS, impro
 
 ## Iteration 14 — branded form controls
 V4.13 latest CI [45892460839](https://github.com/salesrocketdev/focus-workspace/actions/runs/45892460839) and Pages succeeded. Replaced native selects throughout app with custom accessible select-only combobox, unified text/search/textarea fields, and switch cards for automatic focus/break, onboarding layout, motion and compact editor collision toggle. Retained checkboxes for task and calendar selection. Updated Storybook and interaction tests to use actual dropdown and switch semantics. New CI and screenshots pending; top-layer behavior on native iOS/Windows shells remains unverified.
+V4.14 follow-up: guarded popover fallback cleanup and corrected singular minute labels.
