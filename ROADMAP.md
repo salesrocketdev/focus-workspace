@@ -14,3 +14,6 @@ Delivery status lives in GitHub Issues; phases below are release gates, not date
 | M7 Public release | Security/accessibility/provider policy review, license and release documentation |
 
 M0–M4 first usable Windows/web target. A thin vertical slice (timer + one widget + local persistence) is recommended before building all widgets. Mobile spike early, packaging later. Release sequencing subject to review. No coding in M0.
+
+## M0 visual approval gate
+Issues #28–#33 cover the isolated V4 code prototype. Review real screenshots and interaction evidence, then approve before proceeding to M1. This does not supersede original reference issue #3 or Project board issue #4.
