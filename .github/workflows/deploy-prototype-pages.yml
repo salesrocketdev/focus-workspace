@@ -57,3 +57,31 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Verify live React prototype (not Jekyll)
+        env:
+          SITE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, time, urllib.request, urllib.parse, re
+          url = os.environ["SITE_URL"].rstrip("/") + "/"
+          for attempt in range(18):
+              try:
+                  request = urllib.request.Request(url + "?deploy=" + os.environ["GITHUB_SHA"], headers={"Cache-Control": "no-cache"})
+                  with urllib.request.urlopen(request, timeout=15) as response:
+                      html = response.read().decode()
+                  assert 'id="root"' in html, "Live site does not contain the React mount element"
+                  match = re.search(r'<script[^>]+src="([^"]+/assets/[^"]+\.js)"', html)
+                  assert match, "Vite bundle not found"
+                  asset_url = urllib.parse.urljoin(url, match.group(1))
+                  with urllib.request.urlopen(asset_url, timeout=15) as response:
+                      assert response.status == 200 and "javascript" in response.headers.get("Content-Type", "").lower(), "JavaScript asset is unavailable"
+                  print("Verified live React HTML and JS:", url, asset_url)
+                  break
+              except Exception as error:
+                  print(f"Attempt {attempt + 1}: {error}", flush=True)
+                  if attempt == 17:
+                      raise
+                  time.sleep(10)
+          PY
