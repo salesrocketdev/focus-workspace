@@ -30,6 +30,7 @@ test('toggle cards persist and search fields can be cleared',async({page},info)=
  await expect(toggle).toHaveAttribute('aria-checked','false');
  await toggle.focus();await page.keyboard.press('Space');await expect(toggle).toHaveAttribute('aria-checked','true');
  await page.screenshot({path:info.outputPath('toggle-cards-light.png'),animations:'disabled',scale:'css'});
+ await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Aparência',exact:true}).click();
  await page.getByRole('button',{name:'Escuro',exact:true}).click();
  await page.screenshot({path:info.outputPath('toggle-cards-dark.png'),animations:'disabled',scale:'css'});
  await page.reload();await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();

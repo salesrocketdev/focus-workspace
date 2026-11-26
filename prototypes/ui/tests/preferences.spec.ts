@@ -21,6 +21,7 @@ test('onboarding, simulated OAuth and focus preferences persist locally',async({
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
  await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
  await expect(page.getByRole('combobox',{name:'Duração do Pomodoro'})).toHaveText('1 minuto');
+ await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Integrações',exact:true}).click();
  for(const provider of ['Google Agenda','Microsoft Outlook','Spotify','Gmail','Google Meet','Microsoft Teams']){
   await page.getByRole('button',{name:'Conectar '+provider,exact:true}).click();
   await expect(dialog).toContainText('Simulação OAuth');
@@ -34,6 +35,7 @@ test('onboarding, simulated OAuth and focus preferences persist locally',async({
  await expect(dialog).toHaveCount(0);
  await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
  await expect(page.getByRole('combobox',{name:'Duração do Pomodoro'})).toHaveText('1 minuto');
+ await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Integrações',exact:true}).click();
  await page.getByRole('button',{name:'Gerenciar Spotify',exact:true}).click();
  await dialog.getByRole('button',{name:'Desconectar',exact:true}).click();
  await expect(page.getByRole('button',{name:'Conectar Spotify',exact:true})).toBeVisible();

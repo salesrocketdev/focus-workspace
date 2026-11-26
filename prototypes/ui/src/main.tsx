@@ -14,5 +14,8 @@ import './preferences.css';
 import './history.css';
 import './appearance.css';
 import './form-controls.css';
+import './settings.css';
+import { registerNotificationWorker } from './notifications';
+if(import.meta.env.PROD)void registerNotificationWorker();
 
 createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>);

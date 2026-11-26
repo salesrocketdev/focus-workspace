@@ -147,6 +147,7 @@ test('provider artwork is local, legible and consistent across views',async({pag
  await nav.getByRole('button',{name:'Agenda',exact:true}).click();
  await expect(page.locator('.agenda-list .provider-mark[data-provider="outlook"]')).toBeVisible();
  await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Integrações',exact:true}).click();
  const list=page.locator('.integration-preview-list');
  await expect(list.locator('.provider-mark')).toHaveCount(6);
  for(const img of await list.locator('img').all()){

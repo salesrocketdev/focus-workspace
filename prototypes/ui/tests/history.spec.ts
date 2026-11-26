@@ -44,6 +44,7 @@ test('appearance preference persists and system motion is respected',async({page
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
  await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Aparência',exact:true}).click();
  await page.getByRole('button',{name:'Escuro',exact:true}).click();
  await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
  await page.getByRole('switch',{name:'Reduzir animações'}).click();
@@ -54,6 +55,7 @@ test('appearance preference persists and system motion is respected',async({page
  await expect(page.locator('html')).toHaveAttribute('data-motion','reduced');
  await page.screenshot({path:info.outputPath('dashboard-dark.png'),animations:'disabled',scale:'css'});
  await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Aparência',exact:true}).click();
  await page.getByRole('button',{name:'Sistema',exact:true}).click();
  await page.emulateMedia({colorScheme:'light'});
  await expect(page.locator('html')).toHaveAttribute('data-theme','light');
