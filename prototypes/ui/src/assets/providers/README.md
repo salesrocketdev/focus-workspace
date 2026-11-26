@@ -17,3 +17,5 @@ Before releasing production builds, verify usage rights, approved asset versions
 - Spotify: https://developer.spotify.com/documentation/design
 
 Keep assets local; no third-party image requests at runtime. Do not recolor brand marks or use them in the Focus Workspace logo.
+
+- `google-signin.svg`: https://github.com/gilbarbara/logos/blob/main/logos/google-icon.svg — Google identity mark, separate from Gmail and Calendar. Production sign-in button must use the provider-approved implementation.

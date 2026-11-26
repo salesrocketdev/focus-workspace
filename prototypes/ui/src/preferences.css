@@ -99,3 +99,7 @@
 @media(max-width:1250px){.settings-page{grid-template-columns:1fr}}
 @media(max-width:759px){.settings-surface{padding:13px;gap:12px}.settings-page .focus-settings-fields{grid-template-columns:1fr}.settings-page .integration-preview-row{gap:8px}.settings-page .integration-preview-row>.provider-label{font-size:12px;flex-shrink:1}.integration-state .ui-button{min-width:68px}.focus-center>.ui-button{height:30px;min-height:30px}.widget .task-list{gap:6px!important}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+.google-signin-mark{object-fit:contain;flex:0 0 24px}
+.notes-preview{display:grid;gap:7px;min-width:0}.notes-preview p{font-size:12px;line-height:1.4;white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;color:var(--ui-muted)}.notes-preview .ui-button{justify-self:start}.notes-dialog-label{display:grid;gap:8px;font-size:13px;font-weight:550}.notes-dialog-label textarea{width:100%;padding:10px;border:1px solid var(--ui-line);border-radius:8px;background:var(--ui-paper);font:inherit;resize:vertical}
+@container(max-height:150px){.coordinate-grid .notes-preview p{-webkit-line-clamp:1}.coordinate-grid .notes-preview{gap:4px}}

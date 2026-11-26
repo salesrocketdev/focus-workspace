@@ -36,8 +36,8 @@ test('onboarding, simulated OAuth and focus preferences persist locally',async({
  await expect(page.getByRole('button',{name:'Conectar Spotify',exact:true})).toBeVisible();
  await nav.getByRole('button',{name:'Hoje',exact:true}).click();
  await expect(page.getByRole('img',{name:'01:00 · Leitura'})).toBeVisible();
- await page.getByRole('button',{name:'Iniciar foco',exact:true}).click();
  await page.clock.install();
+ await page.getByRole('button',{name:'Iniciar foco',exact:true}).click();
  await page.clock.fastForward(62000);
  await expect(page.getByRole('img',{name:'03:00 · Pausa curta'})).toBeVisible();
 });

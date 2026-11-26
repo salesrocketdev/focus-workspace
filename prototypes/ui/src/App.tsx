@@ -61,6 +61,8 @@ export function App(){
  const [volume,setVolume]=useState(65);
  const [track,setTrack]=useState(0);
  const [notes,setNotes]=useState('');
+ const [showNotes,setShowNotes]=useState(false);
+ const [noteDraft,setNoteDraft]=useState('');
  const [showProgress,setShowProgress]=useState(false);
  const [pageInput,setPageInput]=useState('72');
  const [completed,setCompleted]=useState(0);
@@ -77,7 +79,7 @@ export function App(){
  useEffect(()=>{if(!running)return;let finished=false;const tick=()=>{if(finished)return;const elapsed=Math.floor((Date.now()-clock.current)/1000);const value=mode==='Livre'?elapsed:Math.max(0,duration-elapsed);setSeconds(value);if(mode!=='Livre'&&value===0){finished=true;const next=nextPhase(phase,cycle,prefs);if(phase==='focus')setCompleted(c=>c+1);setPhase(next.phase);setCycle(next.cyclesDone);const length=phaseDuration(next.phase,prefs);setDuration(length);setSeconds(length);clock.current=Date.now();setRunning(next.auto);setMessage(phase==='focus'?'Foco concluído. '+phaseName(next.phase)+' disponível.':'Pausa concluída. Próximo foco disponível.')}};const id=window.setInterval(tick,250);tick();return()=>window.clearInterval(id)},[running,mode,duration,phase,cycle,prefs]);
  function setMethod(value:'Pomodoro'|'Livre'){if(hasSession||value===mode)return;setMode(value);setPhase('focus');setCycle(0);setDuration(prefs.focus);setSeconds(value==='Livre'?0:prefs.focus)}
  function toggle(){if(running){setRunning(false);return}if(mode==='Pomodoro'&&seconds===0){setSeconds(duration);clock.current=Date.now();setRunning(true);return}clock.current=Date.now()-(mode==='Livre'?seconds:duration-seconds)*1000;setRunning(true)}
- function reset(){setRunning(false);setSeconds(mode==='Livre'?0:duration)}
+ function reset(){setRunning(false);setPhase('focus');setCycle(0);setDuration(prefs.focus);setSeconds(mode==='Livre'?0:prefs.focus)}
  function stop(){setRunning(false);if(phase==='focus'&&((mode==='Livre'&&seconds>0)||(mode!=='Livre'&&seconds<duration)))setCompleted(c=>c+1);setPhase('focus');setCycle(0);setDuration(prefs.focus);setSeconds(mode==='Livre'?0:prefs.focus);setMessage('Sessão encerrada (demo).')}
  function navigate(next:View){if(editing&&next!=='edit'){setMessage('Salve ou cancele a edição antes de sair.');return}setView(next)}
  function startEdit(){setOpenMenu(null);setPushNeighbors(false);setCataloguePreview(null);catalogueDrag.current=null;setQuery('');setEditKey(key);setDraft((key==='desktop'?resolveLayout(layouts[key]):layouts[key]).map(w=>({...w,placement:w.placement?{...w.placement}:undefined})));setSelected(layouts[key][0]?.id??'');setShowCatalogue(false);setView('edit')}
@@ -146,7 +148,7 @@ export function App(){
    case 'goal':return <div className="goal-body"><div className="gauge"><svg viewBox="0 0 140 80"><path d="M12 70 A58 58 0 0 1 128 70" fill="none" stroke="#e5ded8" strokeWidth="8" strokeLinecap="round"/><path d="M12 70 A58 58 0 0 1 128 70" fill="none" stroke="#79b384" strokeWidth="8" pathLength="100" strokeDasharray={Math.min(100,135/prefs.goal*100)+' 100'} strokeLinecap="round"/></svg><div><strong>2h 15min</strong><small>de {prefs.goal%60===0?prefs.goal/60+' horas':prefs.goal+' min'}</small></div></div><footer><span><Timer size={13}/> {5+completed} sessões</span><span><Flame size={13} color="#df702c"/> 7 dias seguidos</span></footer></div>;
    case 'music':return player();
    case 'summary':return <div className="summary-body"><div><strong>2h 15min <em>+32%</em></strong><small>de foco · vs. ontem</small></div><div className="bars" aria-label="Gráfico ilustrativo">{[30,55,39,76,61].map((h,i)=><i key={i} style={{height:h+'%'}}/>)}</div></div>;
-   case 'notes':return <textarea aria-label="Notas rápidas" value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Escreva uma nota…"/>;
+   case 'notes':return <div className="notes-preview"><p>{notes||'Escreva uma nota rápida…'}</p><Button variant="soft" size="sm" onClick={()=>{setNoteDraft(notes);setShowNotes(true)}}>Editar nota</Button></div>;
    case 'next':return <AgendaRows single/>;
    case 'recent':return <div className="muted">Leitura · 30 min<br/>Estudo · 25 min<br/>Trabalho · 50 min</div>;
   }
@@ -180,6 +182,7 @@ export function App(){
  {(view!=='focus'||mobile)&&<nav className="bottom-nav">{navigation.map(n=><button key={n.id} className={view===n.id||(editing||view==='focus')&&n.id==='today'?'active':''} onClick={()=>navigate(n.id)}><n.icon size={20} strokeWidth={1.8}/><span>{n.id==='settings'?'Ajustes':n.title}</span></button>)}</nav>}
  {showOnboarding&&<Onboarding profile={profile} prefs={prefs} onFinish={finishOnboarding} onDismiss={skipOnboarding}/>}
  {showFocusSettings&&<Dialog title="Configurar sessão de foco" description="Preferências para as próximas sessões." onDismiss={()=>setShowFocusSettings(false)}><FocusSettings prefs={prefs} onChange={changePreferences} disabled={hasSession}/><footer className="dialog-actions"><Button onClick={()=>setShowFocusSettings(false)}>Concluir</Button></footer></Dialog>}
+ {showNotes&&<Dialog title="Notas rápidas" description="Edite sua anotação sem rolagem dentro do widget." onDismiss={()=>setShowNotes(false)}><form className="dialog-form" onSubmit={e=>{e.preventDefault();setNotes(noteDraft);setShowNotes(false)}}><label className="notes-dialog-label">Anotação<textarea value={noteDraft} onChange={e=>setNoteDraft(e.target.value)} rows={6} maxLength={4000}/></label><footer className="dialog-actions"><Button variant="secondary" onClick={()=>setShowNotes(false)}>Cancelar</Button><Button type="submit">Salvar</Button></footer></form></Dialog>}
  {showProgress&&<Dialog title="Atualizar progresso" description="Registre onde você parou na leitura." onDismiss={()=>setShowProgress(false)}>
  <form className="dialog-form" onSubmit={e=>{e.preventDefault();const n=Number(pageInput);if(Number.isInteger(n)&&n>=0&&n<=readingBook.pages){setPage(n);setShowProgress(false);setMessage('Progresso atualizado.')}}}>
   <div className="dialog-book"><Cover title={readingBook.title}/><div><b>{readingBook.title}</b><small>{readingBook.author}</small><small>Pág. {page} de {readingBook.pages} · {pct}%</small></div></div>
