@@ -67,3 +67,7 @@ V4.19 Pages passed; CI left one compact/tablet editor width regression. Tightene
 ## Iteration 21 — immersive, filters, integrations and iOS
 V4.20 CI and Pages passed. Removed immersive mobile tabbar and fixed centered header grid; transactional mobile history filter sheet; grouped integration cards with status and demo warning; keyboard-aware mobile dialogs via VisualViewport; WebKit prefixed route animations and actual animation event regression, preserving system reduced motion. Added dedicated iPhone WebKit CI project rather than relying on mobile Chromium only. Physical iPhone keyboard and PWA motion remain unverified; simulated visual viewport is not a real OS keyboard. Latest CI pending.
 V4.21 hotfix: CI 45900036075 and Pages 45900027946 failed at TypeScript compilation (TS2367). The mobile tabbar render guard excludes focus, so remove unreachable view==='focus' checks in the tabbar's active state and aria-current. Preserve the immersive tabbar removal and all other V4.21 changes. Fresh CI required.
+
+
+## V4.22 — minimal mobile activity tabs
+V4.21 hotfix Pages succeeded; CI 63 passed / 3 failed due to stale integration summary and mobile autofocus expectations. Update those assertions to verify the actual new UI and deliberate input focus. Replace mobile activity section segmented boxes with transparent text tabs and a thin animated active underline; preserve 44px touch targets, accessible pressed state, dark theme and reduced motion. Desktop and task-status filters unchanged. New mobile geometry regression and screenshot; CI pending.

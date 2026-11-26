@@ -153,7 +153,7 @@ test('provider artwork is local, legible and consistent across views',async({pag
  for(const img of await list.locator('img').all()){
   expect(await img.evaluate((el:HTMLImageElement)=>el.complete&&el.naturalWidth>0&&el.offsetWidth===24&&el.offsetHeight===24)).toBeTruthy();
  }
- await expect(page.getByText('Nenhum provedor conectado nesta prévia.')).toBeVisible();
+ await expect(page.getByText('0 de 6 conexões simuladas',{exact:true})).toBeVisible();
  await page.screenshot({path:info.outputPath('provider-icons.png'),animations:'disabled',scale:'css'});
  await nav.getByRole('button',{name:'Hoje',exact:true}).click();
  await page.getByRole('button',{name:'Editar painel',exact:true}).click();
@@ -170,6 +170,10 @@ test('reading dialog uses shared controls and accessible modal behavior',async({
  await opener.click();
  const dialog=page.getByRole('dialog',{name:'Atualizar progresso'});
  await expect(dialog).toBeVisible();
+ if(info.project.name==='mobile'){
+  await expect(dialog.getByRole('button',{name:'Fechar diálogo'})).toBeFocused();
+  await dialog.getByRole('spinbutton',{name:'Página atual'}).click();
+ }
  await expect(dialog.getByRole('spinbutton',{name:'Página atual'})).toBeFocused();
  const heights=await dialog.locator('.dialog-actions .ui-button').evaluateAll(nodes=>nodes.map(n=>n.getBoundingClientRect().height));
  expect(heights).toEqual(Array(2).fill(info.project.name==='mobile'?44:36));

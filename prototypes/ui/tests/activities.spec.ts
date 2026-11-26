@@ -55,3 +55,23 @@ test('activities share tasks, categories, books and timer context with dashboard
  await expect(page.locator('[data-widget=reading]')).toContainText('40%');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
 });
+
+ test('mobile section tabs are compact, aligned and touch accessible',async({page},info)=>{
+ test.skip(info.project.name!=='mobile','Mobile layout');
+ await page.goto('/');
+ await page.locator('.bottom-nav').getByRole('button',{name:'Atividades',exact:true}).click();
+ const tabs=page.getByRole('group',{name:'Seções de atividades'});
+ for(const width of [320,390,430]){
+  await page.setViewportSize({width,height:844});
+  const boxes=await tabs.getByRole('button').evaluateAll(nodes=>nodes.map(n=>{const r=n.getBoundingClientRect();return {y:r.y,h:r.height,w:r.width}}));
+  expect(boxes).toHaveLength(3);expect(boxes.every(b=>b.h>=44&&b.h<=45&&b.w>=44)).toBeTruthy();
+  expect(Math.max(...boxes.map(b=>b.y))-Math.min(...boxes.map(b=>b.y))).toBeLessThan(1);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
+ }
+ for(const title of ['Tarefas','Leituras','Visão geral']){
+  await tabs.getByRole('button',{name:title,exact:true}).click();
+  await expect(tabs.getByRole('button',{name:title,exact:true})).toHaveAttribute('aria-pressed','true');
+  await expect(tabs.locator('button[aria-pressed=true]')).toHaveCount(1);
+ }
+ await page.screenshot({path:info.outputPath('mobile-minimal-activity-tabs.png'),animations:'disabled',scale:'css'});
+});

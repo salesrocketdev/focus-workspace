@@ -194,3 +194,15 @@
  .integration-service-copy b{font-size:14px}
  .integration-group-rows{padding:0 12px}
 }
+
+/* V4.22 — lightweight section tabs, preserving a 44px touch target. */
+@media(max-width:759px){
+ .activity-topbar>.activity-tabs:not(.small-tabs){display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;gap:0;padding:0;border:0;border-bottom:1px solid var(--ui-line);border-radius:0;background:transparent;box-shadow:none}
+ .activity-topbar>.activity-tabs:not(.small-tabs)>button{position:relative;min-width:0;min-height:44px;height:44px;padding:0 4px 2px;font-size:13px;font-weight:500;line-height:1.25;letter-spacing:-.01em;white-space:nowrap;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--ui-muted)}
+ .activity-topbar>.activity-tabs:not(.small-tabs)>button[aria-pressed=true]{background:transparent;box-shadow:none;color:var(--field-selected-ink);font-weight:650}
+ .activity-topbar>.activity-tabs:not(.small-tabs)>button::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2px;border-radius:2px 2px 0 0;background:var(--field-focus);opacity:0;transform:scaleX(.4);transition:opacity 160ms ease,transform 180ms var(--motion-ease)}
+ .activity-topbar>.activity-tabs:not(.small-tabs)>button[aria-pressed=true]::after{opacity:1;transform:scaleX(1)}
+ .activity-topbar>.activity-tabs:not(.small-tabs)>button:focus-visible{outline-offset:-3px;border-radius:6px}
+}
+@media(prefers-reduced-motion:reduce){.activity-topbar>.activity-tabs>button::after{transition:none}}
+[data-motion=reduced] .activity-topbar>.activity-tabs>button::after{transition:none}
