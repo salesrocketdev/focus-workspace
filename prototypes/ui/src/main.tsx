@@ -24,7 +24,6 @@ import './distraction-shield.css';
 import './filter-polish.css';
 import './focus-mobile.css';
 import './activity-polish.css';
-import { registerNotificationWorker } from './notifications';
-if(import.meta.env.PROD)void registerNotificationWorker();
+import './offline.css';
 
 createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>);

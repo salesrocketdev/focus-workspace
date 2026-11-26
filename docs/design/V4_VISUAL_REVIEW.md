@@ -107,3 +107,7 @@ Previous filter/chart CI and Pages passed. Mobile-only transport adopts a single
 
 ## Quiet activity cards and contextual buttons
 Previous focus mobile hotfix CI and Pages passed. Replace wrapped mobile category mini-cards with full-width clickable rows in a shared surface, preserve contextual focus and accessible labels. Desktop uses two columns of rows. Compact metrics, neutral task edit/play icons, inline library start/details actions, search/manual add in a single header, quiet dashboard secondary actions. Keep mobile 44px targets; test narrow layouts and category/book interactions. CI pending; physical device inspection pending.
+
+
+## Offline app shell
+Previous activity polish CI/Pages passed. Add deterministic production precache, scoped version caches, waiting activation, offline readiness and connection indicator, retain notifications. CI production subpath offline desktop/mobile tests. Offline cache is not persistent storage guarantee or background alarm; no external provider cache. See docs/features/OFFLINE_PWA.md. New CI and device verification pending.

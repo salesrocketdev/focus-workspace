@@ -72,3 +72,6 @@ Mobile immersive focus uses a prominent labeled start/pause button, quiet reset/
 
 
 Activities overview uses a single surface of compact category rows (mobile one column, desktop two), with full-row focus action and task counts. Library uses compact rows with inline reading and details actions, and a single header with search/manual add. Secondary task/dashboard actions remain quiet; primary session and form actions keep emphasis.
+
+
+Profile and panel settings show offline cache readiness and waiting updates. The published app can reopen offline after first successful preparation; the connection indicator appears only when the browser reports offline. Local demo functions remain available; external provider calls are not cached.

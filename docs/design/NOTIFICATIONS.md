@@ -23,3 +23,6 @@ Browsers cannot grant or observe OS-level Do Not Disturb access. Provide a volun
 
 ### Opt-in start handoff
 The iOS preference `Silenciar notificações ao iniciar foco` is off by default and migrates the prior reminder-only setting. With the preference enabled, a fresh manually initiated focus uses the original user gesture to invoke `Focora - Silenciar`, passing rounded minutes (1–120). Persist the running workspace synchronously before opening Shortcuts; if storage fails, offer the manual guide instead. No launch on refresh, pause/resume or automatic transitions; the user may invoke the existing manual link for those cases. Free focus uses the configured Pomodoro duration as a finite initial silence period. A configured OS Focus may replace another active Focus. No automatic ending or native state claim. User can disable in Control Center. Apple documents the URL scheme at https://support.apple.com/guide/shortcuts/apd624386f42/ios . Physical-device setup and execution remain required.
+
+
+The production notification worker also precaches the versioned app shell. This does not change the background notification limitation. Updates wait for existing clients to close, avoiding forced reload of active focus sessions.
