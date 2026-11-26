@@ -69,3 +69,6 @@ Agenda, History and Activities use lightweight text filters with an underline ra
 
 
 Mobile immersive focus uses a prominent labeled start/pause button, quiet reset/stop controls, underline method tabs, compact activity picker and secondary Ajustes/Não Perturbe actions. Method changes are explicitly disabled during active sessions. Desktop transport keeps its original icon layout.
+
+
+Activities overview uses a single surface of compact category rows (mobile one column, desktop two), with full-row focus action and task counts. Library uses compact rows with inline reading and details actions, and a single header with search/manual add. Secondary task/dashboard actions remain quiet; primary session and form actions keep emphasis.

@@ -103,3 +103,7 @@ Previous iOS shortcut commit CI and Pages passed. Unify agenda day/week/month, h
 
 ## Mobile immersive focus controls
 Previous filter/chart CI and Pages passed. Mobile-only transport adopts a single filled start/pause pill with readable labels and quiet reset/stop icon actions, compact text method tabs, borderless context/secondary actions, retained 44px touch targets and centered header. Disable unavailable method changes during a session rather than silently ignoring them. Desktop controls retain layout. Add mobile and WebKit tests for alignment and timer actions. CI pending.
+
+
+## Quiet activity cards and contextual buttons
+Previous focus mobile hotfix CI and Pages passed. Replace wrapped mobile category mini-cards with full-width clickable rows in a shared surface, preserve contextual focus and accessible labels. Desktop uses two columns of rows. Compact metrics, neutral task edit/play icons, inline library start/details actions, search/manual add in a single header, quiet dashboard secondary actions. Keep mobile 44px targets; test narrow layouts and category/book interactions. CI pending; physical device inspection pending.
