@@ -1,6 +1,7 @@
 export type WidgetType = 'focus' | 'agenda' | 'tasks' | 'reading' | 'goal' | 'music' | 'summary' | 'notes' | 'next' | 'recent';
 export type Size = 'small' | 'medium' | 'large';
-export interface Widget { id: string; type: WidgetType; size: Size }
+export interface Placement { x:number; y:number; w:number; h:number }
+export interface Widget { id: string; type: WidgetType; size: Size; placement?:Placement }
 export type Layouts = Record<'desktop' | 'mobile', Widget[]>;
 export const catalogue: {type:WidgetType; title:string; description:string; size:Size}[] = [
  {type:'focus',title:'Temporizador',description:'Pomodoro, cronômetro e foco livre',size:'large'},

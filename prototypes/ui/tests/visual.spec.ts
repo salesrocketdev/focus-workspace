@@ -199,3 +199,59 @@ test('local Inter font and settings field render consistently',async({page},info
  await nav.getByRole('button',{name:'Hoje',exact:true}).click();
  await expect(page.getByRole('img',{name:'50:00 · Leitura'})).toBeVisible();
 });
+
+test('desktop coordinate grid moves and resizes in both axes with collision protection',async({page},info)=>{
+ if(info.project.name!=='desktop')return;
+ await page.goto('/');
+ await page.getByRole('button',{name:'Editar painel',exact:true}).click();
+ const grid=page.locator('.coordinate-grid');
+ const focus=grid.locator('[data-widget=focus]');
+ const position=async()=>JSON.parse((await focus.getAttribute('data-placement'))!);
+ const initial=await position();
+ expect(initial).toEqual({x:0,y:0,w:6,h:6});
+ // An occupied neighbor blocks a width increase.
+ await page.getByRole('button',{name:'Alterar largura de Foco (Pomodoro)',exact:true}).focus();
+ await page.keyboard.press('ArrowRight');
+ expect(await position()).toEqual(initial);
+ await page.getByRole('button',{name:'Remover Agenda de hoje',exact:true}).click();
+ await page.getByRole('button',{name:'Remover Tarefas',exact:true}).click();
+ await page.getByRole('button',{name:'Alterar largura de Foco (Pomodoro)',exact:true}).focus();
+ await page.keyboard.press('ArrowRight');
+ expect((await position()).w).toBe(7);
+ await page.keyboard.press('ArrowLeft');
+ expect((await position()).w).toBe(6);
+ // Move into newly vacant calendar columns, then resize downward into free space.
+ const grip=page.getByRole('button',{name:'Arrastar Foco (Pomodoro)',exact:true});
+ const box=(await grip.boundingBox())!;
+ const step=await grid.evaluate(el=>(el.clientWidth-parseFloat(getComputedStyle(el).paddingLeft)-parseFloat(getComputedStyle(el).paddingRight)+parseFloat(getComputedStyle(el).columnGap))/12);
+ await page.mouse.move(box.x+box.width/2,box.y+box.height/2);
+ await page.mouse.down();await page.mouse.move(box.x+box.width/2+step,box.y+box.height/2,{steps:6});
+ await expect(grid.locator('.grid-ghost.valid')).toBeVisible();
+ await page.screenshot({path:info.outputPath('grid-drag-preview.png'),animations:'disabled',scale:'css'});
+ await page.mouse.up();
+ expect((await position()).x).toBe(1);
+ await grip.focus();await page.keyboard.press('ArrowLeft');
+ expect((await position()).x).toBe(0);
+ // Reading begins at x=4; shrink focus width to four to open vertical space.
+ const width=page.getByRole('button',{name:'Alterar largura de Foco (Pomodoro)',exact:true});
+ await width.focus();await page.keyboard.press('ArrowLeft');await page.keyboard.press('ArrowLeft');
+ expect((await position()).w).toBe(4);
+ const corner=page.getByRole('button',{name:'Redimensionar Foco (Pomodoro)',exact:true});
+ const handle=(await corner.boundingBox())!;
+ await page.mouse.move(handle.x+handle.width/2,handle.y+handle.height/2);await page.mouse.down();
+ await page.mouse.move(handle.x+handle.width/2,handle.y+handle.height/2+38,{steps:5});
+ await expect(grid.locator('.grid-ghost.valid')).toBeVisible();
+ await page.mouse.up();
+ expect((await position()).h).toBe(7);
+ const saved=await position();
+ await page.getByRole('button',{name:'Salvar painel',exact:true}).click();
+ await page.reload();
+ expect(await position()).toEqual(saved);
+ const rects=await page.locator('.coordinate-grid > .widget').evaluateAll(nodes=>nodes.map(n=>{const r=n.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height}}));
+ for(let i=0;i<rects.length;i++)for(let j=i+1;j<rects.length;j++){const a=rects[i],b=rects[j];expect(a.x<b.x+b.w-1&&a.x+a.w>b.x+1&&a.y<b.y+b.h-1&&a.y+a.h>b.y+1).toBeFalsy()}
+ await page.getByRole('button',{name:'Editar painel',exact:true}).click();
+ await page.getByRole('button',{name:'Restaurar layout',exact:true}).click();
+ expect(await position()).toEqual(initial);
+ await page.getByRole('button',{name:'Cancelar',exact:true}).click();
+ expect(await position()).toEqual(saved);
+});

@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ButtonHTMLAttributes, type ReactNode, type DragEvent } from 'react';
+import { useEffect, useRef, type ButtonHTMLAttributes, type ReactNode, type DragEvent, type PointerEvent as ReactPointerEvent, type CSSProperties } from 'react';
 import { Grip, Ellipsis, X, ChevronUp, ChevronDown, Plus, BookOpen, Play, Pause, SkipBack, SkipForward, Heart, Settings, ChevronDown as Down, type LucideIcon } from 'lucide-react';
 import { Ring, Cover, Progress } from './components';
 import type { Size, WidgetType } from './model';
@@ -14,8 +14,8 @@ const sizes:Size[]=['small','medium','large'];
 export function WidgetSizeOptions({value,onChange,visual=false}:{value:Size;onChange:(size:Size)=>void;visual?:boolean}){
  return <div className={visual?'mobile-size-options edit-size-options':'edit-size-options'} role="group" aria-label="Tamanho do widget">{sizes.map((size,i)=><button type="button" key={size} aria-pressed={value===size} onClick={()=>onChange(size)}>{visual&&<span className={'size-shape shape-'+size}/>}<span>{visual?['1 × 1','2 × 1','2 × 2'][i]:['P','M','G'][i]}</span></button>)}</div>;
 }
-interface ToolbarProps{title:string;open:boolean;size:Size;onOpen:()=>void;onClose:()=>void;onDragStart:(e:DragEvent<HTMLButtonElement>)=>void;onMove:(delta:number)=>void;onResize:(size:Size)=>void;onRemove:()=>void;canMoveUp:boolean;canMoveDown:boolean}
-export function EditCardToolbar({title,open,size,onOpen,onClose,onDragStart,onMove,onResize,onRemove,canMoveUp,canMoveDown}:ToolbarProps){
+interface ToolbarProps{title:string;open:boolean;size:Size;onOpen:()=>void;onClose:()=>void;onDragStart:(e:DragEvent<HTMLButtonElement>)=>void;onPointerMoveStart?:(e:ReactPointerEvent<HTMLButtonElement>)=>void;onNudge?:(dx:number,dy:number)=>void;onMove:(delta:number)=>void;onResize:(size:Size)=>void;onRemove:()=>void;canMoveUp:boolean;canMoveDown:boolean}
+export function EditCardToolbar({title,open,size,onOpen,onClose,onDragStart,onPointerMoveStart,onNudge,onMove,onResize,onRemove,canMoveUp,canMoveDown}:ToolbarProps){
  const root=useRef<HTMLDivElement>(null);
  const trigger=useRef<HTMLButtonElement>(null);
  useEffect(()=>{
@@ -26,7 +26,7 @@ export function EditCardToolbar({title,open,size,onOpen,onClose,onDragStart,onMo
   return()=>{document.removeEventListener('pointerdown',close);document.removeEventListener('keydown',escape)};
  },[open,onClose]);
  return <div ref={root} className="edit-card-toolbar" onClick={e=>e.stopPropagation()}>
-  <EditIconButton label={'Arrastar '+title} icon={Grip} draggable onDragStart={onDragStart} onKeyDown={e=>{if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();onMove(e.key==='ArrowUp'?-1:1)}}}/>
+  <EditIconButton label={'Arrastar '+title} icon={Grip} draggable={!onPointerMoveStart} onPointerDown={onPointerMoveStart} onDragStart={onDragStart} className="grid-drag-handle" onKeyDown={e=>{const offsets:Record<string,[number,number]>={ArrowRight:[1,0],ArrowLeft:[-1,0],ArrowDown:[0,1],ArrowUp:[0,-1]};const d=offsets[e.key];if(!d)return;e.preventDefault();if(onNudge)onNudge(...d);else if(d[1])onMove(d[1])}}/>
   <button ref={trigger} type="button" className="edit-icon-button" aria-label={'Opções de '+title} aria-expanded={open} title="Opções do widget" onClick={onOpen}><Ellipsis size={15}/></button>
   <EditIconButton label={'Remover '+title} icon={X} onClick={onRemove}/>
   {open&&<div className="edit-widget-menu" role="group" aria-label={'Opções de '+title}>
@@ -37,7 +37,7 @@ export function EditCardToolbar({title,open,size,onOpen,onClose,onDragStart,onMo
   </div>}
  </div>;
 }
-export function AddWidgetTile({onClick}:{onClick:()=>void}){return <button type="button" className="add-slot edit-add-tile" onClick={onClick}><Plus size={23} strokeWidth={1.6}/><span>Adicionar widget</span><small>Escolha no catálogo</small></button>}
+export function AddWidgetTile({onClick,style}:{onClick:()=>void;style?:CSSProperties}){return <button type="button" className="add-slot edit-add-tile" style={style} onClick={onClick}><Plus size={23} strokeWidth={1.6}/><span>Adicionar widget</span><small>Escolha no catálogo</small></button>}
 interface PreviewProps{type:WidgetType;seconds:number;duration:number;mode:string;page:number;tasks:{id:number;title:string;done:boolean}[];track:string;running:boolean;music:boolean;children:ReactNode}
 export function EditPreview({type,seconds,duration,mode,page,tasks,track,running,music,children}:PreviewProps){
  const pct=Math.round(page/432*100);

@@ -29,3 +29,7 @@ Explicit edit mode, visible handles, grid preview and widget catalogue with sear
 - A single running timer remains coherent across duplicated surfaces.
 
 Candidate: React Grid Layout; verify current API and mobile accessibility in a spike. https://github.com/react-grid-layout/react-grid-layout
+
+
+## Coordinate-grid prototype (V4.08)
+At viewport widths >=1151px the prototype uses a 12-column explicit coordinate grid with independent x/y/w/h in row units. Drag the grip, resize the bottom-right corner or right/bottom edges. The ghost indicates valid placement or a collision; blocked gestures leave the original position intact. Arrow keys on grip move in either axis; arrow keys on resize handles change dimensions. P/M/G menu presets remain and can move the resized widget to the first available region if needed. Old order-only local layouts migrate deterministically without losing widgets under the supported catalogue capacity. Empty cells are visible; the add tile uses the first free 3×3 area. Save persists positions and dimensions; cancel discards the draft. Mobile and narrower desktop/tablet views keep responsive order and size presets, not the absolute coordinate editor. The prototype is a lightweight CSS Grid spike, not the final library selection.
