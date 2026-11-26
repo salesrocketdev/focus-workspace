@@ -87,3 +87,7 @@ Appearance deploy 45903927119 succeeded. Replace basic history bars with interac
 
 ## Session recovery
 Charts deployment passed, CI had three strict selector failures because both SVG and parent shared chart-line. Rename parent chart type class and fix selected-day fallback. Add versioned workspace snapshot, recovery from elapsed wall-clock time and visibility events, no automatic catch-up cycles, local history and activities, optional wake lock. New tests for running/paused/expired reload, no duplicate completion and mocked wake lock. Real iPhone behavior, cross-tab concurrency and notification delivery while closed remain unverified/out of scope. CI pending.
+
+
+## Native distraction shield and mobile refinement
+Previous session recovery CI and Pages passed. Add opt-in DND reminder, accessible native Focus guide, iOS explicit shortcut invocation with duration; no false system state. Mobile prioritize timer above reading card, compact secondary actions, long book titles, notification rows, dialogs and touch targets. Update outdated activity persistence copy. Tests added for reminder persistence, shortcut URL, mobile geometry and existing session behavior; physical iPhone verification pending.

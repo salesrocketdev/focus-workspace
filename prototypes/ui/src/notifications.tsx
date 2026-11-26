@@ -1,6 +1,7 @@
 import { useEffect,useState } from 'react';
 import { Bell,BellRing,CheckCheck,Clock,Timer,Coffee,Monitor,Info,Trash2 } from 'lucide-react';
 import { Button,Dialog,ToggleCard } from './ui';
+import {DistractionSettings,type ShieldPreferences} from './distraction-shield';
 import { readStorage,writeStorage } from './preferences-model';
 type Kind='focus'|'break'|'test';
 type Permission=NotificationPermission|'unsupported';
@@ -55,8 +56,9 @@ export type Notifications=ReturnType<typeof useNotifications>;
 export function NotificationBell({unread,onClick}:{unread:number;onClick:()=>void}){
  return <button type="button" className="ui-icon-button notification-bell" aria-label="Abrir notificações" onClick={onClick}><Bell size={19}/>{unread>0&&<span className="notification-count" aria-label={unread+' não lidas'}>{unread>9?'9+':unread}</span>}</button>;
 }
-export function NotificationSettings({notifications:n}:{notifications:Notifications}){
+export function NotificationSettings({notifications:n,shield,onShield}:{notifications:Notifications;shield?:ShieldPreferences;onShield?:()=>void}){
  return <section className="settings-surface"><header className="settings-section-header"><BellRing size={20}/><div><h2>Notificações</h2><p>Escolha os avisos que deseja receber durante suas sessões.</p></div></header>
+ {shield&&onShield&&<DistractionSettings shield={shield} onOpen={onShield}/>}
  <div className="settings-subgroup"><h3>Avisos de atividade</h3><ToggleCard title="Fim do período de foco" description="Receba um aviso quando o temporizador de foco terminar." icon={<Timer size={19}/>} checked={n.prefs.focus} onChange={v=>n.update({...n.prefs,focus:v})}/><ToggleCard title="Fim da pausa" description="Saiba quando estiver na hora de retomar a concentração." icon={<Coffee size={19}/>} checked={n.prefs.breaks} onChange={v=>n.update({...n.prefs,breaks:v})}/></div>
  <div className="settings-subgroup"><h3>Notificações do sistema</h3>{n.installRequired&&<div className="ios-install-guide"><Info size={20}/><div><b>Ative as notificações no iPhone ou iPad</b><p>É necessário iOS/iPadOS 16.4 ou posterior e abrir o Focora como aplicativo instalado.</p><ol><li>Abra este site no Safari e toque em Compartilhar.</li><li>Escolha Adicionar à Tela de Início (e Abrir como App da Web, se disponível).</li><li>Abra o Focora pelo ícone, volte a esta tela e autorize as notificações.</li><li>Envie uma notificação de teste.</li></ol></div></div>}<ToggleCard title="Exibir notificações no dispositivo" description="Além dos avisos na central do aplicativo." icon={<Monitor size={19}/>} checked={n.prefs.native&&n.access==='granted'} disabled={n.access!=='granted'} onChange={v=>n.update({...n.prefs,native:v})}/><div className="notification-permission"><div><b>{n.access==='granted'?'Permissão concedida':n.access==='denied'?'Permissão bloqueada':n.access==='unsupported'?(n.installRequired?'Instalação necessária':'Indisponível neste ambiente'):'Permissão ainda não solicitada'}</b><small>{n.access==='denied'?'Altere a permissão nas configurações do navegador.':n.access==='unsupported'?(n.installRequired?'Abra o aplicativo instalado para solicitar autorização.':'Use um navegador compatível em HTTPS. No iOS, instale na tela inicial.'):'O navegador controla a autorização.'}</small></div>{n.access==='default'&&<Button variant="secondary" onClick={()=>void n.enable()}>Autorizar notificações</Button>}</div></div>
  <div className="notification-test"><Button variant="secondary" onClick={()=>n.publish('test','Notificação de teste','Tudo pronto para receber seus avisos de foco.')}><Bell size={16}/> Enviar notificação de teste</Button>{n.feedback&&<small role="status">{n.feedback}</small>}</div>

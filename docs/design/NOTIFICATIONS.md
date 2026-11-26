@@ -15,3 +15,7 @@ V4.17: iOS browser explicitly shows Home Screen installation steps; standalone d
 
 
 Local session recovery now reconciles elapsed time on reopening or visibility changes. This is not a background alarm: notifications for an expired session may be delivered only upon return. An overdue focus is logged once in a single running tab and the next phase awaits manual start; no fictional catch-up focus blocks. Multi-tab coordination remains a production requirement.
+
+
+## Native distraction control (prototype)
+Browsers cannot grant or observe OS-level Do Not Disturb access. Provide a voluntary reminder at the start of a new manually initiated focus and a guide accessible from notification settings, immersive focus and quick actions. On iOS, a user-initiated `shortcuts://run-shortcut` link invokes the user's own shortcut `Focora - Silenciar` with numeric text minutes. Configure Set Focus until current date plus input minutes in Shortcuts. No shortcut installation, verification, automatic launch, automatic disabling or claim of active system focus. The user sets allowed contacts/apps and may disable focus via Control Center. Android requires manual quick settings in the PWA; a native app could later evaluate NotificationManager policy access. Device validation required. References: https://support.apple.com/pt-br/105112 ; https://support.apple.com/guide/shortcuts/apd624386f42/ios ; https://developer.android.com/reference/android/app/NotificationManager .

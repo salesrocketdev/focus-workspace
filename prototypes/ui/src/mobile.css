@@ -236,3 +236,33 @@
 .book-chapter-form{display:grid;gap:8px}
 .book-chapter-form>.ui-button{justify-self:start}
 @media(max-width:759px){.book-search-form{grid-template-columns:1fr}.book-search-form>.ui-button{width:100%}.book-import-result{min-height:100px}.book-manual-action{justify-content:flex-start}.book-import .dialog-actions .ui-button{min-height:44px}}
+
+/* Mobile refinement: prioritize timer, compact reading details and stable controls. */
+.immersive-actions{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;max-width:100%}
+@media(max-width:759px){
+ .focus-main .immersive-grid{display:flex;flex-direction:column;gap:16px;margin-top:16px;align-items:stretch}
+ .immersive-grid>.focus-center{order:-1;gap:14px;min-width:0}
+ .immersive-grid>.book-panel,.immersive-grid>.focus-activity-panel{padding:12px;border:1px solid var(--ui-line);border-radius:12px;background:var(--ui-paper);min-width:0}
+ .immersive-grid>.book-panel{grid-template-columns:64px minmax(0,1fr);align-items:start;gap:5px 10px}
+ .immersive-grid>.book-panel .cover{grid-row:1/span 5}
+ .immersive-grid>.book-panel h2{font-size:16px;line-height:1.35;overflow-wrap:anywhere}
+ .immersive-grid>.book-panel .ui-button{grid-column:2;justify-self:start;min-height:44px}
+ .immersive-actions{width:min(100%,330px);display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:8px}
+ .immersive-actions .ui-button{min-width:0;min-height:44px;line-height:1.25;padding:6px 8px;font-size:12px}
+ .focus-center .transport .circle-button:not(.big){min-width:46px;min-height:46px}
+ .focus-center .focus-context-picker{width:min(100%,330px)}
+ .activity-book{min-width:0}.activity-book-copy{min-width:0}.activity-book-copy b{overflow-wrap:anywhere}
+ .activity-book-copy .ui-button{min-height:44px;justify-content:center}
+ .notification-center-actions{flex-wrap:wrap;gap:8px}
+ .notification-entry>div{min-width:0;overflow-wrap:anywhere}
+ .history-toolbar .history-ranges button{min-height:44px}
+ .history-toolbar .history-filter-trigger{min-width:0}
+ .settings-mobile .settings-row-copy small{line-height:1.45}
+ .ui-dialog .dialog-actions{flex-wrap:wrap;gap:8px}
+ .ui-dialog .dialog-actions>.ui-button{min-height:44px;min-width:0}
+ .ui-dialog .dialog-header>div{min-width:0}
+ .ui-dialog .dialog-header h2{overflow-wrap:anywhere}
+ .ui-dialog .dialog-header p{line-height:1.45}
+ .ui-dialog[data-keyboard=open]{max-height:calc(var(--sheet-height,100dvh) - 10px)}
+}
+@media(max-width:359px){.immersive-actions .ui-button{font-size:11px;gap:4px}.immersive-actions .ui-button svg{width:14px;height:14px}.immersive-grid>.book-panel .ui-button{width:100%}}
