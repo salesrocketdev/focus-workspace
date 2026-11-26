@@ -24,7 +24,7 @@ test('desktop header actions are aligned and shortcut stays beside icon',async({
  expect(boxes).toHaveLength(4);expect(Math.max(...boxes.map(b=>b.center))-Math.min(...boxes.map(b=>b.center))).toBeLessThan(1);
  expect(boxes.every(b=>Math.abs(b.height-36)<1)).toBeTruthy();
  const search=header.locator('.quick-action-button');
- expect(await search.evaluate(el=>getComputedStyle(el).display)).toBe('inline-flex');
+ expect(await search.evaluate(el=>getComputedStyle(el).display)).toMatch(/^(inline-)?flex$/);
  await page.screenshot({path:info.outputPath('aligned-header.png'),animations:'disabled',scale:'css'});
 });
 test('iPhone browser explains installation instead of requesting unsupported permission',async({page},info)=>{

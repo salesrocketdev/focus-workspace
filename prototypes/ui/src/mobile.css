@@ -1,0 +1,66 @@
+/* Mobile ergonomics: 44px hit areas, safe-area-aware navigation, page-level scroll. */
+.week-mobile-count{display:none}
+@media(max-width:759px){
+ :root{--mobile-hit:44px;--mobile-nav-height:68px;--edit-control:44px;--edit-action:44px;--ui-control-height:44px}
+ html{scroll-padding-bottom:calc(var(--mobile-nav-height) + env(safe-area-inset-bottom) + 14px);-webkit-text-size-adjust:100%}
+ .app .main,.app.immersive .main{padding-top:max(14px,env(safe-area-inset-top));padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right));padding-bottom:calc(var(--mobile-nav-height) + env(safe-area-inset-bottom) + 20px)}
+ .app.with-compact-focus .main{padding-bottom:calc(250px + env(safe-area-inset-bottom))}
+ .app-masthead{height:44px;min-height:44px;margin-bottom:10px}
+ .bottom-nav{padding:6px max(7px,env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(7px,env(safe-area-inset-left));gap:3px;min-height:calc(var(--mobile-nav-height) + env(safe-area-inset-bottom));align-items:center}
+ .bottom-nav button{flex:1;min-width:0;min-height:48px;gap:4px;font-size:10px;white-space:nowrap}
+ .bottom-nav button svg{width:21px;height:21px}
+ .workspace-page-header:not(.edit-page-head){align-items:center}
+ .workspace-page-header .page-action,.workspace-page-header .head-actions:not(.edit-header)>.ui-icon-button,.quick-header-actions>.ui-icon-button,.quick-header-actions>.quick-action-button{height:44px;min-height:44px;min-width:44px}
+ .quick-header-actions>.ui-icon-button,.workspace-page-header .head-actions:not(.edit-header)>.ui-icon-button{width:44px}
+ .workspace-page-header .head-actions:not(.edit-header){gap:2px}
+ .workspace-page-header .page-action{padding-inline:8px}
+ .ui-dialog{position:fixed;inset:auto 0 0;width:100%;max-width:none;max-height:calc(100dvh - max(24px,env(safe-area-inset-top)));margin:0;padding:20px max(16px,env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));border-radius:20px 20px 0 0;border-bottom:0;overscroll-behavior:contain}
+ .ui-dialog[open]{animation:mobile-sheet-enter 260ms var(--motion-ease)}
+ .dialog-header{align-items:center;margin-bottom:16px}
+ .dialog-header>.ui-icon-button,.notification-center-actions>.ui-icon-button{height:44px;width:44px;flex-basis:44px}
+ .ui-field .ui-input-shell .ui-input,.ui-input-shell .ui-input,.ui-textarea,.ui-select-trigger{font-size:16px}
+ .field-compact .ui-select-trigger{font-size:13px;height:44px;min-height:44px}
+ .ui-input-shell{min-height:44px}
+ .ui-button.ui-sm{min-height:44px;height:auto;padding-block:7px;white-space:normal}
+ .ui-select-option{min-height:44px}
+ .ui-search-clear{height:36px;width:36px;flex-basis:36px}
+ .mobile-widget-row{min-height:58px;padding:5px;gap:3px}
+ .mobile-widget-row>button.edit-icon-button{width:44px;height:44px;min-width:44px;min-height:44px;flex:0 0 44px}
+ .mobile-widget-name{min-height:44px;min-width:0}
+ .mobile-widget-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .mobile-widget-name small{font-size:10px}
+ .edit-header .edit-text-button{min-height:44px;height:44px}
+ .mobile-edit-tabs.segment button,.settings-nav-group button,.activity-tabs button,.calendar-view-switch button,.history-ranges button{min-height:44px}
+ .mobile-layout{gap:8px}
+ .mobile-layout h3{line-height:1.5}
+ .catalogue .mobile-only{width:44px;height:44px}
+ .settings-nav-group button{justify-content:flex-start;flex:1 1 calc(50% - 5px)}
+ .settings-nav-group button span{flex:1}
+ .calendar-arrows button{width:44px;min-width:44px;height:44px;flex-basis:44px}
+ .calendar-date-controls .ui-button{min-height:44px}
+ .calendar-period{flex:1 1 100%;font-size:14px;padding-top:3px}
+ .calendar-week-day{min-height:72px;gap:2px}
+ .week-mobile-count{display:block;font-size:9px;color:var(--ui-muted)}
+ .calendar-week-day[aria-pressed=true] .week-mobile-count{color:inherit}
+ .calendar-month-day{min-height:48px}
+ .calendar-filters label{min-height:44px}
+ .activity-row-actions .ui-icon-button,.activity-category>.task-play{height:44px;width:44px;flex-basis:44px}
+ .activity-task-row{min-height:58px}
+ .widget .card-icon-action{width:44px;height:44px;flex-shrink:0}
+ .widget .card-head{min-height:44px}
+ .widget.small .card-head{gap:3px}
+ .widget.small .card-icon-action{width:36px;min-width:36px;height:44px}
+ .widget .card-body{overflow:clip}
+ .focus-top>button,.focus-top>.ui-icon-button{height:44px;min-height:44px;width:44px;min-width:44px;flex:0 0 44px}
+ .focus-center .segment button{min-height:44px}
+ .focus-center>.ui-button{min-height:44px;height:44px}
+ .compact-dock{bottom:calc(var(--mobile-nav-height) + env(safe-area-inset-bottom) + 8px)}
+ .compact-focus header .ui-icon-button,.compact-transport .ui-icon-button{width:44px;height:44px;min-height:44px;flex-basis:44px}
+ .compact-play{width:44px;height:44px;flex-basis:44px}
+ .compact-time strong{font-size:30px}
+ .toast{bottom:calc(var(--mobile-nav-height) + env(safe-area-inset-bottom) + 8px)}
+}
+@keyframes mobile-sheet-enter{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:359px){.mobile-widget-name small{display:none}.workspace-page-header .page-action{font-size:10px;padding-inline:6px}.mobile-widget-row>button.edit-icon-button{flex-basis:44px}.bottom-nav button{font-size:9px}.compact-transport{gap:1px}}
+@media(prefers-reduced-motion:reduce){.ui-dialog[open]{animation:none!important}}
+[data-motion=reduced] .ui-dialog[open]{animation:none!important}

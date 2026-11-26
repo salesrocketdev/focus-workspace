@@ -75,9 +75,9 @@ test('editor controls share dimensions and previews are inert',async({page},info
  const mobile=info.project.name==='mobile';
  const controls=await page.locator('.editing .edit-icon-button:visible').evaluateAll(nodes=>nodes.map(n=>{const el=n as HTMLElement;return [el.offsetWidth,el.offsetHeight]}));
  expect(controls.length).toBeGreaterThan(0);
- for(const [w,h] of controls){expect(w).toBe(mobile?32:28);expect(h).toBe(w)}
- const heights=await page.locator('.edit-header .edit-text-button').evaluateAll(nodes=>nodes.map(n=>n.getBoundingClientRect().height));
- expect(heights).toEqual(Array(3).fill(mobile?40:36));
+ for(const [w,h] of controls){expect(w).toBe(mobile?44:28);expect(h).toBe(w)}
+ const heights=await page.locator('.edit-header .edit-text-button').evaluateAll(nodes=>nodes.map(n=>(n as HTMLElement).offsetHeight));
+ expect(heights).toEqual(Array(3).fill(mobile?44:36));
  if(!mobile){
   await expect(page.locator('.editing .preview-content[inert]')).toHaveCount(7);
   const rows=await page.locator('.catalogue-item').evaluateAll(nodes=>nodes.map(n=>n.getBoundingClientRect().height));

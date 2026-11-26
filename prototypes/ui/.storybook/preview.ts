@@ -14,6 +14,7 @@ import '../src/form-controls.css';
 import '../src/settings.css';
 import '../src/quick-actions.css';
 import '../src/motion.css';
+import '../src/mobile.css';
 import type { Preview } from '@storybook/react';
 const preview:Preview={parameters:{layout:'centered'}};
 export default preview;

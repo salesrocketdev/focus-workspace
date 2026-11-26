@@ -12,8 +12,8 @@ export function Dialog({title,description,onDismiss,children}:{title:string;desc
   const el=ref.current;if(!el)return;
   const previous=document.activeElement instanceof HTMLElement?document.activeElement:null;
   el.showModal();
-  const initial=el.querySelector<HTMLElement>('input:not([disabled]), [role=combobox]:not([disabled]), textarea:not([disabled])');initial?.focus();
-  return()=>{if(el.open)el.close();if(previous?.isConnected)previous.focus()};
+  const initial=el.querySelector<HTMLElement>('input:not([disabled]), [role=combobox]:not([disabled]), textarea:not([disabled])');initial?.focus({preventScroll:true});
+  return()=>{if(el.open)el.close();if(previous?.isConnected)previous.focus({preventScroll:true})};
  },[]);
  return <dialog ref={ref} className="ui-dialog" aria-labelledby={titleId} aria-describedby={description?descId:undefined}
  onCancel={e=>{e.preventDefault();onDismiss()}} onClick={e=>{if(e.target===e.currentTarget){const r=e.currentTarget.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)onDismiss()}}}>

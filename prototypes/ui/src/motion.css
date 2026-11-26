@@ -2,13 +2,13 @@
 :root{--motion-route:320ms;--motion-ui:180ms;--motion-ease:cubic-bezier(.22,.75,.25,1)}
 @keyframes route-enter{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
 @keyframes workspace-enter{from{opacity:0}to{opacity:1}}
-@keyframes dialog-enter{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
-.route-enter:not([hidden]){animation:route-enter var(--motion-route) var(--motion-ease) both}
-.workspace-enter{animation:workspace-enter var(--motion-route) var(--motion-ease) both}
+@keyframes dialog-enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.route-enter:not([hidden]){animation:route-enter var(--motion-route) var(--motion-ease)}
+.workspace-enter{animation:workspace-enter var(--motion-route) var(--motion-ease)}
 .route-content>.calendar-page,.route-content>.activities-page,.route-content>.settings-page,.route-content>.history-page,.workspace:not(.editing) .widget>.card{animation:none}
-.focus-main .immersive-grid.route-enter{animation:route-enter var(--motion-route) var(--motion-ease) both}
-.settings-section-body{animation:route-enter 260ms var(--motion-ease) both}
-.ui-dialog[open]{animation:dialog-enter 240ms var(--motion-ease) both}
+.focus-main .immersive-grid.route-enter{animation:route-enter var(--motion-route) var(--motion-ease)}
+.settings-section-body{animation:route-enter 260ms var(--motion-ease)}
+.ui-dialog[open]{animation:dialog-enter 240ms var(--motion-ease)}
 .ui-dialog::backdrop{animation:workspace-enter 200ms ease-out}
 .sidebar nav button,.bottom-nav button,.ui-icon-button,.page-action,.ui-button,.calendar-view-switch button,.activity-tabs button,.settings-nav-group button{transition:background-color var(--motion-ui) ease,border-color var(--motion-ui) ease,color var(--motion-ui) ease,box-shadow var(--motion-ui) ease}
 .ui-button:active:not(:disabled),.page-action:active:not(:disabled),.quick-header-actions button:active:not(:disabled){transform:scale(.98)}
