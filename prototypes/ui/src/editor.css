@@ -132,3 +132,11 @@
 .editing .card-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.25}
 @container(max-width:260px){.editing .card-title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;overflow-wrap:anywhere}.editing .widget .card-head>span{white-space:normal}}
 .mobile-size-options.edit-size-options button>span:not(.size-shape){border:0;border-radius:0}
+
+/* Screenshot review: use the whole preview column, not 43% of an already split column. */
+.editing .widget[data-widget=focus] .edit-focus-preview .timer-ring{width:min(100%,140px)}
+@container(max-width:205px){.editing .widget[data-widget=focus] .edit-focus-preview .timer-ring{width:min(100%,100px)}}
+.editing .widget[data-widget=goal] .card-title{font-size:11px}
+.editing .catalogue-item:disabled{opacity:1;color:#766e67;background:#faf5f0}
+.editing .catalogue-item:disabled>svg:last-child{color:#698971}
+.editing .catalogue-item:disabled small{color:#80746d}

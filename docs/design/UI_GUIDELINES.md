@@ -24,3 +24,7 @@ Tokens are proposed, not sampled exactly. Use dark foreground on pastel backgrou
 
 ## Layout and state
 Desktop: sidebar collapsible, header date/actions, flexible grid. Mobile: bottom nav, stacked or two-column compact cards, large primary actions, safe-area padding. Native window can be narrow; treat container size, not user-agent, as layout input. Provide loading skeleton, empty helpful CTA, inline recoverable error and offline/stale label; no perpetual spinners. Active timer stays visible across routes. Illustration in immersive focus is optional, decorative and must not obscure controls. No mock book covers or provider logos shipped without appropriate rights.
+
+
+## Shared page header
+All standard workspace routes (Today, Calendar, Activities, History, Settings, Dashboard editor) use the same PageHeader and top-anchored content shell. The title must have the same x/y origin and typography at each fixed viewport; actions may wrap onto another row without moving the title. On mobile, the masthead stays present in the editor, matching normal routes. The immersive focus view intentionally retains its own compact toolbar from V4 because it is a distraction-free mode, not a regular workspace route. Its title is still semantic and top anchored. Do not vertically center short route content. Validate header coordinates on desktop, tablet and phone in Playwright.

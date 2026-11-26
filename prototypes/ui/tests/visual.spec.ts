@@ -88,3 +88,46 @@ test('editor controls share dimensions and previews are inert',async({page},info
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
  await page.screenshot({path:info.outputPath('editor-standardized.png'),animations:'disabled',scale:'css'});
 });
+
+test('workspace titles remain anchored across routes and editor',async({page},info)=>{
+ const mobile=info.project.name==='mobile';
+ await page.goto('/');
+ const header=page.locator('.workspace-page-header h1');
+ const origin=await header.boundingBox();
+ expect(origin).not.toBeNull();
+ async function check(title:string){
+  await expect(header).toHaveText(title);
+  const box=await header.boundingBox();
+  expect(box).not.toBeNull();
+  expect(Math.abs(box!.x-origin!.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(box!.y-origin!.y)).toBeLessThanOrEqual(1);
+  expect(Math.abs(box!.height-origin!.height)).toBeLessThanOrEqual(1);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
+  await page.screenshot({path:info.outputPath('route-'+title.replace(/\s+/g,'-')+'.png'),animations:'disabled',scale:'css'});
+ }
+ const nav=page.locator(mobile?'.bottom-nav':'.sidebar nav');
+ await check('Meu dia');
+ for(const [label,title] of [['Agenda','Agenda'],['Atividades','Atividades'],['Histórico','Histórico'],[mobile?'Ajustes':'Configurações','Configurações']]){
+  await nav.getByRole('button',{name:label,exact:true}).click();
+  await check(title);
+ }
+ await nav.getByRole('button',{name:'Hoje',exact:true}).click();
+ await page.getByRole('button',{name:'Editar painel',exact:true}).click();
+ await check('Editar painel');
+ await page.getByRole('button',{name:'Cancelar',exact:true}).click();
+ await check('Meu dia');
+});
+test('editor title stays aligned at tablet and compact widths',async({page},info)=>{
+ if(info.project.name!=='desktop')return;
+ for(const width of [1920,1366,1024,768,390,360]){
+  await page.setViewportSize({width,height:900});
+  await page.goto('/');
+  const title=page.locator('.workspace-page-header h1');
+  const before=await title.boundingBox();
+  await page.getByRole('button',{name:'Editar painel',exact:true}).click();
+  const after=await title.boundingBox();
+  expect(Math.abs(after!.x-before!.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(after!.y-before!.y)).toBeLessThanOrEqual(1);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
+ }
+});
