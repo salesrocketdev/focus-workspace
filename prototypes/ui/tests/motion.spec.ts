@@ -1,0 +1,39 @@
+import {test,expect} from '@playwright/test';
+test.beforeEach(async({page})=>{await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')))});
+test('route entry restarts on navigation and honors reduced motion',async({page},info)=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});
+ await page.goto('/');
+ const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
+ const go=async(label:string,route:string)=>{await nav.getByRole('button',{name:label,exact:true}).click();const el=page.locator('[data-route="'+route+'"]:visible');await expect(el).toBeVisible();return el};
+ const agenda=await go('Agenda','calendar');
+ expect(await agenda.evaluate(el=>getComputedStyle(el).animationName)).toBe('route-enter');
+ const history=await go('Histórico','history');
+ expect(await history.evaluate(el=>getComputedStyle(el).animationDuration)).toBe('0.32s');
+ const today=await go('Hoje','today');
+ expect(await today.evaluate(el=>getComputedStyle(el).animationName)).toBe('workspace-enter');
+ await page.emulateMedia({reducedMotion:'reduce'});
+ const reduced=await go('Agenda','calendar');
+ expect(await reduced.evaluate(el=>getComputedStyle(el).animationName)).toBe('none');
+});
+test('desktop header actions are aligned and shortcut stays beside icon',async({page},info)=>{
+ if(info.project.name==='mobile')return;
+ await page.goto('/');
+ const header=page.locator('.workspace-page-header');
+ await expect(header.getByRole('button',{name:'Editar painel'})).toBeVisible();
+ const boxes=await header.locator('.head-actions>button,.quick-header-actions>button').evaluateAll(nodes=>nodes.map(el=>{const b=el.getBoundingClientRect();return {center:b.y+b.height/2,height:b.height}}));
+ expect(boxes).toHaveLength(4);expect(Math.max(...boxes.map(b=>b.center))-Math.min(...boxes.map(b=>b.center))).toBeLessThan(1);
+ expect(boxes.every(b=>Math.abs(b.height-36)<1)).toBeTruthy();
+ const search=header.locator('.quick-action-button');
+ expect(await search.evaluate(el=>getComputedStyle(el).display)).toBe('inline-flex');
+ await page.screenshot({path:info.outputPath('aligned-header.png'),animations:'disabled',scale:'css'});
+});
+test('iPhone browser explains installation instead of requesting unsupported permission',async({page},info)=>{
+ await page.addInitScript(()=>{Object.defineProperty(navigator,'userAgent',{get:()=> 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_4 like Mac OS X)'});Object.defineProperty(navigator,'standalone',{get:()=>false})});
+ await page.goto('/');
+ const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
+ await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Notificações',exact:true}).click();
+ await expect(page.getByText('Ative as notificações no iPhone ou iPad')).toBeVisible();
+ await expect(page.getByRole('button',{name:'Autorizar notificações'})).toHaveCount(0);
+ await expect(page.getByRole('switch',{name:'Exibir notificações no dispositivo'})).toBeDisabled();
+});

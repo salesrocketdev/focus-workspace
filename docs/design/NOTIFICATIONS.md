@@ -9,3 +9,6 @@ References:
 - https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/showNotification
 - https://developer.apple.com/documentation/usernotifications/sending-web-push-notifications-in-web-apps-and-browsers
 - https://web.dev/learn/pwa/service-workers
+
+
+V4.17: iOS browser explicitly shows Home Screen installation steps; standalone detection uses display-mode and navigator.standalone. Permission request remains directly user-triggered. System notification test uses scoped registration.showNotification; optional Badging API mirrors unread count. No remote push subscription or iOS real-device delivery validation. See https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/.
