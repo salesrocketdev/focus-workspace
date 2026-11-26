@@ -34,6 +34,7 @@ test('editor supports catalogue, size, ordering and layout isolation',async({pag
  await page.getByRole('button',{name:/Notas Anotações rápidas/}).click();
  if(mobile) await page.getByRole('button',{name:'Seus widgets',exact:true}).click();
  await expect(page.locator('[data-widget=notes]')).toHaveCount(1);
+ if(!mobile) await page.getByRole('button',{name:'Opções de Notas',exact:true}).click();
  await page.getByRole('button',{name:'Mover acima Notas',exact:true}).click();
  if(mobile) await page.getByRole('button',{name:'1 × 1',exact:true}).click();
  else await page.locator('[data-widget=notes]').getByRole('button',{name:'P',exact:true}).click();
@@ -64,4 +65,26 @@ test('timer starts on dashboard and stays active when opening focus', async({pag
  await page.getByRole('button',{name:'Pausar',exact:true}).click();
  await page.getByRole('button',{name:'Voltar',exact:true}).click();
  await expect(page.getByRole('button',{name:'Iniciar foco',exact:true})).toBeVisible();
+});
+
+test('editor controls share dimensions and previews are inert',async({page},info)=>{
+ await page.goto('/');
+ await page.getByRole('button',{name:'Editar painel',exact:true}).click();
+ const mobile=info.project.name==='mobile';
+ const controls=await page.locator('.editing .edit-icon-button:visible').evaluateAll(nodes=>nodes.map(n=>{const r=n.getBoundingClientRect();return [r.width,r.height]}));
+ expect(controls.length).toBeGreaterThan(0);
+ for(const [w,h] of controls){expect(w).toBe(mobile?32:28);expect(h).toBe(w)}
+ const heights=await page.locator('.edit-header .edit-text-button').evaluateAll(nodes=>nodes.map(n=>n.getBoundingClientRect().height));
+ expect(heights).toEqual(Array(3).fill(mobile?40:36));
+ if(!mobile){
+  await expect(page.locator('.editing .preview-content[inert]')).toHaveCount(7);
+  const rows=await page.locator('.catalogue-item').evaluateAll(nodes=>nodes.map(n=>n.getBoundingClientRect().height));
+  expect(new Set(rows).size).toBe(1);
+  await page.getByRole('button',{name:'Opções de Foco (Pomodoro)',exact:true}).click();
+  await expect(page.getByRole('group',{name:'Opções de Foco (Pomodoro)',exact:true})).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('group',{name:'Opções de Foco (Pomodoro)',exact:true})).toHaveCount(0);
+ }
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
+ await page.screenshot({path:info.outputPath('editor-standardized.png'),animations:'disabled',scale:'css'});
 });

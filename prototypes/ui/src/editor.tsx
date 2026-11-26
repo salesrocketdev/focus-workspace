@@ -1,0 +1,51 @@
+import { useEffect, useRef, type ButtonHTMLAttributes, type ReactNode, type DragEvent } from 'react';
+import { Grip, Ellipsis, X, ChevronUp, ChevronDown, Plus, BookOpen, Play, Pause, SkipBack, SkipForward, Heart, Settings, ChevronDown as Down, type LucideIcon } from 'lucide-react';
+import { Ring, Cover, Progress } from './components';
+import type { Size, WidgetType } from './model';
+
+type IconProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'aria-label'> & { label:string; icon:LucideIcon };
+export function EditIconButton({label,icon:Icon,className='',...props}:IconProps){
+ return <button {...props} type="button" className={'edit-icon-button '+className} aria-label={label} title={label}><Icon size={15} strokeWidth={1.8}/></button>;
+}
+export function EditTextButton({variant='secondary',className='',children,...props}:ButtonHTMLAttributes<HTMLButtonElement>&{variant?:'primary'|'secondary'}){
+ return <button {...props} type="button" className={'edit-text-button edit-'+variant+' '+className}>{children}</button>;
+}
+const sizes:Size[]=['small','medium','large'];
+export function WidgetSizeOptions({value,onChange,visual=false}:{value:Size;onChange:(size:Size)=>void;visual?:boolean}){
+ return <div className={visual?'mobile-size-options edit-size-options':'edit-size-options'} role="group" aria-label="Tamanho do widget">{sizes.map((size,i)=><button type="button" key={size} aria-pressed={value===size} onClick={()=>onChange(size)}>{visual&&<span className={'size-shape shape-'+size}/>}<span>{visual?['1 × 1','2 × 1','2 × 2'][i]:['P','M','G'][i]}</span></button>)}</div>;
+}
+interface ToolbarProps{title:string;open:boolean;size:Size;onOpen:()=>void;onClose:()=>void;onDragStart:(e:DragEvent<HTMLButtonElement>)=>void;onMove:(delta:number)=>void;onResize:(size:Size)=>void;onRemove:()=>void;canMoveUp:boolean;canMoveDown:boolean}
+export function EditCardToolbar({title,open,size,onOpen,onClose,onDragStart,onMove,onResize,onRemove,canMoveUp,canMoveDown}:ToolbarProps){
+ const root=useRef<HTMLDivElement>(null);
+ const trigger=useRef<HTMLButtonElement>(null);
+ useEffect(()=>{
+  if(!open)return;
+  const close=(e:PointerEvent)=>{if(root.current&&!root.current.contains(e.target as Node))onClose()};
+  const escape=(e:KeyboardEvent)=>{if(e.key==='Escape'){onClose();trigger.current?.focus()}};
+  document.addEventListener('pointerdown',close);document.addEventListener('keydown',escape);
+  return()=>{document.removeEventListener('pointerdown',close);document.removeEventListener('keydown',escape)};
+ },[open,onClose]);
+ return <div ref={root} className="edit-card-toolbar" onClick={e=>e.stopPropagation()}>
+  <EditIconButton label={'Arrastar '+title} icon={Grip} draggable onDragStart={onDragStart} onKeyDown={e=>{if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();onMove(e.key==='ArrowUp'?-1:1)}}}/>
+  <button ref={trigger} type="button" className="edit-icon-button" aria-label={'Opções de '+title} aria-expanded={open} title="Opções do widget" onClick={onOpen}><Ellipsis size={15}/></button>
+  <EditIconButton label={'Remover '+title} icon={X} onClick={onRemove}/>
+  {open&&<div className="edit-widget-menu" role="group" aria-label={'Opções de '+title}>
+   <span className="edit-menu-caption">Posição</span>
+   <button className="edit-menu-row" disabled={!canMoveUp} onClick={()=>onMove(-1)} aria-label={'Mover acima '+title}><ChevronUp size={15}/> Mover acima</button>
+   <button className="edit-menu-row" disabled={!canMoveDown} onClick={()=>onMove(1)} aria-label={'Mover abaixo '+title}><ChevronDown size={15}/> Mover abaixo</button>
+   <span className="edit-menu-caption">Tamanho</span><WidgetSizeOptions value={size} onChange={onResize}/>
+  </div>}
+ </div>;
+}
+export function AddWidgetTile({onClick}:{onClick:()=>void}){return <button type="button" className="add-slot edit-add-tile" onClick={onClick}><Plus size={23} strokeWidth={1.6}/><span>Adicionar widget</span><small>Escolha no catálogo</small></button>}
+interface PreviewProps{type:WidgetType;seconds:number;duration:number;mode:string;page:number;tasks:{id:number;title:string;done:boolean}[];track:string;running:boolean;music:boolean;children:ReactNode}
+export function EditPreview({type,seconds,duration,mode,page,tasks,track,running,music,children}:PreviewProps){
+ const pct=Math.round(page/432*100);
+ switch(type){
+  case 'focus':return <div className="edit-focus-preview"><Ring seconds={seconds} total={duration}/><div className="edit-focus-details"><span className="edit-preview-field"><BookOpen size={12}/> <span>Clean Architecture</span></span><span className="edit-preview-field"><span>{mode}</span><Down size={12}/></span><small>Ciclos de foco</small><div className="edit-preview-actions"><span className="edit-preview-cta">{running?<Pause size={12}/>:<Play size={12} fill="currentColor"/>}<span>{running?'Pausar foco':'Iniciar foco'}</span></span><span className="edit-preview-icon"><Settings size={13}/></span></div></div></div>;
+  case 'reading':return <div className="edit-reading-preview"><Cover/><div className="edit-reading-details"><b>Clean Architecture</b><small>Robert C. Martin</small><Progress value={pct}/><small>Pág. {page} de 432 · {pct}%</small></div></div>;
+  case 'tasks':return <div className="edit-task-preview">{tasks.map(t=><div key={t.id} className={t.done?'done':''}><span className="edit-task-check">{t.done?'✓':''}</span><span>{t.title}</span></div>)}</div>;
+  case 'music':return <div className="edit-music-preview"><Cover album/><div className="edit-track"><b>{track}</b><small>Lo-Fi Essentials · demo</small></div><div className="edit-preview-transport"><span><SkipBack size={14}/></span><span className="edit-preview-play">{music?<Pause size={14}/>:<Play size={14} fill="currentColor"/>}</span><span><SkipForward size={14}/></span><span><Heart size={14}/></span></div></div>;
+  default:return <div className={'edit-passive-preview preview-'+type}>{children}</div>;
+ }
+}
