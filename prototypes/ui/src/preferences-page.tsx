@@ -1,0 +1,54 @@
+import { useState } from 'react';
+import { Timer, Coffee, Target, Link2, ShieldCheck, Check, ArrowRight, ArrowLeft, UserRound, LayoutGrid, Sparkles, Settings, Unplug } from 'lucide-react';
+import { Button,Dialog,Field,SelectField } from './ui';
+import { ProviderIcon,ProviderLabel,type ProviderId } from './provider-icons';
+import { type FocusPreferences,type Profile,type Preset,providerKeys } from './preferences-model';
+
+const details:Record<ProviderId,{title:string;account:string;permissions:string[];description:string;planned?:boolean}>={
+ 'google-calendar':{title:'Google Agenda',account:'agenda.demo@example.com',permissions:['Consultar calendários disponíveis','Consultar horários e títulos dos eventos'],description:'Veja compromissos e intervalos de foco no painel.'},
+ outlook:{title:'Microsoft Outlook',account:'outlook.demo@example.com',permissions:['Consultar calendários da conta','Consultar compromissos e disponibilidade'],description:'Reúna sua agenda de trabalho e pessoal.'},
+ spotify:{title:'Spotify',account:'music.demo@example.com',permissions:['Consultar estado de reprodução','Controlar reprodução em dispositivos compatíveis'],description:'Acompanhe a música durante suas sessões.'},
+ gmail:{title:'Gmail',account:'mail.demo@example.com',permissions:['Exemplo conceitual de autorização de e-mail'],description:'Exploração visual, fora do escopo funcional atual.',planned:true},
+ 'google-meet':{title:'Google Meet',account:'meet.demo@example.com',permissions:['Exemplo de acesso aos links dos eventos'],description:'Links de reunião poderão vir do calendário; conexão separada não é necessária neste MVP.',planned:true},
+ teams:{title:'Microsoft Teams',account:'teams.demo@example.com',permissions:['Exemplo de acesso aos links dos eventos'],description:'Links de reunião poderão vir do Outlook; conexão separada não é necessária neste MVP.',planned:true},
+};
+export function ConnectionDialog({provider,connected,onChange,onDismiss}:{provider:ProviderId;connected:boolean;onChange:(connected:boolean)=>void;onDismiss:()=>void}){
+ const [step,setStep]=useState(0);const d=details[provider];
+ return <Dialog title={connected?'Conexão de demonstração': 'Conectar '+d.title} description="Simulação OAuth · nenhuma autenticação real." onDismiss={onDismiss}>
+  <div className="connection-flow" key={step}><div className="oauth-brand"><ProviderIcon provider={provider} size={42}/><Link2 size={20}/><span className="oauth-app"><Timer size={24}/></span></div><div className="demo-warning"><ShieldCheck size={17}/><span>Ambiente de demonstração. Não informe credenciais reais.</span></div>
+  {connected?<><div className="oauth-account"><UserRound size={22}/><div><b>{d.title}</b><small>{d.account}</small></div><Check size={18}/></div><p>Conexão simulada ativa. Não existem tokens, chamadas de API ou dados importados.</p><footer className="dialog-actions"><Button variant="secondary" onClick={onDismiss}>Fechar</Button><Button onClick={()=>{onChange(false);onDismiss()}}><Unplug size={15}/> Desconectar</Button></footer></>:step===0?<><p>{d.description}</p><button className="oauth-account" onClick={()=>setStep(1)}><UserRound size={22}/><div><b>Conta de demonstração</b><small>{d.account}</small></div><ArrowRight size={18}/></button><footer className="dialog-actions"><Button variant="secondary" onClick={onDismiss}>Cancelar</Button></footer></>:<><h3>Permissões simuladas</h3><p>O Focus Workspace solicitaria:</p><ul className="oauth-scopes">{d.permissions.map(s=><li key={s}><Check size={16}/>{s}</li>)}</ul>{d.planned&&<small>Somente exploração visual. Isso não adiciona a integração ao MVP.</small>}<footer className="dialog-actions"><Button variant="secondary" onClick={()=>setStep(0)}>Voltar</Button><Button onClick={()=>{onChange(true);onDismiss()}}>Autorizar simulação</Button></footer></>}
+  </div>
+ </Dialog>;
+}
+export function IntegrationPanel({connections,onChange}:{connections:ProviderId[];onChange:(next:ProviderId[])=>void}){
+ const [provider,setProvider]=useState<ProviderId|null>(null);
+ return <section className="settings-surface"><header className="settings-section-header"><Link2 size={20}/><div><h2>Integrações</h2><p>Conecte serviços para personalizar seu espaço de trabalho.</p></div></header>
+  <div className="integration-preview-list">{providerKeys.map(id=><div className="integration-preview-row" key={id}><ProviderLabel provider={id} size={24}/><div className="integration-state"><small>{connections.includes(id)?'Conectado · demo':details[id].planned?'Exploração visual':'Não conectado'}</small><Button variant="secondary" size="sm" aria-label={(connections.includes(id)?'Gerenciar ':'Conectar ')+details[id].title} onClick={()=>setProvider(id)}>{connections.includes(id)?'Gerenciar':'Conectar'}</Button></div></div>)}</div>
+  <small>{connections.length?connections.length+' conexão(ões) simulada(s). Nenhuma conta real conectada.':'Nenhum provedor conectado nesta prévia.'}</small>
+  {provider&&<ConnectionDialog provider={provider} connected={connections.includes(provider)} onDismiss={()=>setProvider(null)} onChange={on=>onChange(on?[...new Set([...connections,provider])]:connections.filter(p=>p!==provider))}/>}
+ </section>;
+}
+export function FocusSettings({prefs,onChange,disabled=false}:{prefs:FocusPreferences;onChange:(p:FocusPreferences)=>void;disabled?:boolean}){
+ const opts=(values:number[],current:number)=>[...new Set([...values,current])].sort((a,b)=>a-b);
+ const duration=(label:string,key:'focus'|'short'|'long',values:number[],hint?:string)=><SelectField label={label} hint={hint} value={prefs[key]} disabled={disabled} onChange={e=>onChange({...prefs,[key]:Number(e.target.value)})}>{opts(values,prefs[key]).map(n=><option key={n} value={n}>{n/60} minutos</option>)}</SelectField>;
+ return <div className="focus-settings-fields">
+  {duration('Duração do Pomodoro','focus',[60,900,1200,1500,1800,2700,3000,3600,5400,7200], 'Duração da próxima sessão. 1 minuto permite testar a demo.')}
+  {duration('Pausa curta','short',[60,180,300,600,900])}
+  {duration('Pausa longa','long',[60,600,900,1200,1800,2700])}
+  <SelectField label="Ciclos até a pausa longa" value={prefs.cycles} disabled={disabled} onChange={e=>onChange({...prefs,cycles:Number(e.target.value)})}>{Array.from({length:12},(_,i)=><option key={i+1} value={i+1}>{i+1} {i===0?'ciclo':'ciclos'}</option>)}</SelectField>
+  <SelectField label="Meta diária de foco" value={prefs.goal} disabled={disabled} onChange={e=>onChange({...prefs,goal:Number(e.target.value)})}>{opts([30,60,90,120,180,240,300,360,480],prefs.goal).map(n=><option key={n} value={n}>{n} minutos</option>)}</SelectField>
+  <div className="preference-toggles"><label><input type="checkbox" checked={prefs.autoBreak} disabled={disabled} onChange={e=>onChange({...prefs,autoBreak:e.target.checked})}/><span><b>Iniciar pausas automaticamente</b><small>Ao terminar um período de foco.</small></span></label><label><input type="checkbox" checked={prefs.autoFocus} disabled={disabled} onChange={e=>onChange({...prefs,autoFocus:e.target.checked})}/><span><b>Iniciar o próximo foco automaticamente</b><small>Ao terminar uma pausa.</small></span></label></div>
+  {disabled&&<small>Encerre ou reinicie a sessão atual para alterar as preferências.</small>}
+ </div>;
+}
+export function Onboarding({profile,prefs,onFinish,onDismiss}:{profile:Profile|null;prefs:FocusPreferences;onFinish:(profile:Profile,prefs:FocusPreferences,preset:Preset|null)=>void;onDismiss:()=>void}){
+ const [step,setStep]=useState(0);const [identity,setIdentity]=useState<Profile>(profile??'guest');
+ const [draft,setDraft]=useState(prefs);const [preset,setPreset]=useState<Preset>('balanced');const [apply,setApply]=useState(!profile);
+ const options:{id:Preset;title:string;description:string}[]=[{id:'balanced',title:'Um pouco de tudo',description:'Foco, agenda, tarefas, leitura e música.'},{id:'work',title:'Trabalho e reuniões',description:'Agenda, tarefas, foco e resumo.'},{id:'study',title:'Estudos e leituras',description:'Leitura, tarefas, agenda e foco.'}];
+ return <Dialog title={['Seu tempo, seu espaço.','O que você quer priorizar?','Configure seu ritmo','Tudo pronto para começar'][step]} description={'Personalização · etapa '+(step+1)+' de 4'} onDismiss={onDismiss}>
+ <div className="onboarding-progress" aria-label={'Etapa '+(step+1)+' de 4'}>{[0,1,2,3].map(i=><i key={i} className={i<=step?'active':''}/>)}</div>
+ <div className="onboarding-step" key={step}>
+ {step===0?<><div className="onboarding-hero"><span><Timer size={36} strokeWidth={1.6}/></span><h3>Bem-vindo ao Focora</h3><p>Um espaço para se concentrar no que importa, no seu próprio ritmo.</p></div><button className="onboarding-choice" aria-pressed={identity==='google-demo'} onClick={()=>setIdentity('google-demo')}><ProviderIcon provider="gmail" size={24}/><span><b>Entrar com Google (demo)</b><small>Perfil fictício, sem autenticação externa.</small></span>{identity==='google-demo'&&<Check size={18}/>}</button><button className="onboarding-choice" aria-pressed={identity==='guest'} onClick={()=>setIdentity('guest')}><UserRound size={23}/><span><b>Continuar sem conta</b><small>Use o aplicativo localmente.</small></span>{identity==='guest'&&<Check size={18}/>}</button></>:step===1?<>{options.map(o=><button key={o.id} className="onboarding-choice" aria-pressed={preset===o.id} onClick={()=>setPreset(o.id)}><LayoutGrid size={22}/><span><b>{o.title}</b><small>{o.description}</small></span>{preset===o.id&&<Check size={18}/>}</button>)}<label className="onboarding-check"><input type="checkbox" checked={apply} onChange={e=>setApply(e.target.checked)}/> Aplicar painel sugerido (substitui o layout atual)</label></>:step===2?<><FocusSettings prefs={draft} onChange={setDraft}/></>:<><div className="onboarding-hero"><span><Sparkles size={34}/></span><h3>Seu espaço está pronto</h3><p>{draft.focus/60} min de foco · {draft.short/60} min de pausa · meta de {draft.goal} min por dia.</p></div><div className="demo-warning"><ShieldCheck size={19}/><span>Você pode conectar serviços depois em Configurações. Nenhuma permissão é necessária para começar.</span></div></>}
+ </div><footer className="dialog-actions onboarding-actions"><Button variant="secondary" onClick={()=>step?setStep(step-1):onDismiss()}>{step?<><ArrowLeft size={15}/> Voltar</>:'Pular'}</Button><Button onClick={()=>step===3?onFinish(identity,draft,apply?preset:null):setStep(step+1)}>{step===3?'Começar':'Continuar'}<ArrowRight size={15}/></Button></footer>
+ </Dialog>;
+}

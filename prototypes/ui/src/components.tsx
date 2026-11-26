@@ -6,12 +6,12 @@ import { ProviderIcon, type ProviderId } from './provider-icons';
 export const icons:Record<WidgetType,LucideIcon>={focus:Timer,agenda:CalendarDays,tasks:ListTodo,reading:BookOpen,goal:Target,music:Music2,summary:BarChart3,notes:StickyNote,next:CalendarClock,recent:History};
 export function Brand(){return <div className="brand"><span className="brand-symbol" aria-hidden="true"><i/><i/></span><b>Focora</b></div>}
 export function formatTime(seconds:number){return [Math.floor(seconds/60),seconds%60].map(v=>String(v).padStart(2,'0')).join(':')}
-export function Ring({seconds=1500,total=1500,label='Leitura',large=false}:{seconds?:number;total?:number;label?:string;large?:boolean}){
+export function Ring({seconds=1500,total=1500,label='Leitura',large=false,cycleLabel='Ciclo 1 de 4'}:{seconds?:number;total?:number;label?:string;large?:boolean;cycleLabel?:string}){
  const gradient=useId();
  const ratio=Math.min(1,Math.max(0,seconds/Math.max(1,total)));
  return <div className={'timer-ring'+(large?' ring-large':'')} role="img" aria-label={formatTime(seconds)+' · '+label}>
  <svg viewBox="0 0 160 160" aria-hidden="true"><defs><linearGradient id={gradient} x1="0%" x2="0%" y1="0%" y2="100%"><stop stopColor="#f8d4ba"/><stop offset=".44" stopColor="#f8d4ba"/><stop offset=".58" stopColor="#f6a772"/><stop offset=".68" stopColor="#e8752b"/><stop offset="1" stopColor="#d8601b"/></linearGradient></defs><circle cx="80" cy="80" r="72" fill="none" stroke="var(--ring-track)" strokeWidth="8"/><circle cx="80" cy="80" r="72" fill="none" stroke={'url(#'+gradient+')'} strokeWidth="8" strokeLinecap="round" pathLength="100" strokeDasharray={Math.min(99,ratio*100)+' 100'} transform="rotate(-90 80 80)"/></svg>
- <div className="ring-copy"><strong>{formatTime(seconds)}</strong><span>{label}</span>{large&&<small>Ciclo 1 de 4</small>}</div></div>
+ <div className="ring-copy"><strong>{formatTime(seconds)}</strong><span>{label}</span>{large&&<small>{cycleLabel}</small>}</div></div>
 }
 export function Segment({value,onChange}:{value:'Pomodoro'|'Livre';onChange:(v:'Pomodoro'|'Livre')=>void}){return <div className="segment" aria-label="Método de foco">{(['Pomodoro','Livre'] as const).map(v=><button key={v} aria-pressed={value===v} className={value===v?'selected':''} onClick={()=>onChange(v)}>{v}</button>)}</div>}
 export function Card({title,icon:Icon,children,actions,provider}:{title:string;icon:LucideIcon;children:ReactNode;actions?:ReactNode;provider?:ProviderId}){return <section className="card"><header className="card-head"><span>{provider?<ProviderIcon provider={provider} size={16}/>:<Icon size={16} strokeWidth={1.8}/>}<span className="card-title" title={title}>{title}</span></span>{actions??<Ellipsis size={16} aria-hidden="true"/>}</header><div className="card-body">{children}</div></section>}

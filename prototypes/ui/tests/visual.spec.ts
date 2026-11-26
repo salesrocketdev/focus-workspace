@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+// Existing route tests explicitly skip first-run onboarding.
+test.beforeEach(async({page})=>{await page.addInitScript(()=>{if(!localStorage.getItem('focus-workspace:v4:onboarding'))localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest'))})});
 test('capture V4 screen candidates and validate basic flows',async({page},info)=>{
  await page.goto('/');
  await expect(page.getByRole('heading',{name:'Meu dia'})).toBeVisible();

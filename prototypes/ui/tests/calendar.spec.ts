@@ -1,4 +1,6 @@
 import { test,expect } from '@playwright/test';
+// Existing route tests explicitly skip first-run onboarding.
+test.beforeEach(async({page})=>{await page.addInitScript(()=>{if(!localStorage.getItem('focus-workspace:v4:onboarding'))localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest'))})});
 
 test('calendar supports day week month, navigation, source filters and event details',async({page},info)=>{
  await page.goto('/');

@@ -4,7 +4,7 @@
  .editing .widget-grid.coordinate-grid{--grid-row:28px;--grid-gap:10px;padding:12px;background-color:#faf6f2;background-image:linear-gradient(to right,#d9cbbd55 1px,transparent 1px),linear-gradient(to bottom,#d9cbbd55 1px,transparent 1px);background-size:calc((100% + var(--grid-gap))/12) calc(var(--grid-row) + var(--grid-gap));background-origin:content-box;background-clip:content-box}
  .coordinate-grid>.widget[data-widget]{min-height:0;min-width:0}
  .coordinate-grid>.widget>.card{min-height:0;height:100%}
- .coordinate-grid>.widget>.card>.card-body{min-height:0;overflow:auto;scrollbar-width:thin}
+ .coordinate-grid>.widget>.card>.card-body{min-height:0;overflow:clip}
  .coordinate-grid>.widget.grid-active{opacity:.55;z-index:2}
  .coordinate-grid>.grid-ghost{display:grid;place-items:center;pointer-events:none;z-index:5;border:1.5px dashed #db702e;background:#fbd9bd85;border-radius:10px;align-self:stretch;min-width:0;min-height:0}
  .coordinate-grid>.grid-ghost span{background:#fffaf6;color:#9d4114;border:1px solid #e8bd9b;border-radius:6px;padding:5px 8px;font-size:12px;font-weight:600;box-shadow:0 2px 6px #50331b12}

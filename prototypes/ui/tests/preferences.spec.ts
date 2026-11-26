@@ -1,0 +1,52 @@
+import { test,expect } from '@playwright/test';
+test('onboarding, simulated OAuth and focus preferences persist locally',async({page},info)=>{
+ await page.goto('/');
+ let dialog=page.getByRole('dialog');
+ await expect(dialog).toBeVisible();
+ await dialog.getByRole('button',{name:/Entrar com Google/}).click();
+ await dialog.getByRole('button',{name:'Continuar',exact:true}).click();
+ await dialog.getByRole('button',{name:/Trabalho e reuniões/}).click();
+ await dialog.getByLabel('Aplicar painel sugerido').uncheck();
+ await dialog.getByRole('button',{name:'Continuar',exact:true}).click();
+ await dialog.getByLabel('Duração do Pomodoro').selectOption('60');
+ await dialog.getByLabel('Pausa curta').selectOption('180');
+ await dialog.getByLabel('Ciclos até a pausa longa').selectOption('2');
+ await dialog.getByRole('button',{name:'Continuar',exact:true}).click();
+ await page.screenshot({path:info.outputPath('onboarding-ready.png'),animations:'disabled',scale:'css'});
+ await dialog.getByRole('button',{name:'Começar',exact:true}).click();
+ await expect(dialog).toHaveCount(0);
+ const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
+ await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await expect(page.getByLabel('Duração do Pomodoro')).toHaveValue('60');
+ for(const provider of ['Google Agenda','Microsoft Outlook','Spotify','Gmail','Google Meet','Microsoft Teams']){
+  await page.getByRole('button',{name:'Conectar '+provider,exact:true}).click();
+  await expect(dialog).toContainText('Simulação OAuth');
+  await dialog.getByRole('button',{name:/Conta de demonstração/}).click();
+  await expect(dialog).toContainText('Permissões simuladas');
+  await dialog.getByRole('button',{name:'Autorizar simulação'}).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByRole('button',{name:'Gerenciar '+provider,exact:true})).toBeVisible();
+ }
+ await page.reload();
+ await expect(dialog).toHaveCount(0);
+ await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await expect(page.getByLabel('Duração do Pomodoro')).toHaveValue('60');
+ await page.getByRole('button',{name:'Gerenciar Spotify',exact:true}).click();
+ await dialog.getByRole('button',{name:'Desconectar',exact:true}).click();
+ await expect(page.getByRole('button',{name:'Conectar Spotify',exact:true})).toBeVisible();
+ await nav.getByRole('button',{name:'Hoje',exact:true}).click();
+ await expect(page.getByRole('img',{name:'01:00 · Leitura'})).toBeVisible();
+ await page.getByRole('button',{name:'Iniciar foco',exact:true}).click();
+ await page.clock.install();
+ await page.clock.fastForward(62000);
+ await expect(page.getByRole('img',{name:'03:00 · Pausa curta'})).toBeVisible();
+});
+test('dashboard cards do not use internal scrolling, including edit mode',async({page},info)=>{
+ await page.goto('/');
+ await page.getByRole('button',{name:'Pular',exact:true}).click();
+ const verify=async()=>{const overflow=await page.locator('.widget .card-body:visible').evaluateAll(nodes=>nodes.map(n=>[getComputedStyle(n).overflowX,getComputedStyle(n).overflowY]));expect(overflow.length).toBeGreaterThan(0);for(const values of overflow)for(const value of values)expect(['auto','scroll']).not.toContain(value)};
+ await verify();
+ await page.getByRole('button',{name:'Editar painel',exact:true}).click();
+ if(info.project.name!=='mobile')await verify();
+ await page.screenshot({path:info.outputPath('no-scroll-editor.png'),animations:'disabled',scale:'css'});
+});
