@@ -59,13 +59,13 @@
 @media(max-width:359px){.activity-section-head>div:first-child small{font-size:10px;line-height:1.4}.activity-section-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}}
 /* Identical preview geometry regardless of title length or scene art. */
 .scene-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:1fr;align-items:stretch;gap:12px;max-width:760px;width:100%}
-.scene-options>button{box-sizing:border-box;display:grid;grid-template-rows:auto 1fr;position:relative;justify-items:stretch;align-content:start;gap:8px;padding:8px;min-width:0;min-height:0;height:100%;width:100%;border:1px solid var(--ui-line);background:var(--ui-paper);border-radius:11px;text-align:left}
+.scene-options>button{box-sizing:border-box;display:grid;grid-template-rows:max-content 1fr;position:relative;justify-items:stretch;align-items:start;align-self:stretch;gap:8px;padding:8px;min-width:0;min-height:0;height:auto;width:100%;border:1px solid var(--ui-line);background:var(--ui-paper);border-radius:11px;text-align:left}
 .scene-options>button[aria-pressed=true]{border-color:var(--field-selected-edge);background:var(--field-selected)}
 .scene-options>button:focus-visible{outline:2px solid var(--field-focus);outline-offset:2px}
-.scene-sample{position:relative;display:grid;place-items:center;overflow:hidden;width:100%;min-width:0;aspect-ratio:16/10;background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:7px;isolation:isolate}
+.scene-sample{position:relative;display:block;overflow:hidden;width:100%;min-width:0;height:0;padding-top:62.5%;box-sizing:content-box;aspect-ratio:auto;background:var(--ui-surface);border:0;border-radius:7px;isolation:isolate;box-shadow:inset 0 0 0 1px var(--ui-line)}
 .scene-sample svg{position:absolute;bottom:0;width:100%;height:70%;opacity:.94;z-index:-1}
-.scene-sample-clock{font-size:clamp(14px,1.6vw,22px);font-weight:650;letter-spacing:-.04em;font-variant-numeric:tabular-nums;align-self:start;margin-top:18%;color:var(--ui-ink)}
-.scene-copy{display:grid;align-content:start;grid-template-rows:minmax(2.6em,auto) 1fr;gap:3px;min-width:0;padding:0 3px 3px;font-size:12px}
+.scene-sample-clock{font-size:clamp(14px,1.6vw,22px);font-weight:650;letter-spacing:-.04em;font-variant-numeric:tabular-nums;position:absolute;top:25%;left:50%;transform:translateX(-50%);color:var(--ui-ink)}
+.scene-copy{display:grid;align-content:start;grid-template-rows:minmax(2.6em,auto) auto;gap:3px;min-width:0;padding:0 3px 3px;font-size:12px}
 .scene-copy b{font-size:12px;line-height:1.3;overflow-wrap:anywhere}
 .scene-copy small{font-size:11px;line-height:1.35;overflow-wrap:anywhere}
 .scene-check{position:absolute;right:12px;top:12px;color:var(--field-selected-ink);background:var(--ui-paper);border-radius:50%;padding:2px;width:20px;height:20px}
