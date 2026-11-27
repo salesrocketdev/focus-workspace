@@ -24,8 +24,11 @@ function navigatePoint(e:KeyboardEvent<HTMLButtonElement>,index:number,count:num
 }
 export function FocusTrend({days}:{days:Day[]}){
  const [selected,setSelected]=useState<string|null>(null),[hover,setHover]=useState<string|null>(null),[kind,setKind]=useState<'bar'|'line'>('bar');
- const found=days.findIndex(d=>d.day===(hover??selected));
- const index=found<0?Math.max(0,days.length-1):found;
+ const last=Math.max(0,days.length-1);
+ const selectedIndex=days.findIndex(d=>d.day===selected);
+ const current=selectedIndex<0?last:selectedIndex;
+ const hoverIndex=days.findIndex(d=>d.day===hover);
+ const index=hoverIndex<0?current:hoverIndex;
  const day=days[index];
  const max=Math.max(3600,Math.ceil(Math.max(0,...days.map(d=>d.seconds))/1800)*1800);
  const pick=(i:number)=>{setSelected(days[i].day);setHover(null)};
@@ -41,10 +44,10 @@ export function FocusTrend({days}:{days:Day[]}){
   <div className="history-axis" aria-hidden="true"><span>{Math.round(max/60)}m</span><span>{Math.round(max/120)}m</span><span>0</span></div>
   <div className={'history-plot interactive-plot plot-kind-'+kind} role="group" aria-label="Tempo de foco por dia" onPointerLeave={()=>setHover(null)}>
   {kind==='line'&&<svg className="chart-line" viewBox="0 0 600 140" preserveAspectRatio="none" aria-hidden="true"><polygon points={area} fill="var(--field-selected)"/><polyline points={line} fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke"/></svg>}
-  {days.map((d,i)=><button type="button" data-chart-point key={d.day} className="history-bar-column" aria-pressed={i===index} aria-label={longDate(d.day)+': '+durationLabel(d.seconds)+', '+sessionLabel(d.count)} tabIndex={i===index?0:-1} onPointerEnter={e=>{if(e.pointerType==='mouse')setHover(d.day)}} onFocus={()=>pick(i)} onClick={()=>pick(i)} onKeyDown={e=>navigatePoint(e,i,days.length,pick)}><span className="history-bar-track"><i style={{height:d.seconds/max*100+'%'}} className={d.day===DEMO_DAY?'today-bar':''}/>{kind==='line'&&<span className="chart-dot" style={{bottom:d.seconds/max*100+'%'}}/>}</span><small aria-hidden="true">{days.length<=7||i%5===0||i===days.length-1?shortDate(d.day):''}</small></button>)}
+  {days.map((d,i)=><button type="button" data-chart-point key={d.day} className="history-bar-column" aria-pressed={i===index} aria-label={longDate(d.day)+': '+durationLabel(d.seconds)+', '+sessionLabel(d.count)} tabIndex={i===index?0:-1} onPointerEnter={e=>{if(e.pointerType==='mouse'&&window.matchMedia('(hover: hover)').matches)setHover(d.day)}} onFocus={()=>pick(i)} onClick={()=>pick(i)} onKeyDown={e=>navigatePoint(e,i,days.length,pick)}><span className="history-bar-track"><i style={{height:d.seconds/max*100+'%'}} className={d.day===DEMO_DAY?'today-bar':''}/>{kind==='line'&&<span className="chart-dot" style={{bottom:d.seconds/max*100+'%'}}/>}</span><small aria-hidden="true">{days.length<=7||i%5===0||i===days.length-1?shortDate(d.day):''}</small></button>)}
   </div>
  </div>
- <div className="chart-point-controls"><small><span className="chart-key"/> Tempo de foco</small><div className="chart-day-navigation"><button type="button" aria-label="Dia anterior no gráfico" disabled={index===0} onClick={()=>pick(index-1)}><ChevronLeft size={17}/></button><small>{day?shortDate(day.day):'—'}</small><button type="button" aria-label="Próximo dia no gráfico" disabled={index===days.length-1} onClick={()=>pick(index+1)}><ChevronRight size={17}/></button></div></div>
+ <div className="chart-point-controls"><small><span className="chart-key"/> Tempo de foco</small><div className="chart-day-navigation"><button type="button" aria-label="Dia anterior no gráfico" disabled={current===0} onClick={()=>pick(current-1)}><ChevronLeft size={17}/></button><small>{day?shortDate(day.day):'—'}</small><button type="button" aria-label="Próximo dia no gráfico" disabled={current>=last} onClick={()=>pick(current+1)}><ChevronRight size={17}/></button></div></div>
  </div>
 }
 export function CategoryChart({groups,total,color}:{groups:Group[];total:number;color:(id:string)=>string}){
