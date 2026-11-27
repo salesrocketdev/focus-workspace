@@ -1,7 +1,7 @@
 import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>{if(!localStorage.getItem('focus-workspace:v4:onboarding'))localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest'))})});
-test('built Pages subpath opens offline with local session and activities',async({page,context},info)=>{
+test('built Pages subpath opens offline with local session and library',async({page,context},info)=>{
  await page.goto('./');
  const mobile=info.project.name==='offline-mobile';
  const nav=page.locator(mobile?'.bottom-nav':'.sidebar nav');
@@ -13,7 +13,7 @@ test('built Pages subpath opens offline with local session and activities',async
  expect(cache.some(url=>url.endsWith('.woff2'))).toBeTruthy();
  expect(cache.some(url=>url.includes('/assets/')&&url.endsWith('.js'))).toBeTruthy();
  expect(cache.some(url=>url.endsWith('/icons/icon-192.png'))).toBeTruthy();
- await openNavigation(nav,'Atividades');
+ await openNavigation(nav,'Biblioteca');
  await page.getByRole('button',{name:'Nova categoria',exact:true}).click();
  await page.getByLabel('Nome da categoria').fill('Offline local');
  await page.getByRole('button',{name:'Salvar',exact:true}).click();
@@ -25,13 +25,13 @@ test('built Pages subpath opens offline with local session and activities',async
  await expect(page.getByRole('button',{name:'Pausar foco',exact:true})).toBeVisible();
  await expect(page.getByText('Sem conexão · dados locais',{exact:true})).toBeVisible();
  await page.getByRole('button',{name:'Pausar foco',exact:true}).click();
- await openNavigation(nav,'Atividades');
+ await openNavigation(nav,'Biblioteca');
  await expect(page.getByRole('button',{name:'Iniciar foco em Offline local'})).toBeVisible();
  await page.getByRole('button',{name:'Nova categoria',exact:true}).click();
  await page.getByLabel('Nome da categoria').fill('Criado sem rede');
  await page.getByRole('button',{name:'Salvar',exact:true}).click();
  await page.reload();
- await openNavigation(nav,'Atividades');
+ await openNavigation(nav,'Biblioteca');
  await expect(page.getByRole('button',{name:'Iniciar foco em Criado sem rede'})).toBeVisible();
  await context.setOffline(false);
  await expect(page.getByText('Sem conexão · dados locais',{exact:true})).toHaveCount(0);
