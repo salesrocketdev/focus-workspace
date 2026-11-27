@@ -61,3 +61,10 @@
 
 /* The native input stays semantic; selection and option states use the same palette. */
 .ui-select-trigger:disabled>svg{opacity:.6}.ui-search-field:has(.ui-search-clear:focus-visible){box-shadow:0 0 0 3px var(--field-halo)}
+
+/* Product polish: keep label/control anchored when adjacent fields have different helper text. */
+.ui-field{align-content:start;align-self:start;grid-auto-rows:max-content}
+.ui-field>small{margin:0;overflow-wrap:anywhere}
+.ui-field>label{min-width:0;overflow-wrap:anywhere}
+.ui-input-shell:has(input:read-only:not([type=search])){background:var(--ui-surface)}
+@media(prefers-reduced-motion:reduce){.ui-input-shell,.ui-select-trigger,.ui-textarea,.ui-toggle-card,.ui-switch-track,.ui-switch-track i,.ui-select-popup{transition:none;animation:none}}
