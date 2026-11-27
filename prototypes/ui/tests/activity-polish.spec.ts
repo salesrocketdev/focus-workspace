@@ -5,7 +5,7 @@ test('mobile category rows and book actions are compact and accessible',async({p
  test.skip(info.project.name!=='mobile','Mobile layout');
  await page.goto('/');
  const nav=page.getByRole('navigation',{name:'Navegação principal'});
- await openNavigation(nav,'Atividades');
+ await openNavigation(nav,'Biblioteca');
  for(const width of [320,360,390,430]){
   await page.setViewportSize({width,height:844});
   const rows=page.locator('.category-focus-row');
@@ -18,7 +18,7 @@ test('mobile category rows and book actions are compact and accessible',async({p
  await page.screenshot({path:info.outputPath('mobile-category-rows.png'),animations:'disabled',scale:'css'});
  await page.getByRole('button',{name:'Iniciar foco em Trabalho',exact:true}).click();
  await expect(page.locator('.focus-activity-panel h2')).toHaveText('Trabalho');
- await page.getByRole('button',{name:'Ver atividades',exact:true}).click();
+ await page.getByRole('button',{name:'Ver biblioteca',exact:true}).click();
  await page.getByRole('button',{name:'Leituras',exact:true}).click();
  const book=page.locator('.activity-book').first();
  await expect(book.getByRole('button',{name:'Detalhes de Clean Architecture'})).toBeVisible();
