@@ -127,7 +127,7 @@
 .ui-dialog.compact-dialog {
   width:min(calc(100% - 32px), 480px);
   max-height:min(85dvh, calc(var(--sheet-height,100dvh) - 24px));
-  height:auto;
+  height:fit-content;
   padding:16px 20px;
   overflow-y:auto;
   overscroll-behavior:contain;
@@ -194,7 +194,7 @@
 /* Sectioned dialogs: header, navigation and footer remain outside the scrolling content. */
 .ui-dialog.structured-dialog[open] {
  display:flex;flex-direction:column;box-sizing:border-box;width:min(calc(100% - 32px),480px);
- height:auto;min-height:0;max-height:min(78dvh,calc(var(--sheet-height,100dvh) - 32px));
+ height:fit-content;min-height:0;max-height:min(78dvh,calc(var(--sheet-height,100dvh) - 32px));
  padding:0;overflow:hidden;
 }
 .structured-dialog .dialog-header {
