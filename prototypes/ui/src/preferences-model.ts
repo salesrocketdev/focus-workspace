@@ -3,7 +3,7 @@ import { defaultLayout, type Layouts } from './model';
 export const PREFS_KEY='focus-workspace:v4:preferences';
 export const CONNECTIONS_KEY='focus-workspace:v4:demo-connections';
 export const ONBOARDING_KEY='focus-workspace:v4:onboarding';
-export type Profile='guest'|'google-demo';
+export type Profile='guest';
 export type Phase='focus'|'short'|'long';
 export type Preset='balanced'|'work'|'study';
 export interface FocusPreferences { focus:number;short:number;long:number;cycles:number;autoBreak:boolean;autoFocus:boolean;goal:number;keepAwake?:boolean }
@@ -18,7 +18,7 @@ export function loadPreferences():FocusPreferences{
 }
 export const providerKeys:ProviderId[]=['google-calendar','outlook','spotify','gmail','google-meet','teams'];
 export function loadConnections():ProviderId[]{const v=readStorage(CONNECTIONS_KEY);return Array.isArray(v)?providerKeys.filter(p=>v.includes(p)):[]}
-export function loadProfile():Profile|null{const v=readStorage(ONBOARDING_KEY);return v==='guest'||v==='google-demo'?v:null}
+export function loadProfile():Profile|null{const v=readStorage(ONBOARDING_KEY);return v==='guest'||v==='google-demo'?'guest':null}
 export const phaseName=(p:Phase)=>p==='short'?'Pausa curta':p==='long'?'Pausa longa':'Foco';
 export const phaseDuration=(p:Phase,prefs:FocusPreferences)=>p==='focus'?prefs.focus:p==='short'?prefs.short:prefs.long;
 export function nextPhase(phase:Phase,cyclesDone:number,prefs:FocusPreferences):{phase:Phase;cyclesDone:number;auto:boolean}{
