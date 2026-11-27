@@ -123,9 +123,10 @@ export function App(){
  const [blocks,setBlocks]=useState<FocusBlock[]>(restored.blocks??[]);
  const [plannedId,setPlannedId]=useState<string|undefined>(restored.timer.plannedId);
  const [planTask,setPlanTask]=useState<number|undefined>();
- const todayRecords=filterPeriod(records,1),todaySeconds=totalSeconds(todayRecords);
+ const realRecords=records.filter(r=>r.origin==='session');
+ const todayRecords=filterPeriod(realRecords,1),todaySeconds=totalSeconds(todayRecords);
  const demoFreeWindow=freeWindows(DEMO_DAY,[...calendarEvents,...blocks.map(plannedEvent)]).find(w=>w.end-w.start>=Math.min(120,prefs.focus/60));
- const lastWeek=dailyTotals(records,7),yesterdaySeconds=lastWeek[lastWeek.length-2].seconds;
+ const lastWeek=dailyTotals(realRecords,7),yesterdaySeconds=lastWeek[lastWeek.length-2].seconds;
  const changePercent=yesterdaySeconds?Math.round((todaySeconds-yesterdaySeconds)/yesterdaySeconds*100):null;
  const [summaryPoint,setSummaryPoint]=useState<{day:string;seconds:number;count:number}|null>(null);
  function saveFocusRecord(elapsed:number,status:SessionStatus,finishedCycle=0){if(elapsed<=0)return;const record=recordSession(focusContext,elapsed,mode,status,plannedId);setRecords(old=>[record,...old]);setSessionSummary({record,context:{...focusContext},cycle:finishedCycle,cycleGoal:prefs.cycles});}
@@ -371,7 +372,7 @@ export function App(){
    case 'summary':return <div className="summary-body"><div><strong>{durationLabel(todaySeconds)} {changePercent!==null&&<em>{changePercent>=0?'+':''}{changePercent}%</em>}</strong><small>{summaryPoint?summaryPoint.day.slice(8)+'/'+summaryPoint.day.slice(5,7)+' · '+durationLabel(summaryPoint.seconds)+' · '+summaryPoint.count+(summaryPoint.count===1?' sessão':' sessões'):'de foco · vs. ontem'}</small></div><MiniTrend days={lastWeek.slice(-(options.days??5))} onSelect={setSummaryPoint}/></div>;
    case 'notes':return <div className="notes-preview"><p>{notes||'Escreva uma nota rápida…'}</p><Button className="widget-quiet-action" variant="soft" size="sm" disabled={!tabs.canWrite} onClick={()=>{setNoteDraft(notes);setShowNotes(true)}}>Editar nota</Button></div>;
    case 'next':return <AgendaRows single/>;
-   case 'recent':return !records.length?<div className="widget-empty-state"><Timer size={23}/><b>Nenhuma sessão ainda</b><Button variant="secondary" size="sm" onClick={()=>navigate('focus')}>Preparar foco</Button></div>:<div className="recent-preview">{newest(records).slice(0,options.rows??3).map(r=><div key={r.id}><span>{r.title}</span><small>{durationLabel(r.seconds)}</small></div>)}</div>;
+   case 'recent':return !realRecords.length?<div className="widget-empty-state"><Timer size={23}/><b>Nenhuma sessão ainda</b><Button variant="secondary" size="sm" onClick={()=>navigate('focus')}>Preparar foco</Button></div>:<div className="recent-preview">{newest(realRecords).slice(0,options.rows??3).map(r=><div key={r.id}><span>{r.title}</span><small>{durationLabel(r.seconds)}</small></div>)}</div>;
   }
  }
  function renderWidget(w:Widget){const Icon=icons[w.type];return <div key={w.id} data-widget={w.type} data-size={w.size} data-placement={freeGrid&&w.placement?JSON.stringify(w.placement):undefined} style={freeGrid&&w.placement?gridStyle(w.placement):undefined} className={'widget '+w.size+' '+(editing&&selected===w.id?'is-selected':'')+(gesture.preview?.id===w.id?' grid-active':'')} onClick={()=>{if(editing&&selected!==w.id){setSelected(w.id);setOpenMenu(null)}}} onDragOver={e=>editing&&!freeGrid&&e.preventDefault()} onDrop={e=>{if(!editing||freeGrid)return;e.preventDefault();setOpenMenu(null);const from=e.dataTransfer.getData('text/plain');setDraft(old=>old?move(old,from,w.id).map(w=>({...w,placement:undefined})):old)}}>
