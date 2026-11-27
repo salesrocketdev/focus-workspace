@@ -11,3 +11,7 @@ Run results must be recorded against the exact tested SHA. Do not mark skipped, 
 ## V5 preview publication
 
 Maintainer requested publishing the current preview for hands-on testing. Build and Storybook passed on `6d9c106`; functional/offline CI has not yet completed. Publish the exact same application code with `[publish]` (Pages build and live asset verification), not `[release]`. This is a preview, not a full acceptance or production release. Existing user layouts and local data remain intact.
+
+## Second checkpoint
+
+Preview publication succeeded in run 46004201843. First validation 46003528874: build and Storybook passed; Playwright 108 passed, 43 failed, 18 skipped; offline skipped after failure. Addressed hidden mobile settings action and alternate timer face regression; migrated failing selector and explicit layout fixture contracts for task, calendar, focus, history widgets and geometry. Second full `[check]` run required; no acceptance until reviewed.
