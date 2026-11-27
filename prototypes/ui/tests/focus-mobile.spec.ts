@@ -9,11 +9,23 @@ test('mobile immersive controls are compact, aligned and usable',async({page},in
  const start=controls.getByRole('button',{name:'Iniciar',exact:true});
  for(const width of [320,360,390,430]){
   await page.setViewportSize({width,height:844});
-  const boxes=await controls.getByRole('button').evaluateAll(nodes=>nodes.map(n=>{const b=n.getBoundingClientRect();return {x:b.x,y:b.y,w:b.width,h:b.height,bg:getComputedStyle(n).backgroundColor}}));
+  const boxes=await controls.getByRole('button').evaluateAll(nodes=>nodes.map(n=>{const b=n.getBoundingClientRect();return {x:b.x,y:b.y,w:b.width,h:b.height,bg:getComputedStyle(n).backgroundColor,fg:getComputedStyle(n).color}}));
   expect(boxes.length).toBe(3);expect(boxes.every(b=>b.w>=44&&b.h>=44)).toBeTruthy();
   expect(Math.max(...boxes.map(b=>b.y))-Math.min(...boxes.map(b=>b.y))).toBeLessThan(1);
   expect(boxes[1].w).toBeGreaterThan(boxes[0].w);
-  expect(boxes[0].bg).toBe('rgba(0, 0, 0, 0)');expect(boxes[2].bg).toBe('rgba(0, 0, 0, 0)');
+  // Secondary controls have opaque surfaces over scene art; verify actual contrast.
+  const luminance=(color:string)=>{
+   const rgb=color.match(/[\d.]+/g)?.slice(0,3).map(Number);
+   if(!rgb||rgb.length!==3)throw new Error('Unexpected computed color: '+color);
+   return rgb.map(v=>{const n=v/255;return n<=.04045?n/12.92:Math.pow((n+.055)/1.055,2.4)}).reduce((s,v,i)=>s+v*[.2126,.7152,.0722][i],0);
+  };
+  for(const box of [boxes[0],boxes[2]]){
+   expect(box.bg).toMatch(/^rgb\(/);
+   const a=luminance(box.fg),b=luminance(box.bg);
+   expect((Math.max(a,b)+.05)/(Math.min(a,b)+.05)).toBeGreaterThanOrEqual(4.5);
+  }
+  expect(boxes[0].bg).toBe(boxes[2].bg);
+  expect(boxes[1].bg).not.toBe(boxes[0].bg);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
   await expect(focus.getByRole('button',{name:'Configurar sessão de foco',exact:true})).toBeVisible();
   await expect(focus.getByRole('button',{name:'Não perturbe',exact:true})).toBeVisible();
