@@ -36,5 +36,6 @@ import './focus-experience.css';
 import './editor-preferences.css';
 import './planning.css';
 import './first-use.css';
+import './design-system-v5.css';
 
 createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>);
