@@ -11,8 +11,8 @@ test('keyboard skip link, active navigation and progress names',async({page},inf
  await expect(nav.getByRole('button',{name:'Hoje',exact:true})).toHaveAttribute('aria-current','page');
  await expect(page.getByRole('heading',{name:'Leitura em andamento',exact:true})).toBeVisible();
  await expect(page.getByRole('progressbar',{name:'Progresso de leitura: Clean Architecture'})).toBeVisible();
- await openNavigation(nav,'Atividades');
- await expect(nav.getByRole('button',{name:info.project.name==='mobile'?'Mais':'Atividades',exact:true})).toHaveAttribute('aria-current','page');
+ await openNavigation(nav,'Biblioteca');
+ await expect(nav.getByRole('button',{name:info.project.name==='mobile'?'Mais':'Biblioteca',exact:true})).toHaveAttribute('aria-current','page');
  await page.getByRole('button',{name:'Nova categoria',exact:true}).click();
  const dialog=page.getByRole('dialog',{name:'Nova categoria'});
  await expect(dialog).toBeVisible();await page.keyboard.press('Escape');
@@ -25,7 +25,7 @@ test('mobile settings and routes stay inside viewport in both themes',async({pag
  const nav=page.getByRole('navigation',{name:'Navegação principal'});
  for(const width of [320,390,430]){
   await page.setViewportSize({width,height:844});
-  for(const label of ['Hoje','Agenda','Atividades','Histórico','Ajustes']){
+  for(const label of ['Hoje','Agenda','Biblioteca','Histórico','Ajustes']){
    await openNavigation(nav,label);
    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
   }
