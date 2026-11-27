@@ -16,9 +16,11 @@ test('mobile immersive controls are compact, aligned and usable',async({page},in
   expect(boxes[0].bg).toBe('rgba(0, 0, 0, 0)');expect(boxes[2].bg).toBe('rgba(0, 0, 0, 0)');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
   await expect(focus.getByRole('button',{name:'Configurar sessão de foco',exact:true})).toBeVisible();
-  await expect(focus.getByRole('button',{name:'Não Perturbe',exact:true})).toBeVisible();
+  await expect(focus.getByRole('button',{name:'Não perturbe',exact:true})).toBeVisible();
  }
  await start.click();
+ await expect(method).toBeHidden();
+ await page.getByRole('button',{name:'Controles',exact:true}).click();
  await expect(method.getByRole('button',{name:'Livre',exact:true})).toBeDisabled();
  await expect(controls.getByRole('button',{name:'Pausar',exact:true})).toBeVisible();
  await controls.getByRole('button',{name:'Pausar',exact:true}).click();
