@@ -5,7 +5,7 @@ import { EditIconButton, EditTextButton, EditCardToolbar, WidgetSizeOptions, Edi
 import { PageHeader, MobileMasthead } from './layout';
 import { CompactFocus,CommandPalette,QuickActionButton,type QuickAction } from './quick-actions';
 import { CalendarPage } from './calendar-page';
-import {conflict,validBlock,contextExists,type FocusBlock} from './planning-model';
+import {conflict,validBlock,contextExists,blockDone,type FocusBlock} from './planning-model';
 import { HistoryPage } from './history-page';
 import { MiniTrend } from './charts';
 import {useDistractionShield,DistractionDialog,launchFocusShortcut} from './distraction-shield';
@@ -268,9 +268,12 @@ export function App(){
  function prepareBlock(b:FocusBlock){
   if(!requireWriter())return;
   if(hasSession){setMessage('Encerre a sessão atual antes de preparar outro bloco.');return}
+  if(blockDone(b,records)){setMessage('Este bloco já foi concluído.');return}
   if(!blocks.some(x=>x.id===b.id)||!contextExists(b.context,tasks,categories,books)){setMessage('A atividade planejada não está mais disponível.');return}
   if(b.context.kind==='task'&&tasks.some(t=>String(t.id)===b.context.id&&t.done)){setMessage('Esta tarefa já está concluída.');return}
-  setMode('Pomodoro');setPhase('focus');setCycle(0);setFocusContext(b.context);if(b.context.kind==='reading')setReadingId(b.context.id);
+  const currentContext=b.context.kind==='task'?taskContext(tasks.find(t=>String(t.id)===b.context.id)!,categories):b.context.kind==='reading'?readingContext(books.find(x=>x.id===b.context.id)!):b.context;
+  if(!currentContext){setMessage('A atividade planejada não está mais disponível.');return}
+  setMode('Pomodoro');setPhase('focus');setCycle(0);setFocusContext(currentContext);if(currentContext.kind==='reading')setReadingId(currentContext.id);
   const length=(b.end-b.start)*60;setDuration(length);setSeconds(length);setPlannedId(b.id);setSessionSummary(null);navigate('focus');
  }
  function saveBlock(b:FocusBlock):string|null{

@@ -30,4 +30,5 @@ test('estimate, local reservation, reload, prepare and link completed Pomodoro',
  await expect(page.getByRole('button',{name:'Preparar agora'})).toBeDisabled();
  const data=await page.evaluate(()=>JSON.parse(localStorage.getItem('focus-workspace:v4:workspace')!));
  expect(data.records.filter((r:{plannedId?:string})=>r.plannedId===data.blocks[0].id)).toHaveLength(1);
+ expect(data.timer.plannedId).toBeUndefined();
 });

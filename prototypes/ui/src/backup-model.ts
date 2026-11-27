@@ -71,7 +71,7 @@ export function restoreBackup(input:Backup){
  const backup=parseBackup(JSON.stringify(input));
  const values={...backup.data};
  const w=values.workspace,p=values.preferences;
- values.workspace={...w,timer:{...w.timer,phase:'focus',cycle:0,duration:p.focus,seconds:w.timer.mode==='Livre'?0:p.focus,running:false,startedAt:0}};
+ values.workspace={...w,timer:{...w.timer,plannedId:undefined,phase:'focus',cycle:0,duration:p.focus,seconds:w.timer.mode==='Livre'?0:p.focus,running:false,startedAt:0}};
  // Permissions are tied to this device, not a portable file.
  if(object(values.notifications))values.notifications={...values.notifications,native:false};
  if(object(values.shield))values.shield={...values.shield,autoShortcut:false};
