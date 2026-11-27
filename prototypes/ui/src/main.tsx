@@ -25,5 +25,6 @@ import './filter-polish.css';
 import './focus-mobile.css';
 import './activity-polish.css';
 import './offline.css';
+import './tab-coordinator.css';
 
 createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>);

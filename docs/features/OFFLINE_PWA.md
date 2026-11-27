@@ -11,3 +11,6 @@ The Profile and panel settings show readiness only after the controlling worker 
 CI builds with the actual repository subpath and launches Vite preview on a separate port. Chromium desktop/mobile verify cache readiness, fonts/JS/icons, offline reload, timer persistence and local changes. Physical iPhone installation, airplane mode, storage eviction and update lifecycle remain manual acceptance checks. No app-store package or guaranteed closed-app notifications.
 
 Production follow-up: #8 local storage contracts/migrations, #6 platform capabilities, #24 native packages. Preserve version compatibility and cross-tab coordination before shipping real user data.
+
+
+Cross-tab workspace coordination uses an exclusive Web Lock in supported browsers. Mirrors read the same stored workspace and render the timer without independently completing phases or writing records. Close the writer to transfer control. This is same-origin, same-browser-profile coordination, not device sync; suspended writers may delay completion until resume/close. Browsers lacking Web Locks must use one tab. See docs/features/TAB_COORDINATION.md.

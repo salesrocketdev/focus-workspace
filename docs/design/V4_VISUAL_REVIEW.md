@@ -111,3 +111,7 @@ Previous focus mobile hotfix CI and Pages passed. Replace wrapped mobile categor
 
 ## Offline app shell
 Previous activity polish CI/Pages passed. Add deterministic production precache, scoped version caches, waiting activation, offline readiness and connection indicator, retain notifications. CI production subpath offline desktop/mobile tests. Offline cache is not persistent storage guarantee or background alarm; no external provider cache. See docs/features/OFFLINE_PWA.md. New CI and device verification pending.
+
+
+## Cross-tab workspace coordination
+Offline CI and Pages passed. Add exclusive Web Locks writer, read-only mirrors via storage events, automatic takeover after the writer closes, restore authoritative snapshot before acquiring writes, writer-only phase completion, record and wake lock. Guard workspace actions including activity mutations and timer controls. No forced lock stealing; suspended writer may delay completion until it resumes or closes. Unsupported browsers warn to use one tab; preferences outside workspace (appearance/layout/inbox) remain per existing behavior. Automated multi-page test; new CI/device validation pending.

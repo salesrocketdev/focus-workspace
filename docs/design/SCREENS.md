@@ -75,3 +75,6 @@ Activities overview uses a single surface of compact category rows (mobile one c
 
 
 Profile and panel settings show offline cache readiness and waiting updates. The published app can reopen offline after first successful preparation; the connection indicator appears only when the browser reports offline. Local demo functions remain available; external provider calls are not cached.
+
+
+When Web Locks is supported, one tab owns the workspace and other tabs display the shared timer, history and activity data in read-only mode. Closing the owner transfers control to the next waiting tab; no restart. A quiet banner describes the state. Unsupported environments retain single-tab mode with a warning.
