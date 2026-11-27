@@ -4,7 +4,7 @@ import { test, expect } from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>{if(!localStorage.getItem('focus-workspace:v4:onboarding'))localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest'))})});
 test('capture V4 screen candidates and validate basic flows',async({page},info)=>{
  await page.goto('/');
- await expect(page.getByRole('heading',{name:'Hoje'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Hoje',exact:true})).toBeVisible();
  await page.screenshot({path:info.outputPath('dashboard.png'),fullPage:false,animations:'disabled',scale:'css'});
  await page.getByRole('button',{name:'Editar painel',exact:true}).click();
  await expect(page.getByRole('heading',{name:'Editar painel'})).toBeVisible();
@@ -53,7 +53,7 @@ test('dashboard fits supported widths without page-level horizontal scrolling',a
  for(const width of [1920,1366,1024,768,390,360]){
    await page.setViewportSize({width,height:900});
    await page.goto('/');
-   await expect(page.getByRole('heading',{name:'Hoje'})).toBeVisible();
+   await expect(page.getByRole('heading',{name:'Hoje',exact:true})).toBeVisible();
    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy();
    await page.screenshot({path:info.outputPath('dashboard-'+width+'.png'),animations:'disabled',scale:'css'});
  }
@@ -212,6 +212,7 @@ test('local Inter font and settings field render consistently',async({page},info
 
 test('desktop coordinate grid moves and resizes in both axes with collision protection',async({page},info)=>{
  if(info.project.name!=='desktop')return;
+ await page.addInitScript(()=>{const key='focus-workspace:v4:layouts';if(localStorage.getItem(key))return;const desktop=[['focus','large'],['agenda','large'],['tasks','medium'],['reading','medium'],['goal','medium'],['music','large'],['summary','medium']].map(([type,size])=>({id:type,type,size,...(type==='goal'?{placement:{x:9,y:6,w:3,h:5}}:{})}));localStorage.setItem(key,JSON.stringify({desktop,mobile:desktop}));});
  await page.goto('/');
  await page.getByRole('button',{name:'Editar painel',exact:true}).click();
  const grid=page.locator('.coordinate-grid');
@@ -261,13 +262,14 @@ test('desktop coordinate grid moves and resizes in both axes with collision prot
  for(let i=0;i<rects.length;i++)for(let j=i+1;j<rects.length;j++){const a=rects[i],b=rects[j];expect(a.x<b.x+b.w-1&&a.x+a.w>b.x+1&&a.y<b.y+b.h-1&&a.y+a.h>b.y+1).toBeFalsy()}
  await page.getByRole('button',{name:'Editar painel',exact:true}).click();
  await page.getByRole('button',{name:'Restaurar layout',exact:true}).click();
- expect(await position()).toEqual(initial);
+ expect(await position()).toEqual({x:0,y:0,w:12,h:6});
  await page.getByRole('button',{name:'Cancelar',exact:true}).click();
  expect(await position()).toEqual(saved);
 });
 
 test('desktop opt-in push previews and commits neighbors, compact closes vertical gaps',async({page},info)=>{
  if(info.project.name!=='desktop')return;
+ await page.addInitScript(()=>{const key='focus-workspace:v4:layouts';if(localStorage.getItem(key))return;const desktop=[['focus','large'],['agenda','large'],['tasks','medium'],['reading','medium'],['goal','medium'],['music','large'],['summary','medium']].map(([type,size])=>({id:type,type,size,...(type==='goal'?{placement:{x:9,y:6,w:3,h:5}}:{})}));localStorage.setItem(key,JSON.stringify({desktop,mobile:desktop}));});
  await page.goto('/');
  await page.getByRole('button',{name:'Editar painel',exact:true}).click();
  const grid=page.locator('.coordinate-grid');
@@ -302,6 +304,7 @@ test('desktop opt-in push previews and commits neighbors, compact closes vertica
 });
 test('desktop catalogue can drop a widget into a chosen free cell',async({page},info)=>{
  if(info.project.name!=='desktop')return;
+ await page.addInitScript(()=>{const key='focus-workspace:v4:layouts';if(localStorage.getItem(key))return;const desktop=[['focus','large'],['agenda','large'],['tasks','medium'],['reading','medium'],['goal','medium'],['music','large'],['summary','medium']].map(([type,size])=>({id:type,type,size,...(type==='goal'?{placement:{x:9,y:6,w:3,h:5}}:{})}));localStorage.setItem(key,JSON.stringify({desktop,mobile:desktop}));});
  await page.goto('/');
  await page.getByRole('button',{name:'Editar painel',exact:true}).click();
  await page.getByRole('button',{name:'Remover Agenda de hoje',exact:true}).click();
