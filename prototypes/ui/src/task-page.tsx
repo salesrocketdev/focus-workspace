@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { CalendarPlus, Play, Plus, Repeat2, SkipForward, Star } from 'lucide-react';
 import { priorityCount, MAX_PRIORITIES, type Category, type Task } from './activity-model';
 import type { FocusRecord } from './history-model';
@@ -13,6 +13,7 @@ const dateLabel = (date:string) => dateAtNoon(date).toLocaleDateString('pt-BR', 
 export function TaskEditor({task,categories,canPriority,onSave,onDismiss}:{
  task?:Task;categories:Category[];canPriority:boolean;onSave:(draft:Omit<Task,'id'|'done'>)=>boolean;onDismiss:()=>void;
 }){
+ const priorityHint=useId();
  const [draft,setDraft]=useState<Omit<Task,'id'|'done'>>(task??{title:'',categoryId:categories[0]?.id??''});
  const [section,setSection]=useState<'basic'|'planning'|'content'|'source'>(task?.recurrenceDate?'planning':'basic');
  const [scope,setScope]=useState(task?.recurrenceDate?'occurrence':'series');
@@ -55,7 +56,7 @@ export function TaskEditor({task,categories,canPriority,onSave,onDismiss}:{
    {section==='basic'&&<>
    <Field label="Título da tarefa" disabled={scope==='occurrence'} required maxLength={120} value={draft.title} onChange={e=>change({title:e.target.value})}/>
    <SelectField label="Categoria" disabled={scope==='occurrence'} value={draft.categoryId} options={categories.map(c=>({value:c.id,label:c.name}))} onValueChange={categoryId=>change({categoryId})}/>
-   <label className="task-priority-control"><input type="checkbox" checked={Boolean(draft.priority)} disabled={scope==='occurrence'||!canPriority&&!draft.priority||task?.done} onChange={e=>change({priority:e.target.checked})}/><span><b>Destacar no painel</b><small>{!canPriority&&!draft.priority?"Limite de prioridades atingido.":"Mostrar entre as tarefas prioritárias."}</small></span><Star size={17} aria-hidden="true"/></label>
+   <label className="task-priority-control"><input type="checkbox" aria-label="Destacar no painel" aria-describedby={priorityHint} checked={Boolean(draft.priority)} disabled={scope==='occurrence'||!canPriority&&!draft.priority||task?.done} onChange={e=>change({priority:e.target.checked})}/><span><b>Destacar no painel</b><small id={priorityHint}>{!canPriority&&!draft.priority?"Limite de prioridades atingido.":"Mostrar entre as tarefas prioritárias."}</small></span><Star size={17} aria-hidden="true"/></label>
    <p className="dialog-section-hint">Planejamento, conteúdo e origem são opcionais. Você pode salvar agora.</p>
    </>}
    {section==='planning'&&<>
