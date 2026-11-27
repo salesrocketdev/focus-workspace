@@ -1,0 +1,34 @@
+name: V4 published site audit
+on:
+  workflow_dispatch:
+  push:
+    branches: ['prototype/ui-v4']
+    paths:
+      - '.github/workflows/prototype-live-audit.yml'
+      - 'prototypes/ui/live-audit/**'
+      - 'prototypes/ui/live-audit.config.ts'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: prototypes/ui
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npx playwright test --config=live-audit.config.ts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v4-live-audit
+          path: |
+            prototypes/ui/live-audit-results/
+            prototypes/ui/live-audit-report/
+          if-no-files-found: warn

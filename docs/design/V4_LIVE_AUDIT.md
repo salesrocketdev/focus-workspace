@@ -1,0 +1,7 @@
+# Published V4 audit
+
+Independent browser run against https://salesrocketdev.github.io/focus-workspace/ (not the local Vite server). Trigger: changes to the live-audit files on prototype/ui-v4, or workflow dispatch. The audit creates fresh isolated browser contexts with the demo profile and does not access a user's existing workspace.
+
+Matrix: Chromium desktop 1366×768, tablet 768×1024, narrow mobile 320×740, iPhone-sized WebKit. Captures dashboard/editor, agenda, categories/tasks/library, history line and filters, settings subpages, dark appearance and immersive focus. Exercises navigation and timer start/pause/reset. Collects full-page screenshots, JSON measurements, Playwright HTML report and console summary. Checks horizontal overflow, unnamed buttons, uncaught JavaScript errors, same-origin HTTP failures and mobile timer hit targets. Small targets elsewhere and potential clipped headings are heuristic observations, not automatic WCAG failures (spacing and intentionally truncated labels require inspection).
+
+No claim of human visual approval, actual iOS keyboard/notification/audio/Shortcut behavior or screen-reader compliance. The audit does not change the application. Direct browsing from the chat environment failed DNS/access, so GitHub-hosted runners are used for actual URL testing. See the run and artifacts for evidence; the final candidate must still receive maintainer acceptance per V4_ACCEPTANCE.md.
