@@ -37,3 +37,5 @@ G4 automated validation passed: run 46019136485 on 41e0169, including build, Sto
 ## G5 — History and calendar UX
 
 G4 preview deploy 46020396163 succeeded. G5 replaces the permanent desktop filter bar with the same transactional filter dialog used on mobile (category, method, status; apply/cancel/clear; active filter count). Corrected singular/plural wording and demo date/calendar disclosures, retaining local blocks and hidden-calendar conflict checks. Existing keyboard/touch chart interactions retained. Updated functional regression tests for shared dialog, cancellation, clearing, and calendar day/week/month. Fixed-date prototype remains intentional until real data integration. Run full group-end CI before publication.
+
+G5 first validation 46020603561: 149 passed, 2 failed, 18 skipped. Both desktop history scenarios retained a mobile-only Apply guard from V4. Corrected those guards to apply the dialog draft on all viewports, preserving assertions. Offline not reached; rerun full suite before publication.
