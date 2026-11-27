@@ -2,6 +2,7 @@ import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')))});
 test('interactive analytics use filtered data and support keyboard and touch',async({page},info)=>{
+ await page.addInitScript(()=>{const desktop=[{id:'focus',type:'focus',size:'large'},{id:'summary',type:'summary',size:'medium'}];localStorage.setItem('focus-workspace:v4:layouts',JSON.stringify({desktop,mobile:desktop}));});
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
  await openNavigation(nav,'Histórico');
