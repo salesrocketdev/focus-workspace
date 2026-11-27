@@ -1,27 +1,34 @@
 import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>{if(!localStorage.getItem('focus-workspace:v4:onboarding'))localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest'))})});
-test('desktop filter toolbar uses compact labeled fields and reset',async({page},info)=>{
+test('desktop history filter dialog applies, cancels and clears without overflow',async({page},info)=>{
  test.skip(info.project.name!=='desktop','Desktop filter layout');
  await page.goto('/');
  const nav=page.getByRole('navigation',{name:'Navegação principal'});
  await openNavigation(nav,'Histórico');
- const bar=page.getByRole('group',{name:'Filtros do histórico'});
- await expect(bar.getByRole('combobox')).toHaveCount(3);
- await bar.getByRole('combobox',{name:'Categoria do histórico'}).click();
- await page.getByRole('option',{name:'Leitura',exact:true}).click();
- await expect(bar.getByRole('button',{name:'Limpar filtros'})).toBeEnabled();
- await bar.getByRole('button',{name:'Limpar filtros'}).click();
- await expect(bar.getByRole('combobox',{name:'Categoria do histórico'})).toContainText('Todas');
- await expect(bar.getByRole('button',{name:'Limpar filtros'})).toBeDisabled();
+ const trigger=page.getByRole('button',{name:'Abrir filtros do histórico'});
+ const sheet=page.getByRole('dialog',{name:'Filtros do histórico'});
  for(const width of [760,1024,1366]){
   await page.setViewportSize({width,height:768});
-  const fields=await bar.getByRole('combobox').evaluateAll(nodes=>nodes.map(e=>{const r=e.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,height:r.height}}));
-  expect(fields.every(f=>f.height===36)).toBeTruthy();
-  expect(Math.max(...fields.map(f=>f.top))-Math.min(...fields.map(f=>f.top))).toBeLessThanOrEqual(1);
-  expect(fields.every((f,i)=>i===0||f.left>=fields[i-1].right)).toBeTruthy();
+  await trigger.click();
+  await expect(sheet.getByRole('combobox')).toHaveCount(3);
+  await sheet.getByRole('combobox',{name:'Categoria do histórico'}).click();
+  await page.getByRole('option',{name:'Leitura',exact:true}).click();
+  await sheet.getByRole('button',{name:'Aplicar filtros'}).click();
+  await expect(page.getByText('1 filtro aplicado',{exact:true})).toBeVisible();
+  await trigger.click();
+  await sheet.getByRole('button',{name:'Limpar',exact:true}).click();
+  await sheet.getByRole('button',{name:'Fechar diálogo'}).click();
+  await expect(page.getByText('1 filtro aplicado',{exact:true})).toBeVisible();
+  await trigger.click();
+  const bounds=await sheet.boundingBox();
+  expect(bounds!.x).toBeGreaterThanOrEqual(0);
+  expect(bounds!.x+bounds!.width).toBeLessThanOrEqual(width+1);
+  await sheet.screenshot({path:info.outputPath('desktop-filters-'+width+'.png')});
+  await sheet.getByRole('button',{name:'Fechar diálogo'}).click();
+  await page.getByRole('button',{name:'Limpar filtros',exact:true}).click();
+  await expect(page.getByText('1 filtro aplicado',{exact:true})).toHaveCount(0);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
-  await bar.screenshot({path:info.outputPath('desktop-filters-'+width+'.png')});
  }
 });
 test('focus scene persists, supports none and restores original',async({page},info)=>{
