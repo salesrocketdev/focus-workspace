@@ -31,3 +31,12 @@
 .daily-focus-progress .progress{height:5px}
 @media(min-width:1151px){.workspace[data-route=today] .widget[data-widget=focus].large .focus-widget{gap:8px}.workspace[data-route=today] .widget[data-widget=focus].large .focus-controls{display:flex;flex-wrap:wrap;flex-direction:row;justify-content:center;gap:10px}}
 @media(max-width:759px){.home-focus-window{padding:10px 0;align-items:flex-start;flex-wrap:wrap}.home-focus-window .ui-button{min-height:44px}.workspace[data-route=today] .widget[data-widget=focus].large .card-body{overflow:visible}.workspace[data-route=today] .widget[data-widget=focus].large .focus-widget{padding:10px 0}.workspace[data-route=today] .widget[data-widget=focus].large .ring-copy strong{font-size:clamp(42px,12cqw,72px)}}
+
+/* A session in progress defaults to a quiet workspace; controls remain keyboard/touch accessible. */
+.immersive-grid.active-focus-quiet{grid-template-columns:minmax(0,1fr);max-width:600px;justify-items:center;align-items:center;margin-inline:auto}
+.active-focus-quiet>.book-panel,.active-focus-quiet>.focus-activity-panel,.active-focus-quiet>.focus-side,.active-focus-quiet .focus-context-picker,.active-focus-quiet .segment,.active-focus-quiet .immersive-actions{display:none}
+.active-focus-quiet>.focus-center{grid-column:1;grid-row:1;width:100%;max-width:560px;min-width:0}
+.active-focus-quiet .transport .circle-button:not(.primary){box-shadow:none;background:transparent;border:1px solid var(--ui-line);color:var(--ui-muted)}
+.active-focus-quiet .timer-ring{margin-block:8px}
+.focus-header-trailing>.ui-button{flex-shrink:0}
+@media(max-width:759px){.focus-top:has(.active-focus-quiet),.focus-header-trailing{min-width:0}.focus-header-trailing>.ui-button{min-height:44px}.focus-top:has(.focus-header-trailing>.ui-button) .zen-toggle,.focus-top:has(.focus-header-trailing>.ui-button) .focus-header-trailing>button[aria-label="Abrir foco compacto"]{display:none}.active-focus-quiet .transport .circle-button{min-height:44px}}
