@@ -2,7 +2,7 @@ import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>{if(!localStorage.getItem('focus-workspace:v4:onboarding'))localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest'))})});
 test('estimate, local reservation, reload, prepare and link completed Pomodoro',async({page})=>{
- await page.clock.install({time:new Date('2025-01-29T12:00:00')});await page.goto('/');
+ await page.clock.install({time:new Date('2026-11-27T12:00:00')});await page.goto('/');
  const nav=page.getByRole('navigation',{name:'Navegação principal'});
  await openNavigation(nav,'Tarefas');
  await page.getByRole('button',{name:'Finalizar revisão do PR',exact:true}).click();
@@ -12,13 +12,13 @@ test('estimate, local reservation, reload, prepare and link completed Pomodoro',
  const task=page.locator('.planning-row').filter({hasText:'Finalizar revisão do PR'});
  await expect(task).toContainText('0/2 Pomodoros');
  await task.getByRole('button',{name:'Agendar'}).click();
- await page.getByRole('button',{name:'Planejar foco das 09:30 às 11:00'}).click();
+ await page.getByRole('button',{name:'Planejar foco das 09:00 às 18:00'}).click();
  const dialog=page.getByRole('dialog',{name:'Planejar bloco de foco'});
  await expect(dialog.getByRole('combobox',{name:'Atividade planejada'})).toContainText('Finalizar revisão do PR');
  await dialog.getByRole('combobox',{name:'Duração do bloco'}).click();await page.getByRole('option',{name:'15 min',exact:true}).click();
  await dialog.getByRole('button',{name:'Reservar bloco'}).click();
  const event=page.locator('.calendar-event-list .calendar-event').filter({hasText:'Finalizar revisão do PR'});
- await expect(event).toContainText('Foco planejado');await expect(page.locator('.calendar-slots')).toContainText('09:45 – 11:00');
+ await expect(event).toContainText('Foco planejado');await expect(page.locator('.calendar-slots')).toContainText('09:15 – 18:00');
  await page.reload();await nav.getByRole('button',{name:'Agenda',exact:true}).click();await event.click();
  await page.getByRole('button',{name:'Preparar agora'}).click();
  await expect(page.locator('.focus-center .timer-ring')).toHaveAttribute('aria-label',/15:00/);
