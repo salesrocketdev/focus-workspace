@@ -19,3 +19,7 @@ Preview publication succeeded in run 46004201843. First validation 46003528874: 
 ## Third checkpoint
 
 Second CI 46005706005: 149 passed, 2 failed, 18 skipped; build/Storybook passed. Both failures are the same ambiguous category selector on desktop and mobile, now scoped to the New Task dialog. Offline stage was skipped. Re-run full `[check]` before accepting or publishing the corrections.
+
+## Fourth checkpoint
+
+Third full CI 46007307196: TypeScript/build, Storybook and all 151 executed functional tests passed (18 skipped). Two offline tests failed because their old Atividades navigation name was not migrated. Updated offline selectors to Biblioteca without weakening cache, timer persistence or offline data assertions. Application source unchanged from second checkpoint. Run full `[check]` again; no full acceptance until offline passes.
