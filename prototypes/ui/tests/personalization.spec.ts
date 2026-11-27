@@ -22,7 +22,7 @@ test('accent and timer style persist across views and reload',async({page},info)
  await settings();
  await page.getByLabel('Cor personalizada').fill('#2468ac');
  await expect(page.locator('html')).toHaveAttribute('data-accent','#2468ac');
- await page.getByRole('button',{name:'Restaurar cores e círculo'}).click();
+ await page.getByRole('button',{name:'Restaurar cores, círculo e cenário'}).click();
  await expect(page.locator('html')).toHaveAttribute('data-ring','classic');
  await expect(page.locator('html')).toHaveAttribute('data-accent','#e8752b');
 });

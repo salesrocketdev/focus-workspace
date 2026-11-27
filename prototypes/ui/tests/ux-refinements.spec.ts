@@ -13,7 +13,15 @@ test('desktop filter toolbar uses compact labeled fields and reset',async({page}
  await bar.getByRole('button',{name:'Limpar filtros'}).click();
  await expect(bar.getByRole('combobox',{name:'Categoria do histórico'})).toContainText('Todas');
  await expect(bar.getByRole('button',{name:'Limpar filtros'})).toBeDisabled();
- await bar.screenshot({path:info.outputPath('desktop-filters.png')});
+ for(const width of [760,1024,1366]){
+  await page.setViewportSize({width,height:768});
+  const fields=await bar.getByRole('combobox').evaluateAll(nodes=>nodes.map(e=>{const r=e.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,height:r.height}}));
+  expect(fields.every(f=>f.height===36)).toBeTruthy();
+  expect(Math.max(...fields.map(f=>f.top))-Math.min(...fields.map(f=>f.top))).toBeLessThanOrEqual(1);
+  expect(fields.every((f,i)=>i===0||f.left>=fields[i-1].right)).toBeTruthy();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
+  await bar.screenshot({path:info.outputPath('desktop-filters-'+width+'.png')});
+ }
 });
 test('focus scene persists, supports none and restores original',async({page},info)=>{
  await page.goto('/');

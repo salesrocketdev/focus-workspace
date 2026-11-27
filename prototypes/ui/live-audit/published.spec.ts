@@ -44,6 +44,7 @@ test('published screens, navigation, controls and visual evidence',async({page},
   await page.getByRole('button',{name:'Tarefas',exact:true}).click();await audit('05-tasks');
   await page.getByRole('button',{name:'Leituras',exact:true}).click();await audit('06-library');
   await go('Histórico');await audit('07-history');
+  if(!mobile){const filters=page.getByRole('group',{name:'Filtros do histórico'});await expect(filters.getByRole('combobox')).toHaveCount(3);await filters.getByRole('combobox',{name:'Categoria do histórico'}).click();await page.getByRole('option',{name:'Leitura',exact:true}).click();await filters.getByRole('button',{name:'Limpar filtros'}).click();await expect(filters.getByRole('button',{name:'Limpar filtros'})).toBeDisabled();}
   await page.getByRole('button',{name:'Linha',exact:true}).click();await audit('08-history-line');
   if(mobile){await page.getByRole('button',{name:'Abrir filtros do histórico'}).click();await audit('09-history-filters');await page.getByRole('button',{name:'Fechar diálogo'}).click()}
   await go(mobile?'Ajustes':'Configurações');await audit('10-settings');

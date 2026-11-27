@@ -43,14 +43,14 @@
 .calendar-integration-grid .integration-service>.ui-button{justify-self:end;min-width:96px}
 @media(max-width:900px){.calendar-integration-grid{grid-template-columns:1fr}}
 /* Real task/checklist checkboxes retain native semantics and keyboard support. */
-:where(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]{
+:is(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]{
  appearance:none;-webkit-appearance:none;width:18px;height:18px;flex:0 0 18px;min-width:18px;min-height:18px;margin:0;display:grid;place-items:center;border:1.5px solid var(--field-focus);border-radius:5px;background:var(--ui-paper);cursor:pointer;
 }
-:where(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]:checked{background:var(--action);border-color:var(--action)}
-:where(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]:checked::after{content:'';width:8px;height:4px;border-left:2px solid white;border-bottom:2px solid white;transform:translateY(-1px) rotate(-45deg)}
-:where(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]:disabled{opacity:.55;cursor:default}
-:where(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]:focus-visible{outline:2px solid var(--field-focus);outline-offset:3px}
-@media(forced-colors:active){:where(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]{appearance:auto}}
+:is(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]:checked{background:var(--action);border-color:var(--action)}
+:is(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]:checked::after{content:'';width:8px;height:4px;border-left:2px solid white;border-bottom:2px solid white;transform:translateY(-1px) rotate(-45deg)}
+:is(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]:disabled{opacity:.55;cursor:default}
+:is(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]:focus-visible{outline:2px solid var(--field-focus);outline-offset:3px}
+@media(forced-colors:active){:is(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]{appearance:auto}}
 /* Prevent a small caption or heading from overflowing its own column. */
 .activity-section-head>div:first-child{flex:1;min-width:0}
 .activity-section-head>div:first-child h2,.activity-section-head>div:first-child small{overflow-wrap:anywhere;white-space:normal;min-width:0;max-width:100%}
@@ -74,3 +74,5 @@
 @media(max-width:759px){.immersive .focus-landscape{display:block;height:64px;opacity:.35}}
 @media(max-width:759px) and (max-height:600px){.immersive .focus-landscape{height:44px}}
 [data-theme=dark] .immersive .focus-landscape{opacity:.28}
+
+@media(forced-colors:active){:is(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]::after{display:none}}
