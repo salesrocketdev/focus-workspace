@@ -224,7 +224,7 @@ test('desktop coordinate grid moves and resizes in both axes with collision prot
  await page.getByRole('button',{name:'Alterar largura de Foco (Pomodoro)',exact:true}).focus();
  await page.keyboard.press('ArrowRight');
  expect(await position()).toEqual(initial);
- await page.getByRole('button',{name:'Remover Agenda de hoje',exact:true}).click();
+ await page.getByRole('button',{name:'Remover Agenda',exact:true}).click();
  await page.getByRole('button',{name:'Remover Tarefas',exact:true}).click();
  await page.getByRole('button',{name:'Alterar largura de Foco (Pomodoro)',exact:true}).focus();
  await page.keyboard.press('ArrowRight');
@@ -307,7 +307,7 @@ test('desktop catalogue can drop a widget into a chosen free cell',async({page},
  await page.addInitScript(()=>{const key='focus-workspace:v4:layouts';if(localStorage.getItem(key))return;const desktop=[['focus','large'],['agenda','large'],['tasks','medium'],['reading','medium'],['goal','medium'],['music','large'],['summary','medium']].map(([type,size])=>({id:type,type,size,...(type==='goal'?{placement:{x:9,y:6,w:3,h:5}}:{})}));localStorage.setItem(key,JSON.stringify({desktop,mobile:desktop}));});
  await page.goto('/');
  await page.getByRole('button',{name:'Editar painel',exact:true}).click();
- await page.getByRole('button',{name:'Remover Agenda de hoje',exact:true}).click();
+ await page.getByRole('button',{name:'Remover Agenda',exact:true}).click();
  const grid=page.locator('.coordinate-grid');
  const source=page.getByRole('button',{name:/Notas Anotações rápidas/});
  const data=await page.evaluateHandle(()=>new DataTransfer());
