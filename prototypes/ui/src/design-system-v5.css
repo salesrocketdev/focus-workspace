@@ -121,3 +121,69 @@
     outline-color: Highlight;
   }
 }
+
+/* Compact dialogs: natural height, bounded viewport, responsive fields and sticky actions.
+   Native dialog retains focus trapping, Escape, backdrop and visualViewport handling. */
+.ui-dialog.compact-dialog {
+  width:min(calc(100% - 32px), 480px);
+  max-height:min(85dvh, calc(var(--sheet-height,100dvh) - 24px));
+  height:auto;
+  padding:16px 20px;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scroll-padding-block:60px 70px;
+}
+.compact-dialog .dialog-header {
+  position:sticky;top:-16px;z-index:2;
+  background:var(--ui-paper);padding:8px 0;
+  margin:-8px 0 10px;
+  border-bottom:1px solid var(--ui-line);
+}
+.compact-dialog .dialog-header h2 {font-size:18px;line-height:1.3}
+.compact-dialog .dialog-form {gap:10px}
+.compact-dialog .dialog-actions {
+  position:sticky;bottom:-16px;z-index:2;
+  background:var(--ui-paper);border-top:1px solid var(--ui-line);
+  padding:10px 0 8px;margin-top:4px;
+}
+.compact-dialog .ui-field {gap:5px;max-width:none}
+.compact-dialog .ui-textarea {min-height:68px}
+.compact-dialog .dialog-disclosure {
+  width:100%;justify-content:space-between;text-align:left;
+  height:auto;min-height:36px;white-space:normal;
+  background:transparent;border-color:transparent;border-bottom-color:var(--ui-line);
+  border-radius:0;padding:8px 0;color:var(--ui-ink);
+}
+.compact-dialog .dialog-disclosure::after {
+  content:'+';font-size:18px;color:var(--ui-muted);font-weight:400;
+}
+.compact-dialog .dialog-disclosure[aria-expanded=true]::after {content:'−'}
+.focus-settings-dialog > .ui-button {width:100%;margin-bottom:12px}
+.compact-focus-fields {grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.compact-focus-fields > .dialog-disclosure,.compact-focus-fields > .preference-toggles,.compact-focus-fields > small {grid-column:1/-1}
+.compact-focus-fields .preference-toggles {display:grid;gap:4px}
+.compact-focus-fields .ui-toggle-card {min-height:58px;padding:8px;border-radius:8px}
+.compact-focus-fields .ui-toggle-icon {display:none}
+.task-editor-dialog .planning-fields {grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.task-editor-dialog .planning-fields > :last-child {grid-column:1/-1}
+.rhythm-dialog .quick-focus-presets > button {min-height:54px;padding:8px 10px}
+.rhythm-dialog .custom-rhythm-form {margin:0;padding:0;border:0}
+.rhythm-dialog .custom-rhythm-list {margin-block:8px}
+@media(max-width:759px) {
+  .ui-dialog.compact-dialog {
+    width:100%;margin:0;padding:12px max(16px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+    max-height:min(90dvh, calc(var(--sheet-height,100dvh) - 12px));
+    border-radius:16px 16px 0 0;
+  }
+  .compact-dialog .dialog-header {top:-12px;padding-block:4px}
+  .compact-dialog .dialog-actions {bottom:calc(-12px - env(safe-area-inset-bottom));padding-bottom:calc(8px + env(safe-area-inset-bottom))}
+  .compact-dialog .dialog-disclosure {min-height:44px}
+  .compact-focus-fields .ui-toggle-card {min-height:64px}
+  .compact-dialog[data-keyboard=open] .dialog-actions {position:static}
+  .ui-dialog.compact-dialog[data-keyboard=open] {max-height:calc(var(--sheet-height,100dvh) - 10px);padding-bottom:12px}
+}
+@media(max-width:359px) {
+  .task-editor-dialog .planning-fields {grid-template-columns:1fr}
+  .compact-focus-fields {column-gap:8px}
+  .compact-focus-fields .ui-select-trigger {padding-inline:8px;font-size:12px}
+}
