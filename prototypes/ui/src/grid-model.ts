@@ -8,7 +8,7 @@ const limits:Record<WidgetType,{w:number;h:number;defaultW:number;defaultH:numbe
  agenda:{w:4,h:6,defaultW:6,defaultH:6},
  tasks:{w:3,h:5,defaultW:4,defaultH:5},
  reading:{w:3,h:5,defaultW:5,defaultH:5},
- goal:{w:3,h:5,defaultW:3,defaultH:5},
+ goal:{w:3,h:3,defaultW:3,defaultH:3},
  music:{w:4,h:3,defaultW:8,defaultH:3},
  summary:{w:3,h:3,defaultW:4,defaultH:3},
  notes:{w:2,h:3,defaultW:4,defaultH:4},
