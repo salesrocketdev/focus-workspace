@@ -1,4 +1,5 @@
-import {test,expect,type Page} from '@playwright/test';
+import {test,expect} from '@playwright/test';
+import {openNavigation} from '../navigate-test';
 import {writeFile} from 'node:fs/promises';
 type Finding={screen:string;overflow:number;unnamedButtons:number;smallTargets:{name:string;w:number;h:number}[];clippedText:{text:string;w:number;scroll:number}[]};
 test('published screens, navigation, controls and visual evidence',async({page},info)=>{
@@ -9,9 +10,9 @@ test('published screens, navigation, controls and visual evidence',async({page},
  await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')));
  const response=await page.goto('./');
  expect(response?.ok()).toBeTruthy();
- await expect(page.getByRole('heading',{name:'Meu dia'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Hoje',exact:true})).toBeVisible();
  const nav=page.getByRole('navigation',{name:'Navegação principal'});
- const go=async(name:string)=>{await nav.getByRole('button',{name,exact:true}).click()};
+ const go=async(name:string)=>openNavigation(nav,name);
  async function audit(screen:string){
   await page.evaluate(()=>document.fonts.ready);
   const metrics=await page.evaluate(()=>{
@@ -41,13 +42,21 @@ test('published screens, navigation, controls and visual evidence',async({page},
   }
   await page.getByRole('button',{name:'Editar painel',exact:true}).click();await audit('02-editor');await page.getByRole('button',{name:'Layouts',exact:true}).click();await audit('02-layout-presets');await page.getByRole('dialog',{name:'Layouts sugeridos'}).getByRole('button',{name:'Cancelar',exact:true}).click();await page.getByRole('button',{name:'Cancelar',exact:true}).click();
   await go('Agenda');await audit('03-agenda');await page.getByRole('button',{name:'Planejar foco das 09:30 às 11:00'}).click();await audit('03-plan-focus');await page.getByRole('button',{name:'Fechar diálogo'}).click();
-  await go('Atividades');await audit('04-categories');
-  await page.getByRole('group',{name:'Seções de atividades'}).getByRole('button',{name:'Tarefas',exact:true}).click();await audit('05-tasks');
+  await go('Biblioteca');await audit('04-categories');
+  await go('Tarefas');await audit('05-tasks');
+  await go('Biblioteca');
   await page.getByRole('button',{name:'Leituras',exact:true}).click();await audit('06-library');
   await go('Histórico');await audit('07-history');
-  if(!mobile){const filters=page.getByRole('group',{name:'Filtros do histórico'});await expect(filters.getByRole('combobox')).toHaveCount(3);await filters.getByRole('combobox',{name:'Categoria do histórico'}).click();await page.getByRole('option',{name:'Leitura',exact:true}).click();await filters.getByRole('button',{name:'Limpar filtros'}).click();await expect(filters.getByRole('button',{name:'Limpar filtros'})).toBeDisabled();}
   await page.getByRole('button',{name:'Linha',exact:true}).click();await audit('08-history-line');
-  if(mobile){await page.getByRole('button',{name:'Abrir filtros do histórico'}).click();await audit('09-history-filters');await page.getByRole('button',{name:'Fechar diálogo'}).click()}
+  await page.getByRole('button',{name:'Abrir filtros do histórico'}).click();await audit('09-history-filters');
+  const sheet=page.getByRole('dialog',{name:'Filtros do histórico'});
+  await expect(sheet.getByRole('combobox')).toHaveCount(3);
+  await sheet.getByRole('combobox',{name:'Categoria do histórico'}).click();
+  await page.getByRole('option',{name:'Leitura',exact:true}).click();
+  await sheet.getByRole('button',{name:'Aplicar filtros'}).click();
+  await expect(page.getByText('1 filtro aplicado',{exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'Limpar filtros',exact:true}).click();
+  await expect(page.getByText('1 filtro aplicado',{exact:true})).toHaveCount(0);
   await go(mobile?'Ajustes':'Configurações');await audit('10-settings');
   const sections=page.getByRole('navigation',{name:'Seções de configurações'});
   const settings=['Sessões de foco','Notificações','Integrações','Perfil e painel','Aparência'];
@@ -56,11 +65,12 @@ test('published screens, navigation, controls and visual evidence',async({page},
    if(label==='Aparência'){await page.getByRole('button',{name:'Escuro',exact:true}).click();await page.getByRole('button',{name:'Aurora',exact:true}).click();await audit('12-dark-settings')}
    if(mobile)await page.getByRole('button',{name:'Voltar às configurações'}).click();
   }
-  await go('Hoje');await audit('13-dark-dashboard');
+  await go('Hoje');await expect(page.locator('html')).toHaveAttribute('data-theme','dark');await audit('13-dark-dashboard');
   await page.getByRole('button',{name:'Abrir sessão de foco',exact:true}).click();await audit('14-focus');
   const transport=page.locator('.focus-center .transport');
   await transport.getByRole('button',{name:'Iniciar',exact:true}).click();
   await expect(transport.getByRole('button',{name:'Pausar',exact:true})).toBeVisible();
+  await expect(page.locator('.active-focus-quiet')).toBeVisible();await audit('14-active-focus');
   await transport.getByRole('button',{name:'Pausar',exact:true}).click();
   await transport.getByRole('button',{name:'Reiniciar',exact:true}).click();
  if(await page.getByRole('dialog',{name:'Descartar sessão atual?'}).isVisible())await page.getByRole('button',{name:'Descartar e reiniciar',exact:true}).click();
