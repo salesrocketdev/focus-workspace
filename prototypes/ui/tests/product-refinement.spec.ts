@@ -111,7 +111,7 @@ test('V5 legacy demo identity opens as guest without resetting local data',async
  await expect(page.locator('.planning-row').filter({hasText:'Preservar dados locais'})).toBeVisible();
 });
 
-test('V5 compact focus and task dialogs disclose extra fields without losing edits',async({page},info)=>{
+test('V5 sectioned focus and task dialogs preserve draft and natural height',async({page},info)=>{
  await guest(page);
  await page.getByRole('button',{name:'Configurar sessão de foco',exact:true}).click();
  const focus=page.getByRole('dialog',{name:'Configurar sessão de foco'});
@@ -119,15 +119,17 @@ test('V5 compact focus and task dialogs disclose extra fields without losing edi
  await expect(focus.getByRole('switch')).toHaveCount(0);
  const compact=await focus.boundingBox();
  const viewport=page.viewportSize()!;
- expect(compact!.height).toBeLessThan(viewport.height*.82);
+ expect(compact!.height).toBeLessThan(viewport.height*.75);
+ expect(await focus.locator('.dialog-scroll-body').evaluate(e=>e.scrollHeight<=e.clientHeight+2)).toBeTruthy();
  expect(compact!.width).toBeLessThanOrEqual(Math.min(viewport.width,480)+1);
  const fields=await focus.getByRole('combobox').evaluateAll(nodes=>nodes.map(e=>({y:e.getBoundingClientRect().y,h:e.getBoundingClientRect().height})));
  expect(Math.abs(fields[0].y-fields[1].y)).toBeLessThanOrEqual(1);
  expect(Math.abs(fields[2].y-fields[3].y)).toBeLessThanOrEqual(1);
  await page.screenshot({path:info.outputPath('compact-focus.png'),animations:'disabled'});
- await focus.getByRole('button',{name:'Opções avançadas',exact:true}).click();
+ await focus.getByRole('button',{name:'Preferências',exact:true}).click();
  await expect(focus.getByRole('switch')).toHaveCount(3);
- await focus.getByRole('button',{name:'Ocultar opções avançadas',exact:true}).click();
+ await expect(focus.getByRole('combobox',{name:'Duração do Pomodoro'})).toHaveCount(0);
+ await focus.getByRole('button',{name:'Sessão',exact:true}).click();
  await expect(focus.getByRole('switch')).toHaveCount(0);
  await focus.getByRole('button',{name:'Concluir',exact:true}).click();
  const nav=page.getByRole('navigation',{name:'Navegação principal'}).filter({visible:true});
@@ -136,17 +138,25 @@ test('V5 compact focus and task dialogs disclose extra fields without losing edi
  const task=page.getByRole('dialog',{name:'Nova tarefa'});
  await expect(task.getByRole('textbox')).toHaveCount(1);
  await expect(task.getByRole('combobox')).toHaveCount(1);
+ const priority=task.getByRole('checkbox',{name:/Destacar no painel/});
+ await expect(priority).toBeVisible();
+ await expect(task.getByRole('navigation',{name:'Seções da tarefa'}).getByRole('button')).toHaveCount(4);
+ const priorityBox=await priority.boundingBox();
+ expect(priorityBox!.width).toBeGreaterThanOrEqual(18);
+ expect(priorityBox!.height).toBeGreaterThanOrEqual(18);
  expect((await task.boundingBox())!.height).toBeLessThan(viewport.height*.85);
  await task.getByLabel('Título da tarefa').fill('Teste de modal compacto');
+ if(await priority.isEnabled())await priority.check();
  await page.screenshot({path:info.outputPath('compact-task.png'),animations:'disabled'});
- await task.getByRole('button',{name:'Descrição e checklist',exact:true}).click();
+ await task.getByRole('button',{name:'Conteúdo',exact:true}).click();
  await task.getByLabel('Descrição',{exact:true}).fill('Descrição preservada');
- await task.getByRole('button',{name:'Ocultar descrição e checklist',exact:true}).click();
+ await task.getByRole('button',{name:'Origem',exact:true}).click();
+ await expect(task.getByRole('textbox',{name:'Descrição',exact:true})).toHaveCount(0);
  await task.getByRole('button',{name:'Adicionar tarefa',exact:true}).click();
  await page.getByRole('button',{name:'Teste de modal compacto',exact:true}).click();
  const edit=page.getByRole('dialog',{name:'Detalhes da tarefa'});
  expect((await edit.boundingBox())!.height).toBeLessThan(viewport.height*.85);
- await edit.getByRole('button',{name:/Descrição e checklist/}).click();
+ await edit.getByRole('button',{name:'Conteúdo',exact:true}).click();
  await expect(edit.getByLabel('Descrição',{exact:true})).toHaveValue('Descrição preservada');
  await edit.getByRole('button',{name:'Salvar',exact:true}).click();
 });
