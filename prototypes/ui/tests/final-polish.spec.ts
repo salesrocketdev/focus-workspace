@@ -19,7 +19,7 @@ test('mobile dashboard controls and short focus viewport',async({page},info)=>{
  await action.click();await expect(widget.getByRole('button',{name:'Pausar foco',exact:true})).toBeVisible();
  await widget.getByRole('button',{name:'Pausar foco',exact:true}).click();
  await nav.getByRole('button',{name:'Agenda',exact:true}).click();
- expect(await page.getByRole('button',{name:'Hoje (demo)',exact:true}).evaluate(el=>el.getBoundingClientRect().width)).toBeGreaterThanOrEqual(44);
+ expect(await page.getByRole('button',{name:'Hoje',exact:true}).evaluate(el=>el.getBoundingClientRect().width)).toBeGreaterThanOrEqual(44);
  await openNavigation(nav,'Histórico');
  const selected=page.locator('.focus-trend-card .history-bar-column[aria-pressed=true] .history-bar-track');
  expect(await selected.evaluate(el=>parseFloat(getComputedStyle(el,'::before').width))).toBeLessThanOrEqual(32);
