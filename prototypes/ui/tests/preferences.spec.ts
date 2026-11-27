@@ -4,25 +4,23 @@ test('onboarding, simulated OAuth and focus preferences persist locally',async({
  await page.goto('/');
  let dialog=page.getByRole('dialog');
  await expect(dialog).toBeVisible();
- await dialog.getByRole('button',{name:/Entrar com Google/}).click();
- await dialog.getByRole('button',{name:'Continuar',exact:true}).click();
- await dialog.getByRole('button',{name:/Trabalho e reuniões/}).click();
- await dialog.getByRole('switch',{name:'Aplicar painel sugerido'}).click();
- await dialog.getByRole('button',{name:'Continuar',exact:true}).click();
- await dialog.getByRole('combobox',{name:'Duração do Pomodoro'}).click();
- await page.getByRole('option',{name:'1 minuto',exact:true}).click();
- await dialog.getByRole('combobox',{name:'Pausa curta'}).click();
- await page.getByRole('option',{name:'3 minutos',exact:true}).click();
- await dialog.getByRole('combobox',{name:'Ciclos até a pausa longa'}).click();
- await page.getByRole('option',{name:'2 ciclos',exact:true}).click();
- await dialog.getByRole('button',{name:'Continuar',exact:true}).click();
+ await expect(dialog.getByRole('button',{name:/Continuar com Google/})).toBeDisabled();
+ await expect(dialog.getByRole('button',{name:/Continuar com Microsoft/})).toBeDisabled();
+ await dialog.getByRole('switch',{name:'Começar sem exemplos'}).click();
+ await dialog.getByRole('button',{name:'Continuar sem conta',exact:true}).click();
+ await dialog.getByRole('button',{name:/Foco rápido/}).click();
  await page.screenshot({path:info.outputPath('onboarding-ready.png'),animations:'disabled',scale:'css'});
  await dialog.getByRole('button',{name:'Começar',exact:true}).click();
  await expect(dialog).toHaveCount(0);
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
  await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');
  if(info.project.name==='mobile')await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Sessões de foco',exact:true}).click();
- await expect(page.getByRole('combobox',{name:'Duração do Pomodoro'})).toHaveText('1 minuto');
+ await page.getByRole('combobox',{name:'Duração do Pomodoro'}).click();
+ await page.getByRole('option',{name:'1 minuto',exact:true}).click();
+ await page.getByRole('combobox',{name:'Pausa curta'}).click();
+ await page.getByRole('option',{name:'3 minutos',exact:true}).click();
+ await page.getByRole('combobox',{name:'Ciclos até a pausa longa'}).click();
+ await page.getByRole('option',{name:'2 ciclos',exact:true}).click();
  if(info.project.name==='mobile')await page.getByRole('button',{name:'Voltar às configurações'}).click();
  await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Integrações',exact:true}).click();
  for(const provider of ['Google Agenda','Calendário do Outlook','Spotify']){
@@ -53,7 +51,7 @@ test('onboarding, simulated OAuth and focus preferences persist locally',async({
 });
 test('dashboard cards do not use internal scrolling, including edit mode',async({page},info)=>{
  await page.goto('/');
- await page.getByRole('button',{name:'Pular',exact:true}).click();
+ await page.getByRole('button',{name:'Fechar diálogo',exact:true}).click();
  const verify=async()=>{const overflow=await page.locator('.widget .card-body:visible').evaluateAll(nodes=>nodes.map(n=>[getComputedStyle(n).overflowX,getComputedStyle(n).overflowY]));expect(overflow.length).toBeGreaterThan(0);for(const values of overflow)for(const value of values)expect(['auto','scroll']).not.toContain(value)};
  await verify();
  await page.getByRole('button',{name:'Editar painel',exact:true}).click();
