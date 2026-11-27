@@ -31,3 +31,5 @@ CI run 46008582449 on 5fd0b44 succeeded in all steps, including functional and o
 ## G4 — semantic surfaces and states
 
 Baseline deploy 46011176066 passed, including live asset verification. G4 first checkpoint: design-system-v5.css centralizes neutral surface, interaction, typography and cover styles; flatten history metrics without changing grid geometry; secondary hover and focus-visible states reuse theme tokens. Theme regression now selects the real app appearance setting, asserts data-theme, checks history surfaces and horizontal fit, and captures both Home and History in light/dark. No screenshots reviewed yet, no physical device or maintainer signoff. Run `[check]` on the group-end commit before publication or G4 acceptance.
+
+G4 automated validation passed: run 46019136485 on 41e0169, including build, Storybook, functional and offline suites. Publish identical G4 application source for manual review. Screenshot/physical-device signoff remains pending.
