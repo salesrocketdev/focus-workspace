@@ -51,7 +51,7 @@ for(const size of sizes){
   await page.emulateMedia({reducedMotion:'reduce'});
   await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')));
   await page.goto('./');
-  await expect(page.getByRole('heading',{name:'Meu dia'})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Hoje'})).toBeVisible();
   const nav=page.getByRole('navigation',{name:'Navegação principal'});
   const go=async(label:string)=>openNavigation(nav,label);
   await fit(page,'dashboard');
@@ -81,7 +81,7 @@ for(const size of sizes){
     await contained(mark,row,'session mark '+range);
     await separate(row.locator('.history-session-copy'),row.locator('.history-session-meta'),'session copy and duration '+range);
     await separate(row.locator('.history-session-meta'),arrow,'session duration and arrow '+range);
-    await separate(row.locator('.history-status'),arrow,'session status and arrow '+range);
+    if(await row.locator('.history-status').count())await separate(row.locator('.history-status'),arrow,'session status and arrow '+range);
    }
   }
   if(narrow){
@@ -99,7 +99,7 @@ for(const size of sizes){
    await page.getByRole('group',{name:'Visualização da agenda'}).getByRole('button',{name:view,exact:true}).click();
    await fit(page,'agenda '+view);
   }
-  await go('Atividades');
+  await go('Biblioteca');
   await fit(page,'categories');
   const categoryHeader=page.locator('.activity-section-head').first();
   await separate(categoryHeader.locator('div').first(),categoryHeader.getByRole('button',{name:'Nova categoria'}),'category heading');
@@ -108,7 +108,7 @@ for(const size of sizes){
   await page.getByLabel('Nome da categoria').fill('Categoria de auditoria com nome longo');
   await page.getByRole('button',{name:'Salvar',exact:true}).click();
   await fit(page,'long category');
-  await page.getByRole('group',{name:'Seções de atividades'}).getByRole('button',{name:'Tarefas',exact:true}).click();await fit(page,'tasks');
+  await go('Tarefas');await fit(page,'tasks');await go('Biblioteca');
   await page.getByRole('button',{name:'Leituras',exact:true}).click();await fit(page,'library');
   const libraryHeader=page.locator('.activity-section-head').first();
   await separate(libraryHeader.locator('div').first(),libraryHeader.locator('.book-header-actions'),'library heading');
