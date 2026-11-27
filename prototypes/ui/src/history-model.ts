@@ -30,6 +30,7 @@ export function recordSession(context:FocusContext,seconds:number,mode:SessionMo
 }
 export const totalSeconds=(records:FocusRecord[])=>records.reduce((n,r)=>n+r.seconds,0);
 export function durationLabel(seconds:number){
+ if(seconds===0)return '0 min';
  const h=Math.floor(seconds/3600),m=Math.floor(seconds/60)%60;
  if(h)return h+'h'+(m?' '+m+'min':'');
  if(m)return m+' min';

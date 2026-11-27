@@ -1,0 +1,28 @@
+import {test,expect} from '@playwright/test';
+test('empty first-use workspace is usable and persists without fixture records',async({page})=>{
+ await page.goto('/');
+ const dialog=page.getByRole('dialog');
+ for(let i=0;i<3;i++)await dialog.getByRole('button',{name:'Continuar',exact:true}).click();
+ await dialog.getByRole('switch',{name:'Começar sem exemplos'}).click();
+ await dialog.getByRole('button',{name:'Começar',exact:true}).click();
+ await expect(dialog).toHaveCount(0);
+ await expect(page.locator('[data-widget=reading]')).toContainText('Nenhum livro na biblioteca');
+ await expect(page.locator('[data-widget=tasks]')).toContainText('Nenhuma tarefa');
+ await page.reload();
+ await expect(page.locator('[data-widget=reading]')).toContainText('Nenhum livro na biblioteca');
+ const nav=page.getByRole('navigation',{name:'Navegação principal'});
+ await nav.getByRole('button',{name:'Histórico',exact:true}).click();
+ await expect(page.getByRole('button',{name:'CSV',exact:true})).toBeDisabled();
+ await page.getByRole('button',{name:'Preparar primeira sessão'}).click();
+ await expect(page.locator('.focus-context-picker')).toContainText('Trabalho');
+ await page.getByRole('button',{name:'Voltar',exact:true}).click();
+ await page.locator('[data-widget=reading]').getByRole('button',{name:'Adicionar livro',exact:true}).click();
+ await page.getByRole('button',{name:'Adicionar primeiro livro'}).click();
+ await dialog.getByLabel('Título').fill('Meu primeiro livro');
+ await dialog.getByLabel('Autor').fill('Autora');
+ await dialog.getByRole('button',{name:'Salvar',exact:true}).click();
+ await nav.getByRole('button',{name:'Hoje',exact:true}).click();
+ await expect(page.locator('[data-widget=reading]')).toContainText('Meu primeiro livro');
+ const data=await page.evaluate(()=>JSON.parse(localStorage.getItem('focus-workspace:v4:workspace')!));
+ expect(data.records).toEqual([]);expect(data.tasks).toEqual([]);expect(data.books).toHaveLength(1);
+});

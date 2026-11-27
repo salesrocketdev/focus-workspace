@@ -1,0 +1,7 @@
+/* V4.39: compact empty states inside widgets, no internal scrolling. */
+.widget-empty-state{display:grid;justify-items:center;align-content:center;text-align:center;gap:6px;padding:6px;min-width:0;color:var(--ui-muted);font-size:12px}
+.widget-empty-state b{font-size:12px;line-height:1.35;color:var(--ui-ink);overflow-wrap:anywhere}
+.widget-empty-state .ui-button{max-width:100%;min-height:32px;height:auto;white-space:normal;padding:5px 8px}
+.history-empty .ui-button,.activity-empty .ui-button{margin-top:5px}
+@media(max-width:759px){.widget-empty-state .ui-button,.history-empty .ui-button,.activity-empty .ui-button{min-height:44px}}
+@media(max-width:359px){.widget-empty-state{gap:3px;padding:3px}.widget-empty-state>svg{width:19px;height:19px}}

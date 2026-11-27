@@ -31,7 +31,7 @@ function workspace(x:unknown):x is WorkspaceSnapshot{
  const unique=(v:unknown[])=>new Set(v).size===v.length;
  return x.categories.length>0&&x.categories.length<=10000&&x.tasks.length<=10000&&x.books.length<=10000&&x.records.length<=100000&&
  x.records.every(r=>day(r.day)&&time(r.time))&&unique(x.categories.map(c=>c.id))&&unique(x.tasks.map(t=>t.id))&&unique(x.books.map(b=>b.id))&&unique(x.records.map(r=>r.id))&&
- x.tasks.every(t=>x.categories.some(c=>c.id===t.categoryId))&&x.books.some(b=>b.id===x.timer.readingId)&&
+ x.tasks.every(t=>x.categories.some(c=>c.id===t.categoryId))&&(!x.timer.readingId||x.books.some(b=>b.id===x.timer.readingId))&&
  (x.timer.context.kind==='reading'?x.books.some(b=>b.id===x.timer.context.id):x.categories.some(c=>c.id===('categoryId' in x.timer.context?x.timer.context.categoryId:'')))&&
  x.books.every(b=>!b.metadata||(object(b.metadata)&&b.metadata.source==='mock'&&str(b.metadata.editionId)&&str(b.metadata.isbn)&&str(b.metadata.publisher)&&int(b.metadata.year,0,9999)&&str(b.metadata.language)&&optional(b.metadata.coverStyle,v=>one(v,['indigo','forest','sand']))));
 }
