@@ -17,10 +17,23 @@ test('V5 curated Home, theme and no page overflow',async({page},info)=>{
  await expect(page.locator('[data-widget=music]')).toHaveCount(0);
  await expect(page.getByRole('region',{name:'Espaço para foco na agenda de demonstração'})).toBeVisible();
  await expect(page.getByRole('progressbar',{name:'Meta diária de foco'})).toBeVisible();
- for(const theme of ['light','dark']){
-  await page.emulateMedia({colorScheme:theme as 'light'|'dark',reducedMotion:'reduce'});
+ const nav=page.getByRole('navigation',{name:'Navegação principal'}).filter({visible:true});
+ await page.emulateMedia({reducedMotion:'reduce'});
+ for(const [theme,label] of [['light','Claro'],['dark','Escuro']] as const){
+  await openNavigation(nav,'Configurações');
+  await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Aparência',exact:true}).click();
+  await page.getByRole('button',{name:label,exact:true}).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme',theme);
+  await nav.getByRole('button',{name:'Hoje',exact:true}).click();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
   await page.screenshot({path:info.outputPath('v5-home-'+theme+'.png'),animations:'disabled',fullPage:true});
+  await openNavigation(nav,'Histórico');
+  const stats=page.locator('.history-stat');
+  await expect(stats).toHaveCount(4);
+  const surfaces=await stats.evaluateAll(nodes=>nodes.map(node=>({shadow:getComputedStyle(node).boxShadow,background:getComputedStyle(node).backgroundColor})));
+  expect(surfaces.every(s=>s.shadow==='none'&&(s.background==='rgba(0, 0, 0, 0)'||s.background==='transparent'))).toBeTruthy();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
+  await page.screenshot({path:info.outputPath('v5-history-'+theme+'.png'),animations:'disabled',fullPage:true});
  }
 });
 test('V5 custom rhythm creates, edits, applies and persists with aligned fields',async({page})=>{
