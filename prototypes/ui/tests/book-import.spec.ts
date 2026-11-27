@@ -4,7 +4,7 @@ test.beforeEach(async({page})=>{await page.addInitScript(()=>localStorage.setIte
 test('mock book search imports edition, chapters and shared reading context',async({page},info)=>{
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
- await openNavigation(nav,'Atividades');
+ await openNavigation(nav,'Biblioteca');
  await page.getByRole('button',{name:'Leituras',exact:true}).click();
  await page.getByRole('button',{name:'Buscar livro',exact:true}).click();
  const sheet=page.getByRole('dialog',{name:'Buscar livro'});
