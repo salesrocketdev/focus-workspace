@@ -1,9 +1,10 @@
+import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')))});
 test('presets apply shared preferences and picker changes context safely',async({page},info)=>{
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
- await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');
  if(info.project.name==='mobile')await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Sessões de foco',exact:true}).click();
  const deep=page.getByRole('button',{name:/Foco profundo/});
  await deep.click();

@@ -1,3 +1,4 @@
+import { openNavigation } from '../navigate-test';
 import { test,expect } from '@playwright/test';
 test('onboarding, simulated OAuth and focus preferences persist locally',async({page},info)=>{
  await page.goto('/');
@@ -19,12 +20,12 @@ test('onboarding, simulated OAuth and focus preferences persist locally',async({
  await dialog.getByRole('button',{name:'Começar',exact:true}).click();
  await expect(dialog).toHaveCount(0);
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
- await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');
  if(info.project.name==='mobile')await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Sessões de foco',exact:true}).click();
  await expect(page.getByRole('combobox',{name:'Duração do Pomodoro'})).toHaveText('1 minuto');
  if(info.project.name==='mobile')await page.getByRole('button',{name:'Voltar às configurações'}).click();
  await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Integrações',exact:true}).click();
- for(const provider of ['Google Agenda','Microsoft Outlook','Spotify','Gmail','Google Meet','Microsoft Teams']){
+ for(const provider of ['Google Agenda','Calendário do Outlook','Spotify']){
   await page.getByRole('button',{name:'Conectar '+provider,exact:true}).click();
   await expect(dialog).toContainText('Simulação OAuth');
   await dialog.getByRole('button',{name:/Conta de demonstração/}).click();
@@ -35,7 +36,7 @@ test('onboarding, simulated OAuth and focus preferences persist locally',async({
  }
  await page.reload();
  await expect(dialog).toHaveCount(0);
- await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');
  if(info.project.name==='mobile')await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Sessões de foco',exact:true}).click();
  await expect(page.getByRole('combobox',{name:'Duração do Pomodoro'})).toHaveText('1 minuto');
  if(info.project.name==='mobile')await page.getByRole('button',{name:'Voltar às configurações'}).click();

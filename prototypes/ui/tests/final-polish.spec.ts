@@ -1,3 +1,4 @@
+import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')))});
 test('mobile dashboard controls and short focus viewport',async({page},info)=>{
@@ -19,7 +20,7 @@ test('mobile dashboard controls and short focus viewport',async({page},info)=>{
  await widget.getByRole('button',{name:'Pausar foco',exact:true}).click();
  await nav.getByRole('button',{name:'Agenda',exact:true}).click();
  expect(await page.getByRole('button',{name:'Hoje (demo)',exact:true}).evaluate(el=>el.getBoundingClientRect().width)).toBeGreaterThanOrEqual(44);
- await nav.getByRole('button',{name:'Histórico',exact:true}).click();
+ await openNavigation(nav,'Histórico');
  const selected=page.locator('.focus-trend-card .history-bar-column[aria-pressed=true] .history-bar-track');
  expect(await selected.evaluate(el=>parseFloat(getComputedStyle(el,'::before').width))).toBeLessThanOrEqual(32);
  await nav.getByRole('button',{name:'Hoje',exact:true}).click();

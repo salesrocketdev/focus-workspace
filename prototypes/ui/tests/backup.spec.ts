@@ -1,11 +1,12 @@
+import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 import {readFile} from 'node:fs/promises';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')))});
 test('backup export, invalid import, confirmed restore and history CSV',async({page},info)=>{
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
- const settings=async()=>{await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Perfil e painel',exact:true}).click()};
- await nav.getByRole('button',{name:'Atividades',exact:true}).click();
+ const settings=async()=>{await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Perfil e painel',exact:true}).click()};
+ await openNavigation(nav,'Atividades');
  await page.getByRole('button',{name:'Nova categoria',exact:true}).click();
  await page.getByLabel('Nome da categoria').fill('Categoria do backup');
  await page.getByRole('button',{name:'Salvar',exact:true}).click();
@@ -16,7 +17,7 @@ test('backup export, invalid import, confirmed restore and history CSV',async({p
  const input=page.getByLabel('Arquivo de backup');
  await input.setInputFiles({name:'invalido.json',mimeType:'application/json',buffer:Buffer.from('{}')});
  await expect(page.getByRole('alert')).toContainText('incompatível');
- await nav.getByRole('button',{name:'Atividades',exact:true}).click();
+ await openNavigation(nav,'Atividades');
  await page.getByRole('button',{name:'Nova categoria',exact:true}).click();
  await page.getByLabel('Nome da categoria').fill('Após backup');
  await page.getByRole('button',{name:'Salvar',exact:true}).click();
@@ -26,10 +27,10 @@ test('backup export, invalid import, confirmed restore and history CSV',async({p
  await expect(dialog.getByRole('button',{name:'Restaurar dados'})).toBeDisabled();
  await dialog.getByRole('checkbox').check();
  await Promise.all([page.waitForNavigation(),dialog.getByRole('button',{name:'Restaurar dados'}).click()]);
- await nav.getByRole('button',{name:'Atividades',exact:true}).click();
+ await openNavigation(nav,'Atividades');
  await expect(page.getByRole('button',{name:'Iniciar foco em Categoria do backup'})).toBeVisible();
  await expect(page.getByRole('button',{name:'Iniciar foco em Após backup'})).toHaveCount(0);
- await nav.getByRole('button',{name:'Histórico',exact:true}).click();
+ await openNavigation(nav,'Histórico');
  const csv=page.waitForEvent('download');await page.getByRole('button',{name:'CSV',exact:true}).click();
  const content=await readFile((await (await csv).path())!,'utf8');
  expect(content).toContain('Duração (segundos)');expect(content).toContain('Demonstração');

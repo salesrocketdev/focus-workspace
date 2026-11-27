@@ -1,9 +1,10 @@
+import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')))});
 test('mock book search imports edition, chapters and shared reading context',async({page},info)=>{
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
- await nav.getByRole('button',{name:'Atividades',exact:true}).click();
+ await openNavigation(nav,'Atividades');
  await page.getByRole('button',{name:'Leituras',exact:true}).click();
  await page.getByRole('button',{name:'Buscar livro',exact:true}).click();
  const sheet=page.getByRole('dialog',{name:'Buscar livro'});

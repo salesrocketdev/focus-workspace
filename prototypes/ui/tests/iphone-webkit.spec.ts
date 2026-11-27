@@ -1,3 +1,4 @@
+import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')))});
 test('WebKit mobile: immersive header, real route animation and sheet filters',async({page},info)=>{
@@ -13,7 +14,7 @@ test('WebKit mobile: immersive header, real route animation and sheet filters',a
  await page.getByRole('button',{name:'Fechar foco',exact:true}).click();
  await expect(nav).toBeVisible();
  await page.evaluate(()=>{(window as Window&{motionEvents?:string[]}).motionEvents=[];document.addEventListener('animationstart',e=>{if(e.target instanceof HTMLElement&&e.target.matches('[data-route]'))(window as Window&{motionEvents?:string[]}).motionEvents?.push(e.animationName)})});
- await nav.getByRole('button',{name:'Histórico',exact:true}).click();
+ await openNavigation(nav,'Histórico');
  await expect.poll(()=>page.evaluate(()=>(window as Window&{motionEvents?:string[]}).motionEvents??[])).toContain('route-enter');
  await page.getByRole('button',{name:'Abrir filtros do histórico'}).click();
  const sheet=page.getByRole('dialog',{name:'Filtros do histórico'});
@@ -47,7 +48,7 @@ test('WebKit mobile: sheet opens without focusing text and fits resized visual v
 
 test('WebKit: interactive history plots respond to touch and reduced motion',async({page})=>{
  await page.goto('/');
- await page.getByRole('navigation',{name:'Navegação principal'}).getByRole('button',{name:'Histórico',exact:true}).click();
+ await openNavigation(page.getByRole('navigation',{name:'Navegação principal'}),'Histórico');
  await page.getByRole('button',{name:'Dia anterior no gráfico'}).tap();
  await expect(page.getByRole('status',{name:'Detalhes do dia'})).toContainText('1h 42min');
  await page.getByRole('button',{name:'Linha',exact:true}).tap();

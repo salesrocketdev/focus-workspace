@@ -1,3 +1,4 @@
+import { openNavigation } from '../navigate-test';
 import { test, expect } from '@playwright/test';
 // Existing route tests explicitly skip first-run onboarding.
 test.beforeEach(async({page})=>{await page.addInitScript(()=>{if(!localStorage.getItem('focus-workspace:v4:onboarding'))localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest'))})});
@@ -110,7 +111,7 @@ test('workspace titles remain anchored across routes and editor',async({page},in
  const nav=page.locator(mobile?'.bottom-nav':'.sidebar nav');
  await check('Meu dia');
  for(const [label,title] of [['Agenda','Agenda'],['Atividades','Atividades'],['Histórico','Histórico'],[mobile?'Ajustes':'Configurações','Configurações']]){
-  await nav.getByRole('button',{name:label,exact:true}).click();
+  await openNavigation(nav,label);
   await check(title);
  }
  await nav.getByRole('button',{name:'Hoje',exact:true}).click();
@@ -146,14 +147,14 @@ test('provider artwork is local, legible and consistent across views',async({pag
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
  await nav.getByRole('button',{name:'Agenda',exact:true}).click();
  await expect(page.locator('.agenda-list .provider-mark[data-provider="outlook"]')).toBeVisible();
- await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');
  await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Integrações',exact:true}).click();
  const list=page.locator('.integration-preview-list');
  await expect(list.locator('.provider-mark')).toHaveCount(6);
  for(const img of await list.locator('img').all()){
   expect(await img.evaluate((el:HTMLImageElement)=>el.complete&&el.naturalWidth>0&&el.offsetWidth===24&&el.offsetHeight===24)).toBeTruthy();
  }
- await expect(page.getByText('0 de 6 conexões simuladas',{exact:true})).toBeVisible();
+ await expect(page.getByText('0 de 3 conexões simuladas',{exact:true})).toBeVisible();
  await page.screenshot({path:info.outputPath('provider-icons.png'),animations:'disabled',scale:'css'});
  await nav.getByRole('button',{name:'Hoje',exact:true}).click();
  await page.getByRole('button',{name:'Editar painel',exact:true}).click();
@@ -197,7 +198,7 @@ test('local Inter font and settings field render consistently',async({page},info
  await page.evaluate(()=>document.fonts.ready);
  expect(await page.evaluate(()=>document.fonts.check('14px "Inter Variable"'))).toBeTruthy();
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
- await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');
  if(info.project.name==='mobile')await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Sessões de foco',exact:true}).click();
  const select=page.getByLabel('Duração do Pomodoro');
  await expect(select).toBeVisible();

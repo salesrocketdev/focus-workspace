@@ -1,3 +1,4 @@
+import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 test('empty first-use workspace is usable and persists without fixture records',async({page})=>{
  await page.goto('/');
@@ -11,7 +12,7 @@ test('empty first-use workspace is usable and persists without fixture records',
  await page.reload();
  await expect(page.locator('[data-widget=reading]')).toContainText('Nenhum livro na biblioteca');
  const nav=page.getByRole('navigation',{name:'Navegação principal'});
- await nav.getByRole('button',{name:'Histórico',exact:true}).click();
+ await openNavigation(nav,'Histórico');
  await expect(page.getByRole('button',{name:'CSV',exact:true})).toBeDisabled();
  await page.getByRole('button',{name:'Preparar primeira sessão'}).click();
  await expect(page.locator('.focus-context-picker')).toContainText('Trabalho');
@@ -32,7 +33,7 @@ test('refazer onboarding não oferece remoção de dados existentes',async({page
  await page.goto('/');
  const nav=page.getByRole('navigation',{name:'Navegação principal'});
  const mobile=info.project.name==='mobile';
- await nav.getByRole('button',{name:mobile?'Ajustes':'Configurações',exact:true}).click();
+ await openNavigation(nav,mobile?'Ajustes':'Configurações');
  await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Perfil e painel',exact:true}).click();
  await page.getByRole('button',{name:'Refazer onboarding'}).click();
  const dialog=page.getByRole('dialog');

@@ -1,3 +1,4 @@
+import { openNavigation } from '../navigate-test';
 import { test,expect } from '@playwright/test';
 // Existing route tests explicitly skip first-run onboarding.
 test.beforeEach(async({page})=>{await page.addInitScript(()=>{if(!localStorage.getItem('focus-workspace:v4:onboarding'))localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest'))})});
@@ -5,7 +6,7 @@ test.beforeEach(async({page})=>{await page.addInitScript(()=>{if(!localStorage.g
 test('activities share tasks, categories, books and timer context with dashboard',async({page},info)=>{
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
- await nav.getByRole('button',{name:'Atividades',exact:true}).click();
+ await openNavigation(nav,'Atividades');
  const hub=page.locator('.activities-page');
  await expect(hub.locator('.activity-category')).toHaveCount(4);
  await page.screenshot({path:info.outputPath('activities-overview.png'),animations:'disabled',scale:'css'});
@@ -59,7 +60,7 @@ test('activities share tasks, categories, books and timer context with dashboard
  test('mobile section tabs are compact, aligned and touch accessible',async({page},info)=>{
  test.skip(info.project.name!=='mobile','Mobile layout');
  await page.goto('/');
- await page.locator('.bottom-nav').getByRole('button',{name:'Atividades',exact:true}).click();
+ await openNavigation(page.locator('.bottom-nav'),'Atividades');
  const tabs=page.getByRole('group',{name:'Seções de atividades'});
  for(const width of [320,390,430]){
   await page.setViewportSize({width,height:844});

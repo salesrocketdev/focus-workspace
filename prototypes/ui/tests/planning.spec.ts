@@ -1,10 +1,11 @@
+import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>{if(!localStorage.getItem('focus-workspace:v4:onboarding'))localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest'))})});
 test('estimate, local reservation, reload, prepare and link completed Pomodoro',async({page})=>{
  await page.clock.install();await page.goto('/');
  const nav=page.getByRole('navigation',{name:'Navegação principal'});
- await nav.getByRole('button',{name:'Atividades',exact:true}).click();
- await page.getByRole('button',{name:'Tarefas',exact:true}).click();
+ await openNavigation(nav,'Atividades');
+ await page.getByRole('group',{name:'Seções de atividades'}).getByRole('button',{name:'Tarefas',exact:true}).click();
  await page.getByRole('button',{name:'Editar Finalizar revisão do PR',exact:true}).click();
  await page.getByLabel('Estimativa de Pomodoros (opcional)').fill('2');
  await page.getByRole('button',{name:'Salvar',exact:true}).click();
@@ -24,7 +25,7 @@ test('estimate, local reservation, reload, prepare and link completed Pomodoro',
  const transport=page.locator('.focus-center .transport');await transport.getByRole('button',{name:'Iniciar',exact:true}).click();
  await page.clock.fastForward(900000);
  await expect(page.getByRole('region',{name:'Resumo da última sessão'})).toContainText('15 min');
- await page.getByRole('button',{name:'Voltar',exact:true}).click();await nav.getByRole('button',{name:'Atividades',exact:true}).click();
+ await page.getByRole('button',{name:'Voltar',exact:true}).click();await openNavigation(nav,'Atividades');
  await expect(task).toContainText('1/2 Pomodoros');
  await nav.getByRole('button',{name:'Agenda',exact:true}).click();await event.click();await expect(page.getByRole('dialog')).toContainText('Bloco concluído');
  await expect(page.getByRole('button',{name:'Preparar agora'})).toBeDisabled();

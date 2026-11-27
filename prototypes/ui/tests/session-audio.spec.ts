@@ -1,3 +1,4 @@
+import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 test.beforeEach(async({page})=>{
  await page.addInitScript(()=>{
@@ -16,7 +17,7 @@ test.beforeEach(async({page})=>{
 test('audio preferences persist, quiet hours suppress external alerts while preserving inbox',async({page},info)=>{
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
- const settings=async()=>{await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Notificações',exact:true}).click()};
+ const settings=async()=>{await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Notificações',exact:true}).click()};
  const played=()=>page.evaluate(()=>(window as unknown as {playedTones:number}).playedTones);
  await settings();
  await page.getByRole('switch',{name:'Som ao concluir foco ou pausa'}).click();

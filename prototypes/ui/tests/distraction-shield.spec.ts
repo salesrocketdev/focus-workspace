@@ -1,9 +1,10 @@
+import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')))});
 test('optional native focus guide and reminder do not control the OS or stop timer',async({page},info)=>{
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
- await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');
  await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Notificações',exact:true}).click();
  const reminder=page.getByRole('switch',{name:'Lembrar do Não Perturbe'});
  await expect(reminder).toHaveAttribute('aria-checked','false');
@@ -55,7 +56,7 @@ test('opt-in iOS shortcut handoff saves running timer first and only runs on fre
  });
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
- await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');
  await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Notificações',exact:true}).click();
  const toggle=page.getByRole('switch',{name:'Silenciar notificações ao iniciar foco'});
  await expect(toggle).toHaveAttribute('aria-checked','false');

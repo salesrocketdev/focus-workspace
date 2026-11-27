@@ -1,10 +1,11 @@
+import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')))});
 test('mobile category rows and book actions are compact and accessible',async({page},info)=>{
  test.skip(info.project.name!=='mobile','Mobile layout');
  await page.goto('/');
  const nav=page.getByRole('navigation',{name:'Navegação principal'});
- await nav.getByRole('button',{name:'Atividades',exact:true}).click();
+ await openNavigation(nav,'Atividades');
  for(const width of [320,360,390,430]){
   await page.setViewportSize({width,height:844});
   const rows=page.locator('.category-focus-row');

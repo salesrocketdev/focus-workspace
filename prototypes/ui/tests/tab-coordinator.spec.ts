@@ -1,3 +1,4 @@
+import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 const key='focus-workspace:v4:workspace';
 test.beforeEach(async({context})=>{await context.addInitScript(()=>{if(!localStorage.getItem('focus-workspace:v4:onboarding'))localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest'))})});
@@ -10,11 +11,11 @@ test('one writer, synchronized timer and automatic handoff without duplicate com
  const nav=(p:typeof page)=>p.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
  await page.getByRole('button',{name:'Pausar foco',exact:true}).click();
  await expect(follower.getByRole('button',{name:'Iniciar foco',exact:true})).toBeDisabled();
- await nav(page).getByRole('button',{name:'Atividades',exact:true}).click();
+ await openNavigation(nav(page),'Atividades');
  await page.getByRole('button',{name:'Nova categoria',exact:true}).click();
  await page.getByLabel('Nome da categoria').fill('Entre abas');
  await page.getByRole('button',{name:'Salvar',exact:true}).click();
- await nav(follower).getByRole('button',{name:'Atividades',exact:true}).click();
+ await openNavigation(nav(follower),'Atividades');
  await expect(follower.getByRole('button',{name:'Iniciar foco em Entre abas'})).toBeDisabled();
  await nav(page).getByRole('button',{name:'Hoje',exact:true}).click();
  await page.getByRole('button',{name:'Iniciar foco',exact:true}).click();
@@ -34,6 +35,6 @@ test('one writer, synchronized timer and automatic handoff without duplicate com
  await follower.close();
  await expect(third.getByRole('button',{name:'Iniciar foco',exact:true})).toBeEnabled();
  expect(await third.evaluate(k=>JSON.parse(localStorage.getItem(k)!).records.filter((r:{origin:string})=>r.origin==='session').length,key)).toBe(1);
- await nav(third).getByRole('button',{name:'Atividades',exact:true}).click();
+ await openNavigation(nav(third),'Atividades');
  await expect(third.getByRole('button',{name:'Iniciar foco em Entre abas'})).toBeEnabled();
 });

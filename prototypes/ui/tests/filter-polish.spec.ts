@@ -1,3 +1,4 @@
+import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')))});
 test('mobile filters remain on one line and use lightweight active styling',async({page},info)=>{
@@ -18,11 +19,11 @@ test('mobile filters remain on one line and use lightweight active styling',asyn
   await page.setViewportSize({width,height:844});
   await nav.getByRole('button',{name:'Agenda',exact:true}).click();
   await checkTabs('Visualização da agenda');
-  await nav.getByRole('button',{name:'Histórico',exact:true}).click();
+  await openNavigation(nav,'Histórico');
   await checkTabs('Período do histórico');
-  await nav.getByRole('button',{name:'Atividades',exact:true}).click();
+  await openNavigation(nav,'Atividades');
   await checkTabs('Seções de atividades');
-  await page.getByRole('button',{name:'Tarefas',exact:true}).click();
+  await page.getByRole('group',{name:'Seções de atividades'}).getByRole('button',{name:'Tarefas',exact:true}).click();
   await checkTabs('Status das tarefas');
   await page.getByRole('button',{name:'Pendentes',exact:true}).click();
   await expect(page.getByRole('button',{name:'Pendentes',exact:true})).toHaveAttribute('aria-pressed','true');
@@ -30,7 +31,7 @@ test('mobile filters remain on one line and use lightweight active styling',asyn
  await page.screenshot({path:info.outputPath('mobile-clean-activity-filters.png'),animations:'disabled',scale:'css'});
  await nav.getByRole('button',{name:'Agenda',exact:true}).click();
  await page.screenshot({path:info.outputPath('mobile-clean-agenda.png'),animations:'disabled',scale:'css'});
- await nav.getByRole('button',{name:'Histórico',exact:true}).click();
+ await openNavigation(nav,'Histórico');
  await page.getByRole('button',{name:'Linha',exact:true}).click();
  const card=page.locator('.focus-trend-card');
  await expect(card).toContainText('2h 15min');

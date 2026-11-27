@@ -1,9 +1,10 @@
+import { openNavigation } from '../navigate-test';
 import { test,expect } from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')))});
 test('custom select supports pointer, keyboard and top layer in a dialog',async({page},info)=>{
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
- await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');
  if(info.project.name==='mobile')await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Sessões de foco',exact:true}).click();
  const select=page.getByRole('combobox',{name:'Duração do Pomodoro'});
  await select.focus();await page.keyboard.press('ArrowDown');
@@ -26,7 +27,7 @@ test('custom select supports pointer, keyboard and top layer in a dialog',async(
 test('toggle cards persist and search fields can be cleared',async({page},info)=>{
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
- await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');
  if(info.project.name==='mobile')await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Sessões de foco',exact:true}).click();
  const toggle=page.getByRole('switch',{name:'Iniciar pausas automaticamente'});
  await expect(toggle).toHaveAttribute('aria-checked','false');
@@ -36,10 +37,10 @@ test('toggle cards persist and search fields can be cleared',async({page},info)=
  await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Aparência',exact:true}).click();
  await page.getByRole('button',{name:'Escuro',exact:true}).click();
  await page.screenshot({path:info.outputPath('toggle-cards-dark.png'),animations:'disabled',scale:'css'});
- await page.reload();await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await page.reload();await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');
  if(info.project.name==='mobile')await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Sessões de foco',exact:true}).click();
  await expect(toggle).toHaveAttribute('aria-checked','true');
- await nav.getByRole('button',{name:'Atividades',exact:true}).click();
+ await openNavigation(nav,'Atividades');
  const search=page.getByRole('searchbox',{name:'Buscar atividades'});
  await search.fill('exemplo');await page.getByRole('button',{name:'Limpar buscar atividades'}).click();
  await expect(search).toHaveValue('');await expect(search).toBeFocused();

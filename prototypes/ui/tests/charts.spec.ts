@@ -1,9 +1,10 @@
+import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')))});
 test('interactive analytics use filtered data and support keyboard and touch',async({page},info)=>{
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
- await nav.getByRole('button',{name:'Histórico',exact:true}).click();
+ await openNavigation(nav,'Histórico');
  const history=page.locator('.history-page');
  const points=history.getByRole('group',{name:'Tempo de foco por dia'});
  const detail=history.getByRole('status',{name:'Detalhes do dia'});

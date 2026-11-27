@@ -1,7 +1,14 @@
 import { tasksInitial } from './model';
+import { dayKey, type Repeat, type TaskSource } from './task-planning';
 
 export interface Category { id:string; name:string; tone:'blue'|'lavender'|'green'|'orange' }
-export interface Task { id:number; title:string; done:boolean; categoryId:string; priority?:boolean; estimate?:number }
+export interface Task {
+ id:number; title:string; done:boolean; categoryId:string; priority?:boolean; estimate?:number;
+ description?:string; reminderAt?:string; reminderDelivered?:boolean; plannedDate?:string; dueDate?:string; repeat?:Repeat; repeatDays?:number[];
+ monthDay?:number; repeatInterval?:number; recurrenceDate?:string; recurrenceDueDate?:string; previousOccurrence?:number; skipped?:boolean;
+ checklist?:{ title:string; done:boolean }[];
+ source?:TaskSource; sourceUrl?:string;
+}
 export interface BookChapter {id:string;title:string;done:boolean}
 export type BookCoverStyle='indigo'|'forest'|'sand';
 export interface BookMetadata {source:'mock';editionId:string;isbn:string;publisher:string;year:number;language:string;coverStyle?:BookCoverStyle}
@@ -28,7 +35,13 @@ export function nextTaskId(tasks:Task[]){return Math.max(0,...tasks.map(t=>t.id)
 
 export const MAX_PRIORITIES=3;
 export function priorityCount(tasks:Task[]){return tasks.filter(t=>!t.done&&t.priority).length}
-export function dashboardTasks(tasks:Task[]){return [...tasks.filter(t=>!t.done&&t.priority),...tasks.filter(t=>!t.done&&!t.priority)]}
+export function dashboardTasks(tasks:Task[]){
+ const today = dayKey();
+ const rank = (task: Task) => task.dueDate && task.dueDate < today ? 0 : task.priority ? 1
+  : task.plannedDate === today || task.dueDate === today ? 2 : 3;
+ return tasks.filter(task => !task.done && (task.priority || !task.plannedDate || task.plannedDate <= today
+  || Boolean(task.dueDate && task.dueDate <= today))).sort((a,b) => rank(a)-rank(b));
+}
 export function taskContext(task:Task,categories:Category[]):FocusContext|null{
  const category=categories.find(c=>c.id===task.categoryId);
  return category?{kind:'task',id:String(task.id),title:task.title,label:category.name,categoryId:category.id}:null;

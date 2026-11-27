@@ -1,3 +1,4 @@
+import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 const key='focus-workspace:v4:workspace';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')))});
@@ -20,7 +21,7 @@ test('active and paused timers restore after reload; expiry logs once',async({pa
  await expect.poll(()=>page.evaluate(k=>JSON.parse(localStorage.getItem(k)!).records.filter((r:{origin:string})=>r.origin==='session').length,key)).toBe(1);
  await page.reload();
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
- await nav.getByRole('button',{name:'Histórico',exact:true}).click();
+ await openNavigation(nav,'Histórico');
  await page.locator('.history-page').getByRole('button',{name:'Hoje',exact:true}).click();
  await expect(page.locator('.history-session')).toHaveCount(6);
  await expect(page.locator('.history-stat').first()).toContainText('2h 40min');
@@ -29,7 +30,7 @@ test('wake lock is opt-in and released when paused',async({page},info)=>{
  await page.addInitScript(()=>{let requests=0,releases=0;Object.defineProperty(window,'wakeDemo',{get:()=>({requests,releases})});Object.defineProperty(navigator,'wakeLock',{configurable:true,value:{request:async()=>{requests++;const sentinel=new EventTarget() as EventTarget&{released:boolean;release:()=>Promise<void>};sentinel.released=false;sentinel.release=async()=>{if(!sentinel.released){sentinel.released=true;releases++;sentinel.dispatchEvent(new Event('release'))}};return sentinel}}})});
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
- await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');
  if(info.project.name==='mobile')await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Sessões de foco',exact:true}).click();
  await page.getByRole('switch',{name:'Manter tela ligada'}).click();
  await nav.getByRole('button',{name:'Hoje',exact:true}).click();

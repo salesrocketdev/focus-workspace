@@ -42,7 +42,7 @@ test('published screens, navigation, controls and visual evidence',async({page},
   await page.getByRole('button',{name:'Editar painel',exact:true}).click();await audit('02-editor');await page.getByRole('button',{name:'Layouts',exact:true}).click();await audit('02-layout-presets');await page.getByRole('dialog',{name:'Layouts sugeridos'}).getByRole('button',{name:'Cancelar',exact:true}).click();await page.getByRole('button',{name:'Cancelar',exact:true}).click();
   await go('Agenda');await audit('03-agenda');await page.getByRole('button',{name:'Planejar foco das 09:30 às 11:00'}).click();await audit('03-plan-focus');await page.getByRole('button',{name:'Fechar diálogo'}).click();
   await go('Atividades');await audit('04-categories');
-  await page.getByRole('button',{name:'Tarefas',exact:true}).click();await audit('05-tasks');
+  await page.getByRole('group',{name:'Seções de atividades'}).getByRole('button',{name:'Tarefas',exact:true}).click();await audit('05-tasks');
   await page.getByRole('button',{name:'Leituras',exact:true}).click();await audit('06-library');
   await go('Histórico');await audit('07-history');
   if(!mobile){const filters=page.getByRole('group',{name:'Filtros do histórico'});await expect(filters.getByRole('combobox')).toHaveCount(3);await filters.getByRole('combobox',{name:'Categoria do histórico'}).click();await page.getByRole('option',{name:'Leitura',exact:true}).click();await filters.getByRole('button',{name:'Limpar filtros'}).click();await expect(filters.getByRole('button',{name:'Limpar filtros'})).toBeDisabled();}

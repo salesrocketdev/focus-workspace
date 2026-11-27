@@ -140,3 +140,5 @@
 .editing .catalogue-item:disabled{opacity:1;color:#766e67;background:#faf5f0}
 .editing .catalogue-item:disabled>svg:last-child{color:#698971}
 .editing .catalogue-item:disabled small{color:#80746d}
+.editing .widget .card-head > span { flex:1 1 auto; display:block; }
+.editing .widget .card-head > span > svg { vertical-align:middle; margin-inline-end:5px; }

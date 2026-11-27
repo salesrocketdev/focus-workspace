@@ -1,18 +1,40 @@
+import type { Habit } from './habits-page';
+import { httpsLink, repeats, validDay } from './task-planning';
 import {readStorage,writeStorage,type Phase,type FocusPreferences} from './preferences-model';
 import {initialTasks,initialCategories,initialBooks,initialContext,type Task,type Category,type Book,type FocusContext} from './activity-model';
 import {initialRecords,type FocusRecord,type SessionMode} from './history-model';
 import {validBlocks,contextExists,type FocusBlock} from './planning-model';
 export const WORKSPACE_KEY='focus-workspace:v4:workspace';
 export interface TimerSnapshot {mode:SessionMode;phase:Phase;cycle:number;duration:number;seconds:number;running:boolean;startedAt:number;context:FocusContext;readingId:string;plannedId?:string}
-export interface WorkspaceSnapshot {version:1;timer:TimerSnapshot;tasks:Task[];categories:Category[];books:Book[];records:FocusRecord[];blocks?:FocusBlock[]}
+export interface WorkspaceSnapshot {version:1;timer:TimerSnapshot;tasks:Task[];categories:Category[];books:Book[];records:FocusRecord[];blocks?:FocusBlock[];habits?:Habit[]}
 const integer=(v:unknown,min=0,max=Number.MAX_SAFE_INTEGER):v is number=>typeof v==='number'&&Number.isSafeInteger(v)&&v>=min&&v<=max;
 const string=(v:unknown):v is string=>typeof v==='string'&&v.length>0;
+function validTaskDetails(task: Task) {
+ const days = (value: unknown) => Array.isArray(value) && value.every(day => integer(day,0,6));
+ return (task.description===undefined||typeof task.description==='string')
+  && (task.reminderAt===undefined||typeof task.reminderAt==='string'&&/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(task.reminderAt)&&Number.isFinite(Date.parse(task.reminderAt)))
+  && (task.reminderDelivered===undefined||typeof task.reminderDelivered==='boolean')
+  && (task.plannedDate===undefined||validDay(task.plannedDate))
+  && (task.dueDate===undefined||validDay(task.dueDate))
+  && (task.repeat===undefined||validDay(task.plannedDate)&&repeats.some(rule=>rule.value===task.repeat))
+  && (task.repeatDays===undefined||days(task.repeatDays))
+  && (task.repeatInterval===undefined||integer(task.repeatInterval,1,12))
+  && (task.recurrenceDate===undefined||validDay(task.recurrenceDate))
+  && (task.recurrenceDueDate===undefined||validDay(task.recurrenceDueDate))
+  && (task.monthDay===undefined||integer(task.monthDay,1,31))
+  && (task.previousOccurrence===undefined||integer(task.previousOccurrence,1))
+  && (task.skipped===undefined||typeof task.skipped==='boolean')
+  && (task.source===undefined||['gmail','outlook','google-meet','teams'].includes(task.source))
+  && (task.sourceUrl===undefined||typeof task.sourceUrl==='string'&&Boolean(httpsLink(task.sourceUrl)))
+  && (task.checklist===undefined||Array.isArray(task.checklist)&&task.checklist.every(step=>step&&string(step.title)&&typeof step.done==='boolean'));
+}
 function contextValid(v:FocusContext|undefined){return !!v&&string(v.id)&&string(v.title)&&string(v.label)&&(v.kind==='reading'?v.label==='Leitura':(v.kind==='activity'||v.kind==='task')&&string(v.categoryId))}
 export function validWorkspace(value:unknown):value is WorkspaceSnapshot{
  if(!value||typeof value!=='object')return false;
  const v=value as Partial<WorkspaceSnapshot>,t=v.timer;
  return v.version===1&&!!t&&['Pomodoro','Livre'].includes(t.mode)&&['focus','short','long'].includes(t.phase)&&integer(t.cycle,0,12)&&integer(t.duration,1,7200)&&integer(t.seconds)&&typeof t.running==='boolean'&&integer(t.startedAt)&&(!t.running||t.startedAt>0)&&contextValid(t.context)&&typeof t.readingId==='string'&&
- Array.isArray(v.tasks)&&v.tasks.every(x=>x&&integer(x.id)&&string(x.title)&&typeof x.done==='boolean'&&string(x.categoryId)&&(x.priority===undefined||typeof x.priority==='boolean')&&(x.estimate===undefined||integer(x.estimate,1,20)))&&
+ Array.isArray(v.tasks)&&v.tasks.every(x=>x&&integer(x.id)&&string(x.title)&&typeof x.done==='boolean'&&string(x.categoryId)&&(x.priority===undefined||typeof x.priority==='boolean')&&(x.estimate===undefined||integer(x.estimate,1,20))&&validTaskDetails(x))&&
+ (v.habits===undefined||Array.isArray(v.habits)&&v.habits.every(h=>h&&integer(h.id,1)&&string(h.title)&&Array.isArray(h.days)&&h.days.length>0&&h.days.every(day=>integer(day,0,6))&&Array.isArray(h.checks)&&h.checks.every(validDay)&&(h.archived===undefined||typeof h.archived==='boolean')))&&
  Array.isArray(v.categories)&&v.categories.every(x=>x&&string(x.id)&&string(x.name)&&['blue','lavender','green','orange'].includes(x.tone))&&
  Array.isArray(v.books)&&v.books.every(x=>x&&string(x.id)&&string(x.title)&&string(x.author)&&integer(x.pages,1,10000)&&integer(x.page,0,x.pages)&&(!x.chapters||Array.isArray(x.chapters)&&x.chapters.every(c=>c&&string(c.id)&&string(c.title)&&typeof c.done==='boolean')))&&
  Array.isArray(v.records)&&v.records.every(x=>x&&string(x.id)&&string(x.day)&&string(x.title)&&string(x.categoryId)&&string(x.category)&&string(x.time)&&integer(x.seconds)&&['Pomodoro','Livre'].includes(x.mode)&&['completed','interrupted'].includes(x.status)&&['fixture','session'].includes(x.origin)&&(x.taskId===undefined||integer(x.taskId,1))&&(x.plannedId===undefined||string(x.plannedId)))&&

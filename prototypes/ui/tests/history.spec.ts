@@ -1,9 +1,10 @@
+import { openNavigation } from '../navigate-test';
 import { test,expect } from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')))});
 test('history filters, details and dashboard share recorded focus',async({page},info)=>{
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
- await nav.getByRole('button',{name:'Histórico',exact:true}).click();
+ await openNavigation(nav,'Histórico');
  const history=page.locator('.history-page');
  await expect(history.locator('.history-stat').first()).toContainText('10h 32min');
  await history.getByRole('button',{name:'Hoje',exact:true}).click();
@@ -41,7 +42,7 @@ test('history filters, details and dashboard share recorded focus',async({page},
  await page.getByRole('button',{name:'Iniciar foco',exact:true}).click();
  await page.clock.fastForward(1500*1000+250);
  await expect(page.locator('[data-widget=goal]')).toContainText('2h 40min');
- await nav.getByRole('button',{name:'Histórico',exact:true}).click();
+ await openNavigation(nav,'Histórico');
  await history.getByRole('button',{name:'Hoje',exact:true}).click();
  await expect(history.locator('.history-session')).toHaveCount(6);
  await expect(history.locator('.history-session').first()).toContainText('Sessão local');
@@ -51,7 +52,7 @@ test('history filters, details and dashboard share recorded focus',async({page},
 test('appearance preference persists and system motion is respected',async({page},info)=>{
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
- await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');
  await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Aparência',exact:true}).click();
  await page.getByRole('button',{name:'Escuro',exact:true}).click();
  await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
@@ -62,7 +63,7 @@ test('appearance preference persists and system motion is respected',async({page
  await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
  await expect(page.locator('html')).toHaveAttribute('data-motion','reduced');
  await page.screenshot({path:info.outputPath('dashboard-dark.png'),animations:'disabled',scale:'css'});
- await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');
  await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Aparência',exact:true}).click();
  await page.getByRole('button',{name:'Sistema',exact:true}).click();
  await page.emulateMedia({colorScheme:'light'});
@@ -82,7 +83,7 @@ test('interrupted focus is logged, pauses are excluded and reset discards time',
  await page.getByRole('button',{name:'Reiniciar',exact:true}).click();
  if(await page.getByRole('dialog',{name:'Descartar sessão atual?'}).isVisible())await page.getByRole('button',{name:'Descartar e reiniciar',exact:true}).click();
  await page.getByRole('button',{name:'Voltar',exact:true}).click();
- await nav.getByRole('button',{name:'Histórico',exact:true}).click();
+ await openNavigation(nav,'Histórico');
  const history=page.locator('.history-page');
  await history.getByRole('button',{name:'Hoje',exact:true}).click();
  if(info.project.name==='mobile')await history.getByRole('button',{name:'Abrir filtros do histórico'}).click();

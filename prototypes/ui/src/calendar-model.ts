@@ -4,6 +4,7 @@ export type CalendarProvider='google-calendar'|'outlook';
 export type CalendarView='day'|'week'|'month';
 export interface CalendarEvent {
  id:string; day:string; title:string; start:number; end:number;
+ meeting?:'google-meet'|'teams';
  provider:CalendarProvider|'local-focus'; color:'lavender'|'blue'|'orange';
 }
 export const DEMO_DAY='2025-01-29';
@@ -28,7 +29,7 @@ export const fullDay=(day:string)=>dateLabel(day,{weekday:'long',day:'numeric',m
 export function timeLabel(minutes:number){return String(Math.floor(minutes/60)).padStart(2,'0')+':'+String(minutes%60).padStart(2,'0')}
 const startOf=(time:string)=>{const [h,m]=time.split(':').map(Number);return h*60+m};
 export const calendarEvents:CalendarEvent[]=[
- ...events.map((e,i)=>({id:'today-'+i,day:DEMO_DAY,title:e.title,start:startOf(e.time),end:startOf(e.time)+[30,45,60][i],provider:(e.provider==='Outlook'?'outlook':'google-calendar') as CalendarProvider,color:e.color})),
+ ...events.map((e,i)=>({id:'today-'+i,day:DEMO_DAY,title:e.title,start:startOf(e.time),end:startOf(e.time)+[30,45,60][i],provider:(e.provider==='Outlook'?'outlook':'google-calendar') as CalendarProvider,color:e.color,meeting:i===0?'google-meet' as const:i===1?'teams' as const:undefined})),
  {id:'mon-1',day:'2025-01-27',title:'Planejamento da semana',start:540,end:600,provider:'outlook',color:'blue'},
  {id:'tue-1',day:'2025-01-28',title:'Revisão de prioridades',start:630,end:660,provider:'google-calendar',color:'lavender'},
  {id:'thu-1',day:'2025-01-30',title:'Workshop de produto',start:600,end:690,provider:'outlook',color:'blue'},

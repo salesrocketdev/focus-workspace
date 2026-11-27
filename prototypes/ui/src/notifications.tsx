@@ -4,7 +4,7 @@ import { Button,Dialog,ToggleCard,SelectField,Field } from './ui';
 import {DistractionSettings,type ShieldPreferences} from './distraction-shield';
 import { readStorage,writeStorage } from './preferences-model';
 import {tones,validTone,validTime,quietAt,unlockAudio,playSessionTone,type Tone,type SoundEvent} from './session-audio';
-type Kind='focus'|'break'|'test';
+type Kind='focus'|'break'|'test'|'task';
 type Permission=NotificationPermission|'unsupported';
 interface Preferences {focus:boolean;breaks:boolean;native:boolean;sound:boolean;startSound:boolean;tone:Tone;volume:number;quiet:boolean;quietStart:string;quietEnd:string}
 interface Entry{id:string;title:string;body:string;kind:Kind;at:number;read:boolean}
@@ -16,7 +16,7 @@ const needsInstall=()=>isAppleMobile()&&!installed();
 const supported=()=>!needsInstall()&&typeof Notification!=='undefined'&&window.isSecureContext&&'serviceWorker' in navigator&&typeof ServiceWorkerRegistration!=='undefined'&&'showNotification' in ServiceWorkerRegistration.prototype;
 const permission=():Permission=>supported()?Notification.permission:'unsupported';
 function loadPrefs():Preferences{const p=readStorage(KEY) as Partial<Preferences>|null;return {focus:p?.focus!==false,breaks:p?.breaks!==false,native:p?.native===true,sound:p?.sound===true,startSound:p?.startSound===true,tone:validTone(p?.tone),volume:typeof p?.volume==='number'&&Number.isFinite(p.volume)?Math.max(0,Math.min(100,p.volume)):50,quiet:p?.quiet===true,quietStart:validTime(p?.quietStart,'22:00'),quietEnd:validTime(p?.quietEnd,'07:00')}}
-function loadInbox():Entry[]{const data=readStorage(INBOX);return Array.isArray(data)?data.filter(e=>e&&typeof e.id==='string'&&typeof e.title==='string'&&typeof e.body==='string'&&typeof e.at==='number'&&typeof e.read==='boolean'&&['focus','break','test'].includes(e.kind)).slice(0,50):[]}
+function loadInbox():Entry[]{const data=readStorage(INBOX);return Array.isArray(data)?data.filter(e=>e&&typeof e.id==='string'&&typeof e.title==='string'&&typeof e.body==='string'&&typeof e.at==='number'&&typeof e.read==='boolean'&&['focus','break','test','task'].includes(e.kind)).slice(0,50):[]}
 export async function registerNotificationWorker(){
  if(!('serviceWorker' in navigator)||!window.isSecureContext)return null;
  try{return await navigator.serviceWorker.register(import.meta.env.BASE_URL+'sw.js',{scope:import.meta.env.BASE_URL})}catch{return null}
@@ -75,7 +75,7 @@ export function useNotifications(){
    if(kind==='test')setFeedback('Horário silencioso ativo: aviso salvo apenas na central interna.');
    return;
   }
-  if(kind!=='test'&&p.sound&&p.volume>0)void playSessionTone(p.tone,kind,p.volume);
+  if((kind==='focus'||kind==='break')&&p.sound&&p.volume>0)void playSessionTone(p.tone,kind,p.volume);
   if(p.native&&permission()==='granted')void nativeNotice(entry).then(ok=>{if(kind==='test')setFeedback(ok?'Notificação enviada ao sistema.':'Não foi possível entregar ao sistema; veja a central interna.')});
   else if(kind==='test')setFeedback('Notificação adicionada à central interna.');
  }

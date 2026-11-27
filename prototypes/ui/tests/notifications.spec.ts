@@ -1,9 +1,10 @@
+import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')))});
 test('settings section navigation and notification center',async({page},info)=>{
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
- await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');
  const sections=page.getByRole('navigation',{name:'Seções de configurações'});
  if(info.project.name==='mobile')await sections.getByRole('button',{name:'Sessões de foco',exact:true}).click();
  else await expect(sections.getByRole('button',{name:'Sessões de foco'})).toHaveAttribute('aria-current','page');

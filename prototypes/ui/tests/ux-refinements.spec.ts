@@ -1,10 +1,11 @@
+import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>{if(!localStorage.getItem('focus-workspace:v4:onboarding'))localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest'))})});
 test('desktop filter toolbar uses compact labeled fields and reset',async({page},info)=>{
  test.skip(info.project.name!=='desktop','Desktop filter layout');
  await page.goto('/');
  const nav=page.getByRole('navigation',{name:'Navegação principal'});
- await nav.getByRole('button',{name:'Histórico',exact:true}).click();
+ await openNavigation(nav,'Histórico');
  const bar=page.getByRole('group',{name:'Filtros do histórico'});
  await expect(bar.getByRole('combobox')).toHaveCount(3);
  await bar.getByRole('combobox',{name:'Categoria do histórico'}).click();
@@ -26,7 +27,7 @@ test('desktop filter toolbar uses compact labeled fields and reset',async({page}
 test('focus scene persists, supports none and restores original',async({page},info)=>{
  await page.goto('/');
  const nav=page.getByRole('navigation',{name:'Navegação principal'});
- const settings=async()=>{await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Aparência',exact:true}).click()};
+ const settings=async()=>{await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Aparência',exact:true}).click()};
  await settings();
  const options=page.getByRole('group',{name:'Cenário do modo foco'});
  await expect(options.getByRole('button')).toHaveCount(6);

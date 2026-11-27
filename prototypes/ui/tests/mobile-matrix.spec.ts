@@ -1,3 +1,4 @@
+import { openNavigation } from '../navigate-test';
 import {test,expect,type Page,type Locator} from '@playwright/test';
 const sizes=[
  {width:320,height:568},{width:360,height:640},{width:375,height:667},
@@ -52,7 +53,7 @@ for(const size of sizes){
   await page.goto('./');
   await expect(page.getByRole('heading',{name:'Meu dia'})).toBeVisible();
   const nav=page.getByRole('navigation',{name:'Navegação principal'});
-  const go=async(label:string)=>nav.getByRole('button',{name:label,exact:true}).click();
+  const go=async(label:string)=>openNavigation(nav,label);
   await fit(page,'dashboard');
   await page.getByRole('button',{name:'Editar painel',exact:true}).click();await fit(page,'editor');await page.getByRole('button',{name:'Layouts',exact:true}).click();await dialogFits(page,'layout presets');await page.getByRole('dialog',{name:'Layouts sugeridos'}).getByRole('button',{name:'Cancelar',exact:true}).click();await page.getByRole('button',{name:'Cancelar',exact:true}).click();
   await page.getByRole('button',{name:'Adicionar tarefa rápida'}).click();await dialogFits(page,'quick task');await page.getByRole('button',{name:'Fechar diálogo'}).click();
@@ -107,7 +108,7 @@ for(const size of sizes){
   await page.getByLabel('Nome da categoria').fill('Categoria de auditoria com nome longo');
   await page.getByRole('button',{name:'Salvar',exact:true}).click();
   await fit(page,'long category');
-  await page.getByRole('button',{name:'Tarefas',exact:true}).click();await fit(page,'tasks');
+  await page.getByRole('group',{name:'Seções de atividades'}).getByRole('button',{name:'Tarefas',exact:true}).click();await fit(page,'tasks');
   await page.getByRole('button',{name:'Leituras',exact:true}).click();await fit(page,'library');
   const libraryHeader=page.locator('.activity-section-head').first();
   await separate(libraryHeader.locator('div').first(),libraryHeader.locator('.book-header-actions'),'library heading');

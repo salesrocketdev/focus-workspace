@@ -4,15 +4,15 @@ test('dashboard capture, priority, contextual routes and focus preparation',asyn
  await page.goto('/');
  const nav=page.getByRole('navigation',{name:'Navegação principal'}),widget=page.locator('[data-widget=tasks]');
  await widget.getByRole('button',{name:'Adicionar tarefa rápida'}).click();
- const dialog=page.getByRole('dialog',{name:'Nova tarefa rápida'});
+ const dialog=page.getByRole('dialog',{name:'Nova tarefa'});
  await dialog.getByLabel('Título da tarefa').fill('Revisar arquitetura do Focora');
- await dialog.getByRole('switch',{name:'Marcar como prioridade'}).click();
+ await dialog.getByRole('checkbox',{name:'Destacar no painel'}).click();
  await dialog.getByRole('button',{name:'Adicionar tarefa'}).click();
  await expect(widget.locator('.dashboard-task-row').first()).toContainText('Revisar arquitetura do Focora');
  await page.reload();
  await expect(widget.getByRole('button',{name:'Prioridade: Revisar arquitetura do Focora'})).toHaveAttribute('aria-pressed','true');
  await widget.getByRole('button',{name:'Abrir todas as tarefas'}).click();
- await expect(page.getByRole('button',{name:'Tarefas',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect(nav.getByRole('button',{name:'Tarefas',exact:true})).toHaveAttribute('aria-current','page');
  await expect(page.getByRole('button',{name:'Nova categoria'})).toHaveCount(0);
  await nav.getByRole('button',{name:'Hoje',exact:true}).click();
  await page.getByRole('button',{name:'Abrir atividades de leitura'}).click();
@@ -25,6 +25,7 @@ test('dashboard capture, priority, contextual routes and focus preparation',asyn
  await widget.getByRole('checkbox',{name:'Revisar arquitetura do Focora',exact:true}).click();
  await expect(widget.getByText('Revisar arquitetura do Focora',{exact:true})).toHaveCount(0);
  await widget.getByRole('button',{name:'Abrir todas as tarefas'}).click();
- await expect(page.locator('.activity-task-row').filter({hasText:'Revisar arquitetura do Focora'}).getByRole('checkbox')).toBeChecked();
+ await page.getByRole('button',{name:'Concluídas',exact:true}).click();
+ await expect(page.getByRole('checkbox',{name:'Reabrir Revisar arquitetura do Focora'})).toBeChecked();
  await page.screenshot({path:'test-results/dashboard-actions.png',animations:'disabled'});
 });

@@ -1,9 +1,10 @@
+import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')))});
 test('mobile settings list, detail, summaries and return',async({page},info)=>{
  test.skip(info.project.name!=='mobile','Mobile only');
  await page.goto('/');
- await page.getByRole('navigation',{name:'Navegação principal'}).getByRole('button',{name:'Ajustes',exact:true}).click();
+ await openNavigation(page.getByRole('navigation',{name:'Navegação principal'}),'Ajustes');
  const sections=page.getByRole('navigation',{name:'Seções de configurações'});
  await expect(sections.getByRole('button')).toHaveCount(5);
  await expect(page.getByRole('combobox',{name:'Duração do Pomodoro'})).toHaveCount(0);

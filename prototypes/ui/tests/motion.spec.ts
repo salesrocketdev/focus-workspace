@@ -1,10 +1,11 @@
+import { openNavigation } from '../navigate-test';
 import {test,expect} from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')))});
 test('route entry restarts on navigation and honors reduced motion',async({page},info)=>{
  await page.emulateMedia({reducedMotion:'no-preference'});
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
- const go=async(label:string,route:string)=>{await nav.getByRole('button',{name:label,exact:true}).click();const el=page.locator('[data-route="'+route+'"]:visible');await expect(el).toBeVisible();return el};
+ const go=async(label:string,route:string)=>{await openNavigation(nav,label);const el=page.locator('[data-route="'+route+'"]:visible');await expect(el).toBeVisible();return el};
  const agenda=await go('Agenda','calendar');
  expect(await agenda.evaluate(el=>getComputedStyle(el).animationName)).toBe('route-enter');
  const history=await go('Histórico','history');
@@ -31,7 +32,7 @@ test('iPhone browser explains installation instead of requesting unsupported per
  await page.addInitScript(()=>{Object.defineProperty(navigator,'userAgent',{get:()=> 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_4 like Mac OS X)'});Object.defineProperty(navigator,'standalone',{get:()=>false})});
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
- await nav.getByRole('button',{name:info.project.name==='mobile'?'Ajustes':'Configurações',exact:true}).click();
+ await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');
  await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Notificações',exact:true}).click();
  await expect(page.getByText('Ative as notificações no iPhone ou iPad')).toBeVisible();
  await expect(page.getByRole('button',{name:'Autorizar notificações'})).toHaveCount(0);

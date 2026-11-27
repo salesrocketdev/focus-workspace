@@ -6,7 +6,7 @@ export function Button({variant='primary',size='md',className='',type='button',.
  return <button {...props} type={type} className={['ui-button','ui-'+variant,'ui-'+size,className].join(' ')}/>;
 }
 export { Field, SelectField, SearchField, TextareaField, ToggleCard } from './form-controls';
-export function Dialog({title,description,onDismiss,children}:{title:string;description?:string;onDismiss:()=>void;children:ReactNode}){
+export function Dialog({title,description,onDismiss,children,className}:{title:string;description?:string;onDismiss:()=>void;children:ReactNode;className?:string}){
  const ref=useRef<HTMLDialogElement>(null);const titleId=useId();const descId=useId();
  useEffect(()=>{
   const el=ref.current;if(!el)return;
@@ -40,7 +40,7 @@ export function Dialog({title,description,onDismiss,children}:{title:string;desc
   sync();vv?.addEventListener('resize',sync);vv?.addEventListener('scroll',sync);window.addEventListener('resize',sync);el.addEventListener('focusin',sync);el.addEventListener('focusout',sync);
   return()=>{cancelAnimationFrame(frame);vv?.removeEventListener('resize',sync);vv?.removeEventListener('scroll',sync);window.removeEventListener('resize',sync);el.removeEventListener('focusin',sync);el.removeEventListener('focusout',sync);initial?.removeAttribute('autofocus');if(el.open)el.close();if(previous?.isConnected)previous.focus({preventScroll:true})};
  },[]);
- return <dialog ref={ref} className="ui-dialog" aria-labelledby={titleId} aria-describedby={description?descId:undefined}
+ return <dialog ref={ref} className={className?'ui-dialog '+className:'ui-dialog'} aria-labelledby={titleId} aria-describedby={description?descId:undefined}
  onCancel={e=>{e.preventDefault();onDismiss()}} onClick={e=>{if(e.target===e.currentTarget){const r=e.currentTarget.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)onDismiss()}}}>
  <header className="dialog-header"><div><h2 id={titleId}>{title}</h2>{description&&<p id={descId}>{description}</p>}</div><button type="button" className="ui-icon-button" aria-label="Fechar diálogo" onClick={onDismiss}><X size={18}/></button></header>
  {children}</dialog>;
