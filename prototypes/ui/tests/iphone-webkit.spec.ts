@@ -68,6 +68,7 @@ test('WebKit: clean focus controls preserve touch targets and timer actions',asy
  await expect(transport.getByRole('button',{name:'Pausar',exact:true})).toBeVisible();
  await transport.getByRole('button',{name:'Pausar',exact:true}).tap();
  await transport.getByRole('button',{name:'Reiniciar',exact:true}).tap();
+ if(await page.getByRole('dialog',{name:'Descartar sessão atual?'}).isVisible())await page.getByRole('button',{name:'Descartar e reiniciar',exact:true}).click();
  await expect(transport.getByRole('button',{name:'Iniciar',exact:true})).toBeVisible();
  await expect(page.getByRole('navigation',{name:'Navegação principal'})).toHaveCount(0);
 });

@@ -23,6 +23,7 @@ test('mobile immersive controls are compact, aligned and usable',async({page},in
  await expect(controls.getByRole('button',{name:'Pausar',exact:true})).toBeVisible();
  await controls.getByRole('button',{name:'Pausar',exact:true}).click();
  await controls.getByRole('button',{name:'Reiniciar',exact:true}).click();
+ if(await page.getByRole('dialog',{name:'Descartar sessão atual?'}).isVisible())await page.getByRole('button',{name:'Descartar e reiniciar',exact:true}).click();
  await expect(method.getByRole('button',{name:'Livre',exact:true})).toBeEnabled();
  await method.getByRole('button',{name:'Livre',exact:true}).click();
  await expect(method.getByRole('button',{name:'Livre',exact:true})).toHaveAttribute('aria-pressed','true');

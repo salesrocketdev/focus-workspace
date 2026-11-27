@@ -63,6 +63,7 @@ test('published screens, navigation, controls and visual evidence',async({page},
   await expect(transport.getByRole('button',{name:'Pausar',exact:true})).toBeVisible();
   await transport.getByRole('button',{name:'Pausar',exact:true}).click();
   await transport.getByRole('button',{name:'Reiniciar',exact:true}).click();
+ if(await page.getByRole('dialog',{name:'Descartar sessão atual?'}).isVisible())await page.getByRole('button',{name:'Descartar e reiniciar',exact:true}).click();
   if(mobile){
    const sizes=await transport.getByRole('button').evaluateAll(nodes=>nodes.map(n=>{const r=n.getBoundingClientRect();return [r.width,r.height]}));
    expect.soft(sizes.every(([w,h])=>w>=44&&h>=44),'focus transport hit areas').toBeTruthy();

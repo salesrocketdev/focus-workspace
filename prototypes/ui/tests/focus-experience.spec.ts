@@ -1,0 +1,22 @@
+import {test,expect} from '@playwright/test';
+test.beforeEach(async({page})=>{await page.addInitScript(()=>{if(!localStorage.getItem('focus-workspace:v4:onboarding'))localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest'))})});
+test('Zen, quick rhythms, discard protection and non-blocking completion',async({page},info)=>{
+ await page.clock.install();await page.goto('/');
+ await page.getByRole('button',{name:'Abrir sessão de foco',exact:true}).click();
+ const transport=page.locator('.focus-center .transport'),zen=page.getByRole('button',{name:'Modo Zen',exact:true});
+ await zen.click();await expect(zen).toHaveAttribute('aria-pressed','true');await expect(page.locator('.focus-side')).toBeHidden();await expect(transport).toBeVisible();
+ await page.getByRole('button',{name:'Ritmos de foco',exact:true}).click();await page.getByRole('button',{name:/Foco rápido/}).click();
+ await expect(page.locator('.focus-center .timer-ring')).toHaveAttribute('aria-label',/15:00/);
+ await transport.getByRole('button',{name:'Iniciar',exact:true}).click();await page.clock.fastForward(15000);
+ await transport.getByRole('button',{name:'Reiniciar',exact:true}).click();const reset=page.getByRole('dialog',{name:'Descartar sessão atual?'});
+ await expect(reset).toBeVisible();await reset.getByRole('button',{name:'Continuar sessão'}).click();await expect(transport.getByRole('button',{name:'Pausar',exact:true})).toBeVisible();
+ await transport.getByRole('button',{name:'Reiniciar',exact:true}).click();await reset.getByRole('button',{name:'Descartar e reiniciar'}).click();
+ await expect(page.locator('.focus-center .timer-ring')).toHaveAttribute('aria-label',/15:00/);
+ await transport.getByRole('button',{name:'Iniciar',exact:true}).click();await page.clock.fastForward(900000);
+ const summary=page.getByRole('region',{name:'Resumo da última sessão'});
+ await expect(summary).toContainText('Sessão concluída');await expect(summary).toContainText('15 min');
+ await summary.getByRole('button',{name:'Iniciar pausa curta'}).click();await expect(transport.getByRole('button',{name:'Pausar',exact:true})).toBeVisible();
+ await summary.getByRole('button',{name:'Dispensar',exact:true}).click();await expect(summary).toHaveCount(0);
+ await zen.click();await expect(page.locator('.focus-side')).toBeVisible();
+ await page.screenshot({path:info.outputPath('focus-experience.png'),animations:'disabled',scale:'css'});
+});

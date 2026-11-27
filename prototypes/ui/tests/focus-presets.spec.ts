@@ -24,6 +24,7 @@ test('presets apply shared preferences and picker changes context safely',async(
  await page.getByRole('button',{name:'Iniciar',exact:true}).click();
  await expect(picker).toBeDisabled();
  await page.getByRole('button',{name:'Reiniciar',exact:true}).click();
+ if(await page.getByRole('dialog',{name:'Descartar sessão atual?'}).isVisible())await page.getByRole('button',{name:'Descartar e reiniciar',exact:true}).click();
  await expect(picker).toBeEnabled();
  await picker.click();
  await dialog.getByRole('searchbox',{name:'Buscar atividade de foco'}).fill('estudos');

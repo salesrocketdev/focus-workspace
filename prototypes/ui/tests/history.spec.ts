@@ -80,6 +80,7 @@ test('interrupted focus is logged, pauses are excluded and reset discards time',
  await page.getByRole('button',{name:'Iniciar',exact:true}).click();
  await page.clock.fastForward(15000);
  await page.getByRole('button',{name:'Reiniciar',exact:true}).click();
+ if(await page.getByRole('dialog',{name:'Descartar sessão atual?'}).isVisible())await page.getByRole('button',{name:'Descartar e reiniciar',exact:true}).click();
  await page.getByRole('button',{name:'Voltar',exact:true}).click();
  await nav.getByRole('button',{name:'Histórico',exact:true}).click();
  const history=page.locator('.history-page');

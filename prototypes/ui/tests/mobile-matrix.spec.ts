@@ -129,6 +129,7 @@ for(const size of sizes){
   await go('Hoje');
   await page.getByRole('button',{name:'Abrir sessão de foco',exact:true}).click();
   await fit(page,'focus');
+  await page.getByRole('button',{name:'Modo Zen',exact:true}).click();await fit(page,'zen');await expect(page.locator('.focus-side')).toBeHidden();await page.getByRole('button',{name:'Modo Zen',exact:true}).click();
   await expect(page.locator('.focus-landscape')).toHaveAttribute('data-focus-scene','ocean');
   const transport=page.locator('.focus-center .transport'),start=transport.getByRole('button',{name:'Iniciar',exact:true});
   await contained(start,transport,'focus start');

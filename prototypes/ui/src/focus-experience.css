@@ -1,0 +1,43 @@
+/* V4.36: optional Zen, compact rhythm chooser and non-blocking session feedback. */
+.focus-top .zen-toggle[aria-pressed=true]{background:var(--field-selected);color:var(--field-selected-ink)}
+.immersive-grid.zen-mode{display:grid;grid-template-columns:minmax(0,1fr);max-width:540px;justify-items:center;align-items:center;margin-inline:auto}
+.immersive-grid.zen-mode>.book-panel,.immersive-grid.zen-mode>.focus-activity-panel,.immersive-grid.zen-mode>.focus-side{display:none}
+.immersive-grid.zen-mode>.focus-center{grid-column:1;grid-row:1;width:100%;max-width:500px}
+.focus-center .immersive-actions{flex-wrap:wrap}
+.quick-focus-presets{display:grid;gap:8px;min-width:0}
+.quick-focus-presets>button{display:flex;align-items:center;gap:10px;text-align:left;min-width:0;padding:12px;border:1px solid var(--ui-line);background:var(--ui-paper);border-radius:10px;min-height:70px}
+.quick-focus-presets>button[aria-pressed=true]{border-color:var(--field-selected-edge);background:var(--field-selected)}
+.quick-focus-presets>button>span{display:grid;gap:4px;min-width:0;flex:1}
+.quick-focus-presets>button>span b{font-size:13px;overflow-wrap:anywhere}
+.quick-focus-presets small{font-size:11px;line-height:1.4;overflow-wrap:anywhere}
+.quick-focus-presets .quick-preset-duration{text-align:right;flex:0 1 116px}
+.quick-preset-duration strong{font-size:17px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.quick-focus-presets>button>svg{flex-shrink:0;color:var(--field-selected-ink)}
+.session-summary{display:grid;gap:10px;min-width:0;background:var(--ui-paper);border:1px solid var(--ui-line);border-radius:12px;padding:14px;margin:0 0 14px;box-shadow:var(--ui-shadow)}
+.focus-main>.session-summary{max-width:540px;margin:18px auto 16px;position:relative;z-index:1}
+.session-summary>header{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:10px;align-items:center}
+.session-summary-mark{display:grid;place-items:center;width:36px;height:36px;background:var(--field-selected);color:var(--field-selected-ink);border-radius:9px}
+.session-summary-mark.completed{color:#438c69}
+[data-theme=dark] .session-summary-mark.completed{color:#8dc7a6}
+.session-summary h2{font-size:14px;line-height:1.4;margin:0}
+.session-summary p{font-size:12px;color:var(--ui-muted);overflow-wrap:anywhere;margin:3px 0 0}
+.session-summary-details{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.session-summary-details strong{font-size:23px;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
+.session-summary-details small{font-size:11px}
+.session-summary-actions{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.session-summary-actions>.ui-button{min-width:0;max-width:100%;white-space:normal;height:auto;min-height:36px;padding-block:6px}
+.summary-task-done{display:flex;align-items:center;gap:5px;color:var(--ui-muted)}
+.reset-confirm-copy{font-size:13px;line-height:1.5;color:var(--ui-muted)}
+.discard-session-button.ui-button{background:#9c3833;border-color:#9c3833;color:white}
+@media(max-width:759px){
+ .focus-top .focus-header-trailing{gap:0}
+ .focus-top .focus-header-trailing>.ui-icon-button{width:44px;min-width:44px;height:44px;flex-basis:44px}
+ .focus-top .focus-header-leading{min-width:0}
+ .focus-top .focus-breadcrumb{min-width:0}
+ .focus-center .immersive-actions{max-width:100%;gap:2px}
+ .focus-center .immersive-actions>.ui-button{padding-inline:7px;min-height:44px}
+ .session-summary{padding:11px;gap:8px}
+ .session-summary-actions>.ui-button{min-height:44px;font-size:12px}
+ .quick-focus-presets>button{padding:9px;gap:7px}
+}
+@media(max-width:359px){.focus-top .focus-header-trailing>.ui-icon-button{width:44px;flex-basis:44px}.focus-top .focus-breadcrumb>svg{display:none}.focus-center .immersive-actions>.ui-button{padding-inline:4px;font-size:11px}}
