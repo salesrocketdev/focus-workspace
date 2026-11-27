@@ -32,6 +32,12 @@ test('published screens, navigation, controls and visual evidence',async({page},
  }
  try{
   await audit('01-dashboard');
+  if(mobile){
+   const targets=page.locator('.quick-action-button:visible,[data-widget=music] .player-controls button:visible,[data-widget=focus] .timer-start:visible');
+   const rects=await targets.evaluateAll(nodes=>nodes.map(n=>{const r=n.getBoundingClientRect();return [r.width,r.height]}));
+   expect.soft(rects.every(([w,h])=>w>=44&&h>=44),'dashboard controls have 44px targets').toBeTruthy();
+   await expect(page.locator('[data-widget=focus] .timer-start span')).toBeVisible();
+  }
   await page.getByRole('button',{name:'Editar painel',exact:true}).click();await audit('02-editor');await page.getByRole('button',{name:'Cancelar',exact:true}).click();
   await go('Agenda');await audit('03-agenda');
   await go('Atividades');await audit('04-categories');

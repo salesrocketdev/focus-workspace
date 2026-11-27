@@ -9,6 +9,7 @@ on:
       - 'prototypes/ui/live-audit.config.ts'
 permissions:
   contents: read
+  actions: read
 jobs:
   audit:
     runs-on: ubuntu-latest
@@ -23,6 +24,18 @@ jobs:
           node-version: '22'
       - run: npm install --no-audit --no-fund
       - run: npx playwright install --with-deps chromium webkit
+      - name: Wait for matching Pages deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for attempt in $(seq 1 60); do
+            result=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$GITHUB_SHA&per_page=30" --jq '[.workflow_runs[] | select(.name == "Deploy V4 prototype to Pages")][0] | .conclusion // ""')
+            if [ "$result" = success ]; then exit 0; fi
+            if [ -n "$result" ]; then echo "Pages deployment: $result"; exit 1; fi
+            sleep 5
+          done
+          echo "No successful Pages deployment for $GITHUB_SHA"
+          exit 1
       - run: npx playwright test --config=live-audit.config.ts
       - uses: actions/upload-artifact@v4
         if: always()
