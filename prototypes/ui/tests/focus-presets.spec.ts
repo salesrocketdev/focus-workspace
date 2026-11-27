@@ -23,6 +23,8 @@ test('presets apply shared preferences and picker changes context safely',async(
  await expect(page.locator('.focus-context-picker')).toContainText('Hábitos Atômicos');
  await expect(page.getByRole('img',{name:'50:00 · Leitura',exact:true})).toBeVisible();
  await page.getByRole('button',{name:'Iniciar',exact:true}).click();
+ await expect(picker).toHaveCount(0);
+ await page.getByRole('button',{name:'Controles',exact:true}).click();
  await expect(picker).toBeDisabled();
  await page.getByRole('button',{name:'Reiniciar',exact:true}).click();
  if(await page.getByRole('dialog',{name:'Descartar sessão atual?'}).isVisible())await page.getByRole('button',{name:'Descartar e reiniciar',exact:true}).click();
