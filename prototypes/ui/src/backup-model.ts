@@ -1,14 +1,14 @@
 import {WORKSPACE_KEY,loadWorkspace,validWorkspace,type WorkspaceSnapshot} from './workspace-storage';
-import {PREFS_KEY,CONNECTIONS_KEY,ONBOARDING_KEY,providerKeys,loadPreferences,readStorage,type FocusPreferences} from './preferences-model';
+import {PREFS_KEY,CONNECTIONS_KEY,ONBOARDING_KEY,providerKeys,loadPreferences,readStorage,CUSTOM_RHYTHMS_KEY,loadCustomRhythms,validCustomRhythms,type FocusPreferences,type CustomRhythm} from './preferences-model';
 import {STORAGE,catalogue,validWidgetOptions,type Layouts,type Widget} from './model';
 import {valid as validPlacement} from './grid-model';
 import type {FocusRecord} from './history-model';
 
 const prefix='focus-workspace:v4:';
 export const NOTES_KEY=prefix+'notes';
-const keys={workspace:WORKSPACE_KEY,preferences:PREFS_KEY,layouts:STORAGE,appearance:prefix+'appearance',notifications:prefix+'notifications',inbox:prefix+'inbox',shield:prefix+'distraction-shield',connections:CONNECTIONS_KEY,profile:ONBOARDING_KEY,notes:NOTES_KEY} as const;
+const keys={workspace:WORKSPACE_KEY,preferences:PREFS_KEY,layouts:STORAGE,appearance:prefix+'appearance',notifications:prefix+'notifications',inbox:prefix+'inbox',shield:prefix+'distraction-shield',connections:CONNECTIONS_KEY,profile:ONBOARDING_KEY,notes:NOTES_KEY,rhythms:CUSTOM_RHYTHMS_KEY} as const;
 type Key=keyof typeof keys;
-type Data=Record<Key,unknown>&{workspace:WorkspaceSnapshot;preferences:FocusPreferences};
+type Data=Record<Exclude<Key,'rhythms'>,unknown>&{workspace:WorkspaceSnapshot;preferences:FocusPreferences;rhythms?:CustomRhythm[]|null};
 export interface Backup {format:'focora-backup';version:1;exportedAt:string;data:Data}
 const object=(x:unknown):x is Record<string,unknown>=>!!x&&typeof x==='object'&&!Array.isArray(x);
 const str=(x:unknown,max=4000):x is string=>typeof x==='string'&&x.length<=max;
@@ -48,6 +48,7 @@ function validate(key:Key,x:unknown){
  case 'connections':return Array.isArray(x)&&x.every(v=>providerKeys.includes(v));
  case 'profile':return one(x,['guest','google-demo']);
  case 'notes':return str(x);
+ case 'rhythms':return validCustomRhythms(x);
  }
 }
 export function parseBackup(raw:string):Backup{
@@ -55,8 +56,8 @@ export function parseBackup(raw:string):Backup{
  let v:unknown;try{v=JSON.parse(raw)}catch{throw new Error('Arquivo JSON inválido.')}
  if(!object(v)||v.format!=='focora-backup'||v.version!==1||typeof v.exportedAt!=='string'||!Number.isFinite(Date.parse(v.exportedAt))||!object(v.data))throw new Error('Formato ou versão de backup incompatível.');
  const data=v.data;
- for(const key of Object.keys(keys) as Key[])if(!Object.prototype.hasOwnProperty.call(data,key)||!validate(key,data[key]))throw new Error('Dados inválidos no backup: '+key+'.');
- return {format:'focora-backup',version:1,exportedAt:v.exportedAt,data:Object.fromEntries((Object.keys(keys) as Key[]).map(k=>[k,data[k]])) as Data};
+ for(const key of Object.keys(keys) as Key[])if(!(key==='rhythms'&&!Object.prototype.hasOwnProperty.call(data,key))&&(!Object.prototype.hasOwnProperty.call(data,key)||!validate(key,data[key])))throw new Error('Dados inválidos no backup: '+key+'.');
+ return {format:'focora-backup',version:1,exportedAt:v.exportedAt,data:Object.fromEntries((Object.keys(keys) as Key[]).filter(k=>Object.prototype.hasOwnProperty.call(data,k)).map(k=>[k,data[k]])) as Data};
 }
 export function loadNotes(){const value=readStorage(NOTES_KEY);return typeof value==='string'?value.slice(0,4000):''}
 export function makeBackup():Backup{
@@ -64,7 +65,7 @@ export function makeBackup():Backup{
  // Export committed data, not an unfinished session that could replay on import.
  const w={...current,timer:{...current.timer,plannedId:undefined,phase:'focus' as const,cycle:0,running:false,startedAt:0,duration:prefs.focus,seconds:current.timer.mode==='Livre'?0:prefs.focus}};
  const data=Object.fromEntries((Object.keys(keys) as Key[]).map(k=>[k,readStorage(keys[k])])) as Data;
- data.workspace=w;data.preferences=prefs;
+ data.workspace=w;data.preferences=prefs;data.rhythms=loadCustomRhythms();
  return parseBackup(JSON.stringify({format:'focora-backup',version:1,exportedAt:new Date().toISOString(),data}));
 }
 export function restoreBackup(input:Backup){
@@ -76,7 +77,7 @@ export function restoreBackup(input:Backup){
  if(object(values.notifications))values.notifications={...values.notifications,native:false};
  if(object(values.shield))values.shield={...values.shield,autoShortcut:false};
  const previous=new Map<string,string|null>();
- const entries=Object.entries(keys) as [Key,string][];
+ const entries=(Object.entries(keys) as [Key,string][]).filter(([name])=>name!=='rhythms'||Object.prototype.hasOwnProperty.call(values,name));
  // Snapshot all old values before writing anything; rollback on quota/access errors.
  for(const [,key] of entries)previous.set(key,localStorage.getItem(key));
  const changed:string[]=[];
@@ -90,7 +91,7 @@ export function restoreBackup(input:Backup){
 }
 function csvCell(v:unknown){let s=String(v??'');if(/^[\s\u0000-\u001f]*[=+\-@]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"'}
 export function historyCsv(records:FocusRecord[]){
- const header=['Data (referência demo)','Hora','Atividade','Categoria','Duração (segundos)','Método','Status','Origem'];
+ const header=['Data registrada','Hora','Atividade','Categoria','Duração (segundos)','Método','Status','Origem'];
  return '\uFEFF'+[header,...records.map(r=>[r.day,r.time,r.title,r.category,r.seconds,r.mode,r.status==='completed'?'Concluída':'Interrompida',r.origin==='fixture'?'Demonstração':'Sessão local'])].map(row=>row.map(csvCell).join(';')).join('\r\n');
 }
 export function downloadText(name:string,content:string,mime:string){
