@@ -81,17 +81,21 @@
 [data-theme=dark] .app.immersive .focus-landscape{opacity:.52}
 .app.immersive .focus-main{isolation:isolate}
 .app.immersive .focus-center{position:relative;isolation:isolate}
-.app.immersive .focus-center::before{
+.app.immersive:has(.focus-landscape) .focus-center::before{
  content:'';position:absolute;inset:-18px -12px;z-index:-1;pointer-events:none;
  background:radial-gradient(ellipse at center,color-mix(in srgb,var(--ui-paper) 96%,transparent) 0%,color-mix(in srgb,var(--ui-paper) 86%,transparent) 48%,transparent 74%);
 }
 @media(max-width:759px){
  .app.immersive .focus-landscape{height:clamp(210px,44svh,360px);opacity:.86}
- .app.immersive .focus-center::before{inset:-12px -6px}
+ .app.immersive:has(.focus-landscape) .focus-center::before{inset:-12px -6px}
 }
 @media(max-height:500px) and (orientation:landscape){
  .app.immersive .focus-landscape{height:36svh}
 }
-@media(forced-colors:active){.app.immersive .focus-landscape,.app.immersive .focus-center::before{display:none}}
+@media(forced-colors:active){.app.immersive .focus-landscape,.app.immersive:has(.focus-landscape) .focus-center::before{display:none}}
 
 @media(forced-colors:active){:is(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]::after{display:none}}
+
+.focus-landscape .scene-wide-art,.focus-landscape .scene-portrait-art{width:100%;height:100%}
+.focus-landscape .scene-portrait-art{display:none}
+@media(max-width:759px) and (orientation:portrait){.focus-landscape .scene-wide-art{display:none}.focus-landscape .scene-portrait-art{display:block}}
