@@ -13,7 +13,7 @@ test('history filters, details and dashboard share recorded focus',async({page},
  await history.getByRole('button',{name:'Abrir filtros do histórico'}).click();
  await page.getByRole('dialog',{name:'Filtros do histórico'}).getByRole('combobox',{name:'Categoria do histórico'}).click();
  await page.getByRole('option',{name:'Leitura',exact:true}).click();
- if(info.project.name==='mobile')await page.getByRole('button',{name:'Aplicar filtros',exact:true}).click();
+ await page.getByRole('dialog',{name:'Filtros do histórico'}).getByRole('button',{name:'Aplicar filtros',exact:true}).click();
  await expect(history.locator('.history-session')).toHaveCount(1);
  await history.getByRole('button',{name:'Detalhes de Clean Architecture',exact:true}).click();
  await expect(page.getByRole('dialog')).toContainText('30 min');
@@ -21,16 +21,16 @@ test('history filters, details and dashboard share recorded focus',async({page},
  await history.getByRole('button',{name:'Abrir filtros do histórico'}).click();
  await page.getByRole('dialog',{name:'Filtros do histórico'}).getByRole('combobox',{name:'Categoria do histórico'}).click();
  await page.getByRole('option',{name:'Todas',exact:true}).click();
- if(info.project.name==='mobile')await page.getByRole('button',{name:'Aplicar filtros',exact:true}).click();
+ await page.getByRole('dialog',{name:'Filtros do histórico'}).getByRole('button',{name:'Aplicar filtros',exact:true}).click();
  await history.getByRole('button',{name:'Abrir filtros do histórico'}).click();
  await page.getByRole('dialog',{name:'Filtros do histórico'}).getByRole('combobox',{name:'Status do histórico'}).click();
  await page.getByRole('option',{name:'Interrompidas',exact:true}).click();
- if(info.project.name==='mobile')await page.getByRole('button',{name:'Aplicar filtros',exact:true}).click();
+ await page.getByRole('dialog',{name:'Filtros do histórico'}).getByRole('button',{name:'Aplicar filtros',exact:true}).click();
  await expect(history.getByText('Nenhuma sessão encontrada')).toBeVisible();
  await history.getByRole('button',{name:'Abrir filtros do histórico'}).click();
  await page.getByRole('dialog',{name:'Filtros do histórico'}).getByRole('combobox',{name:'Status do histórico'}).click();
  await page.getByRole('option',{name:'Todos',exact:true}).click();
- if(info.project.name==='mobile')await page.getByRole('button',{name:'Aplicar filtros',exact:true}).click();
+ await page.getByRole('dialog',{name:'Filtros do histórico'}).getByRole('button',{name:'Aplicar filtros',exact:true}).click();
  await page.screenshot({path:info.outputPath('history-today.png'),animations:'disabled',scale:'css'});
  await history.getByRole('button',{name:'30 dias',exact:true}).click();
  await expect(history.locator('.history-bar-column')).toHaveCount(30);
@@ -89,7 +89,7 @@ test('interrupted focus is logged, pauses are excluded and reset discards time',
  await history.getByRole('button',{name:'Abrir filtros do histórico'}).click();
  await page.getByRole('dialog',{name:'Filtros do histórico'}).getByRole('combobox',{name:'Status do histórico'}).click();
  await page.getByRole('option',{name:'Interrompidas',exact:true}).click();
- if(info.project.name==='mobile')await page.getByRole('button',{name:'Aplicar filtros',exact:true}).click();
+ await page.getByRole('dialog',{name:'Filtros do histórico'}).getByRole('button',{name:'Aplicar filtros',exact:true}).click();
  await expect(history.locator('.history-session')).toHaveCount(1);
  await expect(history.locator('.history-session').first()).toContainText('1 min');
  await expect(history.locator('.history-session').first()).toContainText('Interrompida');
