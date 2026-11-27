@@ -87,3 +87,26 @@ test('V5 single task management surface and honest account onboarding',async({pa
  await expect(page.getByRole('group',{name:'Seções da biblioteca'})).toBeVisible();
  await expect(page.getByRole('group',{name:'Seções da biblioteca'}).getByRole('button',{name:'Tarefas',exact:true})).toHaveCount(0);
 });
+
+test('V5 legacy demo identity opens as guest without resetting local data',async({page})=>{
+ await page.addInitScript(()=>{
+  if(!localStorage.getItem('focus-workspace:v4:onboarding'))localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('google-demo'));
+ });
+ await page.goto('/');
+ await expect(page.getByRole('dialog',{name:'Começar no Focora'})).toHaveCount(0);
+ const nav=page.getByRole('navigation',{name:'Navegação principal'}).filter({visible:true});
+ await openNavigation(nav,'Tarefas');
+ await page.getByRole('button',{name:'Nova tarefa',exact:true}).click();
+ const task=page.getByRole('dialog',{name:'Nova tarefa',exact:true});
+ await task.getByLabel('Título da tarefa').fill('Preservar dados locais');
+ await task.getByRole('button',{name:'Adicionar tarefa',exact:true}).click();
+ await page.reload();
+ await openNavigation(nav,'Configurações');
+ await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Perfil e painel',exact:true}).click();
+ await expect(page.getByText('Modo visitante · somente neste navegador.',{exact:true})).toBeVisible();
+ const providers=page.getByRole('group',{name:'Opções de conta'});
+ await expect(providers.getByRole('button',{name:/Continuar com Google/})).toBeDisabled();
+ await expect(providers.getByRole('button',{name:/Continuar com Microsoft/})).toBeDisabled();
+ await openNavigation(nav,'Tarefas');
+ await expect(page.locator('.planning-row').filter({hasText:'Preservar dados locais'})).toBeVisible();
+});
