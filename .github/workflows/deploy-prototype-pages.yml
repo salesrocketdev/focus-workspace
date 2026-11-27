@@ -3,16 +3,18 @@ name: Deploy V4 prototype to Pages
 on:
   push:
     branches: [prototype/ui-v4]
-    paths:
-      - 'prototypes/ui/**'
-      - '.github/workflows/deploy-prototype-pages.yml'
   workflow_dispatch:
+    inputs:
+      full_validation:
+        description: Run full checks and published audit before accepting a milestone
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 concurrency:
-  group: prototype-pages
+  group: ${{ (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[publish]') || contains(github.event.head_commit.message, '[release]')) && 'prototype-pages' || github.sha }}
   cancel-in-progress: true
 
 jobs:
@@ -20,9 +22,9 @@ jobs:
     permissions:
       contents: read
       pages: read
-    if: github.ref == 'refs/heads/prototype/ui-v4'
+    if: github.ref == 'refs/heads/prototype/ui-v4' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[publish]') || contains(github.event.head_commit.message, '[release]'))
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: prototypes/ui
@@ -31,6 +33,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-prototype-${{ runner.os }}-${{ hashFiles('prototypes/ui/package.json', 'prototypes/ui/package-lock.json') }}
+          restore-keys: npm-prototype-${{ runner.os }}-
       - name: Install dependencies
         run: |
           if [ -f package-lock.json ]; then npm ci --no-audit --no-fund; else npm install --no-audit --no-fund; fi
@@ -42,6 +49,26 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: prototypes/ui/dist
+      - name: Storybook build (release)
+        if: ${{ inputs.full_validation == true || contains(github.event.head_commit.message, '[release]') }}
+        run: npm run build-storybook
+      - name: Install test browsers (release)
+        if: ${{ inputs.full_validation == true || contains(github.event.head_commit.message, '[release]') }}
+        run: npx playwright install --with-deps chromium webkit
+      - name: Functional regression (release)
+        if: ${{ inputs.full_validation == true || contains(github.event.head_commit.message, '[release]') }}
+        run: npm test
+      - name: Offline regression (release)
+        if: ${{ inputs.full_validation == true || contains(github.event.head_commit.message, '[release]') }}
+        run: npm run test:offline
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() && (inputs.full_validation == true || contains(github.event.head_commit.message, '[release]')) }}
+        with:
+          name: v4-prototype-evidence
+          path: prototypes/ui/test-results/
+          if-no-files-found: warn
+          retention-days: 7
+
 
   deploy:
     needs: build
@@ -85,3 +112,35 @@ jobs:
                       raise
                   time.sleep(10)
           PY
+
+  audit:
+    needs: deploy
+    if: ${{ inputs.full_validation == true || contains(github.event.head_commit.message, '[release]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: prototypes/ui
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-prototype-${{ runner.os }}-${{ hashFiles('prototypes/ui/package.json', 'prototypes/ui/package-lock.json') }}
+          restore-keys: npm-prototype-${{ runner.os }}-
+      - run: |
+          if [ -f package-lock.json ]; then npm ci --no-audit --no-fund; else npm install --no-audit --no-fund; fi
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npx playwright test --config=live-audit.config.ts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v4-live-audit
+          path: |
+            prototypes/ui/live-audit-results/
+            prototypes/ui/live-audit-report/
+          if-no-files-found: warn
+          retention-days: 7

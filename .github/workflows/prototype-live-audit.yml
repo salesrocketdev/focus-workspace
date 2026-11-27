@@ -1,17 +1,11 @@
 name: V4 published site audit
 on:
   workflow_dispatch:
-  push:
-    branches: ['prototype/ui-v4']
-    paths:
-      - '.github/workflows/prototype-live-audit.yml'
-      - 'prototypes/ui/live-audit/**'
-      - 'prototypes/ui/live-audit.config.ts'
 permissions:
   contents: read
-  actions: read
 jobs:
   audit:
+    if: github.ref == 'refs/heads/prototype/ui-v4'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
@@ -22,20 +16,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: npm install --no-audit --no-fund
+      - uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-prototype-${{ runner.os }}-${{ hashFiles('prototypes/ui/package.json', 'prototypes/ui/package-lock.json') }}
+          restore-keys: npm-prototype-${{ runner.os }}-
+      - run: |
+          if [ -f package-lock.json ]; then npm ci --no-audit --no-fund; else npm install --no-audit --no-fund; fi
       - run: npx playwright install --with-deps chromium webkit
-      - name: Wait for matching Pages deployment
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          for attempt in $(seq 1 60); do
-            result=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$GITHUB_SHA&per_page=30" --jq '[.workflow_runs[] | select(.name == "Deploy V4 prototype to Pages")][0] | .conclusion // ""')
-            if [ "$result" = success ]; then exit 0; fi
-            if [ -n "$result" ]; then echo "Pages deployment: $result"; exit 1; fi
-            sleep 5
-          done
-          echo "No successful Pages deployment for $GITHUB_SHA"
-          exit 1
+      # Standalone manual audit tests the currently published site, not necessarily this SHA.
       - run: npx playwright test --config=live-audit.config.ts
       - uses: actions/upload-artifact@v4
         if: always()
@@ -45,3 +34,4 @@ jobs:
             prototypes/ui/live-audit-results/
             prototypes/ui/live-audit-report/
           if-no-files-found: warn
+          retention-days: 7
