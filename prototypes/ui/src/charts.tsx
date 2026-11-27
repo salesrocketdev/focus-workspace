@@ -1,6 +1,6 @@
-import {useState,type KeyboardEvent} from 'react';
+import {useState,useEffect,useRef,type KeyboardEvent} from 'react';
 import {ChevronLeft,ChevronRight,ChartNoAxesColumn,ChartNoAxesCombined} from 'lucide-react';
-import {dateLabel,DEMO_DAY} from './calendar-model';
+import {dateLabel} from './calendar-model';
 import {durationLabel} from './history-model';
 type Day={day:string;seconds:number;count:number};
 type Group={id:string;label:string;seconds:number};
@@ -24,12 +24,14 @@ function navigatePoint(e:KeyboardEvent<HTMLButtonElement>,index:number,count:num
 }
 export function FocusTrend({days}:{days:Day[]}){
  const [selected,setSelected]=useState<string|null>(null),[hover,setHover]=useState<string|null>(null),[kind,setKind]=useState<'bar'|'line'>('bar');
+ const scroller=useRef<HTMLDivElement>(null);
  const last=Math.max(0,days.length-1);
  const selectedIndex=days.findIndex(d=>d.day===selected);
  const current=selectedIndex<0?last:selectedIndex;
  const hoverIndex=days.findIndex(d=>d.day===hover);
  const index=hoverIndex<0?current:hoverIndex;
  const day=days[index];
+ useEffect(()=>{const el=scroller.current,point=el?.querySelectorAll<HTMLElement>('[data-chart-point]')[current];if(!el||!point||el.scrollWidth<=el.clientWidth)return;const a=el.getBoundingClientRect(),b=point.getBoundingClientRect();if(b.left<a.left)el.scrollLeft+=b.left-a.left;else if(b.right>a.right)el.scrollLeft+=b.right-a.right;},[current,days.length]);
  const max=Math.max(3600,Math.ceil(Math.max(0,...days.map(d=>d.seconds))/1800)*1800);
  const pick=(i:number)=>{setSelected(days[i].day);setHover(null)};
  const points=days.map((d,i)=>[(i+.5)/days.length*600,140-d.seconds/max*140]);
@@ -37,15 +39,15 @@ export function FocusTrend({days}:{days:Day[]}){
  const area=points.length?points[0][0]+',140 '+line+' '+points[points.length-1][0]+',140':'';
  return <div className="focus-trend">
  <div className="chart-heading">
-  <div className="chart-tooltip" role="status" aria-label="Detalhes do dia">{day&&<><small className="chart-date">{longDate(day.day)}{day.day===DEMO_DAY?' · Hoje':''}</small><strong>{durationLabel(day.seconds)}</strong><div className="chart-meta"><small>{sessionLabel(day.count)}</small><small className="chart-comparison">{changeLabel(day.seconds,days[index-1]?.seconds)}</small></div></>}</div>
+  <div className="chart-tooltip" role="status" aria-label="Detalhes do dia">{day&&<><small className="chart-date">{longDate(day.day)}{index===last?' · Último dia':''}</small><strong>{durationLabel(day.seconds)}</strong><div className="chart-meta"><small>{sessionLabel(day.count)}</small><small className="chart-comparison">{changeLabel(day.seconds,days[index-1]?.seconds)}</small></div></>}</div>
   <div className="chart-type" role="group" aria-label="Tipo de gráfico"><button type="button" aria-label="Barras" title="Barras" aria-pressed={kind==='bar'} onClick={()=>setKind('bar')}><ChartNoAxesColumn size={17}/></button><button type="button" aria-label="Linha" title="Linha" aria-pressed={kind==='line'} onClick={()=>setKind('line')}><ChartNoAxesCombined size={17}/></button></div>
  </div>
  <div className={'history-bars '+(days.length>7?'dense-bars':'')}>
   <div className="history-axis" aria-hidden="true"><span>{Math.round(max/60)}m</span><span>{Math.round(max/120)}m</span><span>0</span></div>
-  <div className={'history-plot interactive-plot plot-kind-'+kind} role="group" aria-label="Tempo de foco por dia" onPointerLeave={()=>setHover(null)}>
+  <div className="history-plot-scroll" ref={scroller}><div style={{'--chart-day-count':days.length} as React.CSSProperties} className={'history-plot interactive-plot plot-kind-'+kind} role="group" aria-label="Tempo de foco por dia" onPointerLeave={()=>setHover(null)}>
   {kind==='line'&&<svg className="chart-line" viewBox="0 0 600 140" preserveAspectRatio="none" aria-hidden="true"><polygon points={area} fill="var(--field-selected)"/><polyline points={line} fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke"/></svg>}
   {days.map((d,i)=><button type="button" data-chart-point key={d.day} className="history-bar-column" aria-pressed={i===index} aria-label={longDate(d.day)+': '+durationLabel(d.seconds)+', '+sessionLabel(d.count)} tabIndex={i===index?0:-1} onPointerEnter={e=>{if(e.pointerType==='mouse'&&window.matchMedia('(hover: hover)').matches)setHover(d.day)}} onFocus={()=>pick(i)} onClick={()=>pick(i)} onKeyDown={e=>navigatePoint(e,i,days.length,pick)}><span className="history-bar-track"><i style={{height:d.seconds/max*100+'%'}} className={i===days.length-1?'today-bar':''}/>{kind==='line'&&<span className="chart-dot" style={{bottom:d.seconds/max*100+'%'}}/>}</span><small aria-hidden="true">{days.length<=7||i%5===0||i===days.length-1?shortDate(d.day):''}</small></button>)}
-  </div>
+  </div></div>
  </div>
  <div className="chart-point-controls"><small><span className="chart-key"/> Tempo de foco</small><div className="chart-day-navigation"><button type="button" aria-label="Dia anterior no gráfico" disabled={current===0} onClick={()=>pick(current-1)}><ChevronLeft size={17}/></button><small>{day?shortDate(day.day):'—'}</small><button type="button" aria-label="Próximo dia no gráfico" disabled={current>=last} onClick={()=>pick(current+1)}><ChevronRight size={17}/></button></div></div>
  </div>
