@@ -21,7 +21,7 @@ test('optional native focus guide and reminder do not control the OS or stop tim
  await expect(page.getByRole('button',{name:'Pausar foco',exact:true})).toBeVisible();
  await page.getByRole('button',{name:'Pausar foco',exact:true}).click();
  await page.getByRole('button',{name:'Abrir sessão de foco',exact:true}).click();
- await page.getByRole('button',{name:'Não Perturbe',exact:true}).click();
+ await page.getByRole('button',{name:'Não perturbe',exact:true}).click();
  await expect(sheet).toBeVisible();
  await page.screenshot({path:info.outputPath('distraction-shield.png'),animations:'disabled'});
  await sheet.getByRole('button',{name:'Voltar ao Focora'}).click();
@@ -39,7 +39,7 @@ test('iOS shortcut link passes a bounded duration and explains setup',async({pag
  await page.addInitScript(()=>Object.defineProperty(navigator,'userAgent',{get:()=> 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)'}));
  await page.goto('/');
  await page.getByRole('button',{name:'Abrir sessão de foco',exact:true}).click();
- await page.getByRole('button',{name:'Não Perturbe',exact:true}).click();
+ await page.getByRole('button',{name:'Não perturbe',exact:true}).click();
  const sheet=page.getByRole('dialog',{name:'Não Perturbe'});
  await expect(sheet.getByRole('link',{name:'Executar atalho (25 min)'})).toHaveAttribute('href','shortcuts://run-shortcut?name=Focora%20-%20Silenciar&input=text&text=25');
  await sheet.getByRole('button',{name:'Como criar o atalho'}).click();
