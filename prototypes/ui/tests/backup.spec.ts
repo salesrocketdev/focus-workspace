@@ -10,9 +10,11 @@ test('backup export, invalid import, confirmed restore and history CSV',async({p
  await page.getByRole('button',{name:'Nova categoria',exact:true}).click();
  await page.getByLabel('Nome da categoria').fill('Categoria do backup');
  await page.getByRole('button',{name:'Salvar',exact:true}).click();
+ await page.evaluate(()=>localStorage.setItem('focus-workspace:v4:custom-rhythms',JSON.stringify([{id:'custom-backup-test',label:'Ritmo do backup',focus:2400,short:480,long:1200,cycles:3}])));
  await settings();
  const download=page.waitForEvent('download');await page.getByRole('button',{name:'Exportar JSON',exact:true}).click();
  const file=await download;const raw=await readFile((await file.path())!,'utf8');const data=JSON.parse(raw);
+ expect(data.data.rhythms).toEqual([{id:'custom-backup-test',label:'Ritmo do backup',focus:2400,short:480,long:1200,cycles:3}]);
  expect(data.format).toBe('focora-backup');expect(data.data.workspace.categories.some((c:{name:string})=>c.name==='Categoria do backup')).toBeTruthy();
  const input=page.getByLabel('Arquivo de backup');
  await input.setInputFiles({name:'invalido.json',mimeType:'application/json',buffer:Buffer.from('{}')});
@@ -22,11 +24,13 @@ test('backup export, invalid import, confirmed restore and history CSV',async({p
  await page.getByLabel('Nome da categoria').fill('Após backup');
  await page.getByRole('button',{name:'Salvar',exact:true}).click();
  await settings();
+ await page.evaluate(()=>localStorage.removeItem('focus-workspace:v4:custom-rhythms'));
  await input.setInputFiles({name:'focora.json',mimeType:'application/json',buffer:Buffer.from(raw)});
  const dialog=page.getByRole('dialog',{name:'Restaurar backup'});
  await expect(dialog.getByRole('button',{name:'Restaurar dados'})).toBeDisabled();
  await dialog.getByRole('checkbox').check();
  await Promise.all([page.waitForNavigation(),dialog.getByRole('button',{name:'Restaurar dados'}).click()]);
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('focus-workspace:v4:custom-rhythms')??'[]'))).toEqual(data.data.rhythms);
  await openNavigation(nav,'Biblioteca');
  await expect(page.getByRole('button',{name:'Iniciar foco em Categoria do backup'})).toBeVisible();
  await expect(page.getByRole('button',{name:'Iniciar foco em Após backup'})).toHaveCount(0);
