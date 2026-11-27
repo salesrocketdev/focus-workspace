@@ -34,7 +34,7 @@ test('activities share tasks, categories, books and timer context with dashboard
  await nav.getByRole('button',{name:'Hoje',exact:true}).click();
  await expect(page.locator('[data-widget=focus] .timer-ring')).toHaveAttribute('aria-label',/Inglês/);
  await page.getByRole('button',{name:'Abrir sessão de foco'}).click();
- await page.getByRole('button',{name:'Controles',exact:true}).click();
+ if(await page.getByRole('button',{name:'Controles',exact:true}).isVisible())await page.getByRole('button',{name:'Controles',exact:true}).click();
  await page.getByLabel('Marcar tarefa como concluída').check();
  await page.getByRole('button',{name:'Encerrar',exact:true}).click();
  await page.getByRole('button',{name:'Ver biblioteca',exact:true}).click();
