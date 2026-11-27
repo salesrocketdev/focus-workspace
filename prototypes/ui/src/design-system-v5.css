@@ -190,3 +190,74 @@
 
 .compact-field-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:start}
 .rhythm-dialog>.ui-button{margin-top:8px;width:100%}
+
+/* Sectioned dialogs: header, navigation and footer remain outside the scrolling content. */
+.ui-dialog.structured-dialog[open] {
+ display:flex;flex-direction:column;box-sizing:border-box;width:min(calc(100% - 32px),480px);
+ height:auto;min-height:0;max-height:min(78dvh,calc(var(--sheet-height,100dvh) - 32px));
+ padding:0;overflow:hidden;
+}
+.structured-dialog .dialog-header {
+ position:static;flex:0 0 auto;margin:0;padding:14px 20px 10px;
+ border:0;align-items:center;background:var(--ui-paper);
+}
+.structured-dialog .dialog-header p{margin-top:3px}
+.structured-dialog .dialog-form,.structured-dialog .focus-dialog-content {
+ display:flex;flex-direction:column;gap:0;min-height:0;overflow:hidden;
+}
+.structured-dialog .dialog-section-nav {
+ display:flex;gap:2px;flex:0 0 auto;margin:0 20px;border-bottom:1px solid var(--ui-line);
+}
+.structured-dialog .dialog-section-nav button {
+ flex:1 1 0;min-width:0;min-height:38px;padding:6px 3px;
+ border:0;border-bottom:2px solid transparent;border-radius:0;box-shadow:none;background:transparent;
+ color:var(--ui-muted);font-size:12px;font-weight:550;white-space:normal;overflow-wrap:normal;
+}
+.structured-dialog .dialog-section-nav button[aria-pressed=true] {
+ border-bottom-color:var(--field-focus);color:var(--field-selected-ink);font-weight:650;
+}
+.structured-dialog .dialog-section-nav button:focus-visible{outline-offset:-3px}
+.structured-dialog .dialog-scroll-body {
+ display:grid;gap:12px;align-content:start;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+ padding:14px 20px;scroll-padding:12px;scrollbar-width:thin;
+}
+.structured-dialog .dialog-actions {
+ position:static;flex:0 0 auto;margin:0;padding:12px 20px;border-top:1px solid var(--ui-line);
+ background:var(--ui-paper);
+}
+.structured-dialog .dialog-section-error{padding:0 20px 10px;font-size:12px;flex:none}
+.structured-dialog .dialog-section-hint{font-size:12px;line-height:1.45;color:var(--ui-muted);margin:0}
+.structured-dialog .choose-rhythm-action{width:100%;min-height:38px;white-space:normal}
+.structured-dialog .compact-focus-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.structured-dialog .compact-focus-fields .preference-toggles,.structured-dialog .compact-focus-fields>small{grid-column:1/-1}
+.structured-dialog .task-priority-control {
+ display:grid;grid-template-columns:20px minmax(0,1fr) 18px;align-items:center;gap:10px;
+ min-height:54px;padding:9px 12px;border:1px solid var(--ui-line);border-radius:8px;cursor:pointer;
+}
+.structured-dialog .task-priority-control:has(input:checked){background:var(--field-selected);border-color:var(--field-selected-edge)}
+.structured-dialog .task-priority-control:has(input:disabled){opacity:.65;cursor:not-allowed}
+.structured-dialog .task-priority-control input{appearance:auto;accent-color:var(--ui-action);width:18px;height:18px;min-width:18px;margin:0;cursor:inherit}
+.structured-dialog .task-priority-control input:focus-visible{outline:2px solid var(--field-focus);outline-offset:3px}
+.structured-dialog .task-priority-control span{display:grid;gap:3px;min-width:0}
+.structured-dialog .task-priority-control b{font-size:13px;font-weight:600;line-height:1.3}
+.structured-dialog .task-priority-control small{font-size:11px;color:var(--ui-muted);line-height:1.35}
+.structured-dialog .task-priority-control>svg{color:var(--ui-muted)}
+.structured-dialog .task-priority-control:has(input:checked)>svg{color:var(--field-selected-ink);fill:var(--field-selected-ink)}
+.structured-dialog .planning-weekdays {margin:0;min-width:0;border:1px solid var(--ui-line);border-radius:8px;padding:8px;gap:4px}
+.structured-dialog .planning-weekdays label{flex:1 1 30px;min-height:44px}
+.structured-dialog .planning-weekdays input,.structured-dialog .planning-checklist input{accent-color:var(--ui-action);width:17px;height:17px;margin:0;flex:none}
+@media(max-width:759px) {
+ .ui-dialog.structured-dialog[open]{width:100%;max-height:min(88dvh,calc(var(--sheet-height,100dvh) - 12px));padding:0}
+ .structured-dialog .dialog-header{padding:10px 16px 6px}
+ .structured-dialog .dialog-section-nav{margin-inline:16px}
+ .structured-dialog .dialog-section-nav button{min-height:44px;font-size:11px}
+ .structured-dialog .dialog-scroll-body{padding:12px 16px}
+ .structured-dialog .dialog-actions{padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+ .ui-dialog.structured-dialog[data-keyboard=open][open]{max-height:calc(var(--sheet-height,100dvh) - 10px)}
+ .structured-dialog[data-keyboard=open] .dialog-actions{padding-bottom:8px}
+ .structured-dialog .choose-rhythm-action{min-height:44px}
+}
+@media(max-width:359px){
+ .task-editor-dialog .dialog-section-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .structured-dialog .compact-focus-fields{gap:8px}
+}
