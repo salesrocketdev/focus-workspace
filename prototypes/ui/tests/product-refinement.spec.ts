@@ -160,3 +160,35 @@ test('V5 sectioned focus and task dialogs preserve draft and natural height',asy
  await expect(edit.getByLabel('Descrição',{exact:true})).toHaveValue('Descrição preservada');
  await edit.getByRole('button',{name:'Salvar',exact:true}).click();
 });
+
+test('V5 scene cards share geometry and immersive art remains prominent in focus',async({page},info)=>{
+ await guest(page);
+ await page.emulateMedia({reducedMotion:'reduce'});
+ const nav=page.getByRole('navigation',{name:'Navegação principal'}).filter({visible:true});
+ await openNavigation(nav,'Configurações');
+ await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Aparência',exact:true}).click();
+ const options=page.getByRole('group',{name:'Cenário do modo foco'});
+ await expect(options.getByRole('button')).toHaveCount(6);
+ const dimensions=await options.getByRole('button').evaluateAll(nodes=>nodes.map(e=>{const r=e.getBoundingClientRect();const p=e.querySelector('.scene-sample')!.getBoundingClientRect();return {w:r.width,h:r.height,pw:p.width,ph:p.height}}));
+ for(const key of ['w','h','pw','ph'] as const)expect(Math.max(...dimensions.map(d=>d[key]))-Math.min(...dimensions.map(d=>d[key]))).toBeLessThanOrEqual(1);
+ await options.getByRole('button',{name:'Aurora',exact:true}).click();
+ await options.screenshot({path:info.outputPath('scene-cards.png'),animations:'disabled'});
+ await nav.getByRole('button',{name:'Hoje',exact:true}).click();
+ await page.getByRole('button',{name:'Abrir sessão de foco',exact:true}).click();
+ const landscape=page.locator('.focus-landscape');
+ await expect(landscape).toHaveAttribute('data-focus-scene','aurora');
+ const viewport=page.viewportSize()!;
+ const rect=await landscape.boundingBox();
+ expect(rect!.height).toBeGreaterThan(viewport.height*.28);
+ expect(Math.abs(rect!.y+rect!.height-viewport.height)).toBeLessThanOrEqual(2);
+ expect(await landscape.evaluate(e=>getComputedStyle(e).pointerEvents)).toBe('none');
+ await expect(landscape.locator(viewport.width<760?'.scene-portrait-art':'.scene-wide-art')).toBeVisible();
+ await page.screenshot({path:info.outputPath('scene-expanded.png'),animations:'disabled'});
+ const transport=page.locator('.focus-center .transport');
+ await transport.getByRole('button',{name:'Iniciar',exact:true}).click();
+ await expect(transport.getByRole('button',{name:'Pausar',exact:true})).toBeVisible();
+ await expect(landscape).toBeVisible();
+ await page.screenshot({path:info.outputPath('scene-active.png'),animations:'disabled'});
+ await transport.getByRole('button',{name:'Pausar',exact:true}).click();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
+});
