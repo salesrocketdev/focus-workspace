@@ -27,3 +27,7 @@ Third full CI 46007307196: TypeScript/build, Storybook and all 151 executed func
 ## Validated preview baseline
 
 CI run 46008582449 on 5fd0b44 succeeded in all steps, including functional and offline regression suites. Publish identical application source using `[publish]`; visual approval and outstanding G4–G6 scope remain pending. This does not close #33, #42 or #43.
+
+## G4 — semantic surfaces and states
+
+Baseline deploy 46011176066 passed, including live asset verification. G4 first checkpoint: design-system-v5.css centralizes neutral surface, interaction, typography and cover styles; flatten history metrics without changing grid geometry; secondary hover and focus-visible states reuse theme tokens. Theme regression now selects the real app appearance setting, asserts data-theme, checks history surfaces and horizontal fit, and captures both Home and History in light/dark. No screenshots reviewed yet, no physical device or maintainer signoff. Run `[check]` on the group-end commit before publication or G4 acceptance.
