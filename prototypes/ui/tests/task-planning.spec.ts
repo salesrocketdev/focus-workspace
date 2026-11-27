@@ -13,20 +13,30 @@ test('recurrence keeps its original date after a one-off reschedule', () => {
  expect(finishTask(result,1,true)).toBe(result);
 });
 
-test('captures mock messages and joins mock meetings from a task', async ({page}) => {
+test('manual task management preserves source and preview without a dev capture button', async ({page}) => {
  await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')));
  await page.goto('/');
  const nav=page.getByRole('navigation',{name:'Navegação principal'});
  await openNavigation(nav,'Tarefas');
- await page.getByRole('button',{name:'Capturar exemplo'}).click();
- await page.getByRole('dialog').getByRole('button',{name:/Gmail ·/}).click();
+ await expect(page.getByRole('button',{name:'Capturar exemplo'})).toHaveCount(0);
+ await page.getByRole('button',{name:'Nova tarefa',exact:true}).click();
+ const dialog=page.getByRole('dialog');
+ await dialog.getByLabel('Título da tarefa').fill('Responder à proposta de orçamento');
+ await dialog.getByRole('button',{name:'Adicionar datas e detalhes'}).click();
+ await dialog.getByRole('combobox',{name:'Origem',exact:true}).click();
+ await page.getByRole('option',{name:'Gmail',exact:true}).click();
+ await dialog.getByRole('button',{name:'Adicionar tarefa',exact:true}).click();
  await page.getByRole('button',{name:'Ver e-mail'}).click();
- await expect(page.getByRole('dialog')).toContainText('Marina');
+ await expect(dialog).toContainText('Marina');
  await page.keyboard.press('Escape');
- await page.getByRole('button',{name:'Capturar exemplo'}).click();
- await page.getByRole('dialog').getByRole('button',{name:/Google Meet ·/}).click();
+ await page.getByRole('button',{name:'Nova tarefa',exact:true}).click();
+ await dialog.getByLabel('Título da tarefa').fill('Alinhamento semanal do produto');
+ await dialog.getByRole('button',{name:'Adicionar datas e detalhes'}).click();
+ await dialog.getByRole('combobox',{name:'Origem',exact:true}).click();
+ await page.getByRole('option',{name:'Google Meet',exact:true}).click();
+ await dialog.getByRole('button',{name:'Adicionar tarefa',exact:true}).click();
  await page.getByRole('button',{name:'Entrar no Google Meet'}).click();
- await expect(page.getByRole('dialog')).toContainText('Demonstração com dados fictícios.');
+ await expect(dialog).toContainText('Demonstração com dados fictícios.');
 });
 
 test('persists the habit check-in after reload', async ({page}) => {
