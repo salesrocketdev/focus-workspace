@@ -40,9 +40,9 @@ test('toggle cards persist and search fields can be cleared',async({page},info)=
  await page.reload();await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');
  if(info.project.name==='mobile')await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Sessões de foco',exact:true}).click();
  await expect(toggle).toHaveAttribute('aria-checked','true');
- await openNavigation(nav,'Atividades');
- const search=page.getByRole('searchbox',{name:'Buscar atividades'});
- await search.fill('exemplo');await page.getByRole('button',{name:'Limpar buscar atividades'}).click();
+ await openNavigation(nav,'Biblioteca');
+ const search=page.getByRole('searchbox',{name:'Buscar na biblioteca'});
+ await search.fill('exemplo');await page.getByRole('button',{name:'Limpar buscar na biblioteca'}).click();
  await expect(search).toHaveValue('');await expect(search).toBeFocused();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
 });
