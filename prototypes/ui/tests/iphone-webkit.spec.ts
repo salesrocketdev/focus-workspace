@@ -71,3 +71,6 @@ test('WebKit: clean focus controls preserve touch targets and timer actions',asy
  await expect(transport.getByRole('button',{name:'Iniciar',exact:true})).toBeVisible();
  await expect(page.getByRole('navigation',{name:'Navegação principal'})).toHaveCount(0);
 });
+
+// The same mobile matrix runs under real desktop WebKit with iPhone emulation.
+import './mobile-matrix.spec';
