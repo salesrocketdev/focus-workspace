@@ -3,8 +3,8 @@ import {test,expect} from '@playwright/test';
 test('empty first-use workspace is usable and persists without fixture records',async({page})=>{
  await page.goto('/');
  const dialog=page.getByRole('dialog');
- for(let i=0;i<3;i++)await dialog.getByRole('button',{name:'Continuar',exact:true}).click();
- await dialog.getByRole('switch',{name:'Começar sem exemplos'}).click();
+ await expect(dialog.getByRole('switch',{name:'Começar sem exemplos'})).toHaveAttribute('aria-checked','true');
+ await dialog.getByRole('button',{name:'Continuar sem conta',exact:true}).click();
  await dialog.getByRole('button',{name:'Começar',exact:true}).click();
  await expect(dialog).toHaveCount(0);
  await expect(page.locator('[data-widget=reading]')).toContainText('Nenhum livro na biblioteca');
@@ -14,7 +14,7 @@ test('empty first-use workspace is usable and persists without fixture records',
  const nav=page.getByRole('navigation',{name:'Navegação principal'});
  await openNavigation(nav,'Histórico');
  await expect(page.getByRole('button',{name:'CSV',exact:true})).toBeDisabled();
- await page.getByRole('button',{name:'Preparar primeira sessão'}).click();
+ await page.getByRole('button',{name:'Abrir primeira sessão'}).click();
  await expect(page.locator('.focus-context-picker')).toContainText('Trabalho');
  await page.getByRole('button',{name:'Voltar',exact:true}).click();
  await page.locator('[data-widget=reading]').getByRole('button',{name:'Adicionar livro',exact:true}).click();
@@ -35,9 +35,9 @@ test('refazer onboarding não oferece remoção de dados existentes',async({page
  const mobile=info.project.name==='mobile';
  await openNavigation(nav,mobile?'Ajustes':'Configurações');
  await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Perfil e painel',exact:true}).click();
- await page.getByRole('button',{name:'Refazer onboarding'}).click();
+ await page.getByRole('button',{name:'Configuração inicial'}).click();
  const dialog=page.getByRole('dialog');
- for(let i=0;i<3;i++)await dialog.getByRole('button',{name:'Continuar',exact:true}).click();
+ await dialog.getByRole('button',{name:'Continuar sem conta',exact:true}).click();
  await expect(dialog.getByRole('switch',{name:'Começar sem exemplos'})).toHaveCount(0);
  await dialog.getByRole('button',{name:'Começar',exact:true}).click();
  const data=await page.evaluate(()=>JSON.parse(localStorage.getItem('focus-workspace:v4:workspace')!));
