@@ -261,3 +261,26 @@
  .task-editor-dialog .dialog-section-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
  .structured-dialog .compact-focus-fields{gap:8px}
 }
+
+/* Quality pass: distinguish sample analytics and make interactive targets reachable. */
+.history-origin-switch{display:flex;gap:4px;align-self:start;border-bottom:1px solid var(--ui-line)}
+.history-origin-switch button{min-height:44px;padding:8px 14px;border-bottom:2px solid transparent;color:var(--ui-muted);font-size:13px}
+.history-origin-switch button[aria-pressed=true]{color:var(--field-selected-ink);border-bottom-color:var(--field-focus);font-weight:650}
+.history-plot-scroll{display:flex;flex:1;min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}
+.history-plot-scroll>.history-plot{flex:1;min-width:100%}
+@media(max-width:759px){
+ .workspace:not(.editing) .focus-controls>.activity-tag{min-height:44px}
+ .planning-page .planning-title{min-height:44px;align-items:center;justify-content:flex-start;line-height:1.35}
+ .planning-page .planning-actions .priority-action{width:44px;height:44px;min-width:44px;min-height:44px}
+ .history-plot-scroll>.history-plot{min-width:max(100%,calc(var(--chart-day-count)*44px));gap:0}
+ .history-plot-scroll .history-bar-column{flex:1 0 44px;min-width:44px}
+ .history-plot-scroll .history-bar-column small{font-size:10px}
+}
+.app.immersive:has(.focus-landscape) .focus-center .transport .circle-button:not(.big),
+.app.immersive:has(.focus-landscape) .focus-center .immersive-actions>.ui-button,
+.app.immersive:has(.focus-landscape) .focus-top .ui-icon-button{
+ background:var(--ui-paper);color:var(--ui-ink);border:1px solid var(--ui-line);box-shadow:none;
+}
+.app.immersive:has(.focus-landscape) .focus-center .focus-context-picker{
+ background:var(--ui-paper);border:1px solid var(--ui-line);border-radius:10px;color:var(--ui-ink);
+}
