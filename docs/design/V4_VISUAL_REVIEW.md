@@ -123,3 +123,7 @@ Previous cross-tab CI and Pages succeeded. Add opt-in start/completion audio, th
 
 ## Backup, restore and CSV (V4.33)
 V4.32 build failed on a leftover inboxRef reference; removed it. Add versioned JSON backup with strict known-key validation, local restore preview/confirmation, writer and idle-session guard, best-effort rollback on write failure, reset unfinished timers and device-specific permissions/shortcut opt-in. Persist quick notes. CSV exports current history filters or all from profile, UTF-8 BOM and semicolon separator, escaped cells with formula-injection protection. No remote upload. Test export, invalid backup, confirmed restoration and CSV. New pipeline pending.
+
+
+## V4.34 accessibility and responsive audit
+V4.33 Pages succeeded; CI failed only two history assertions expecting the obsolete 'Nesta execução' copy. Align regression with 'Sessão local'. Add keyboard skip link, desktop active navigation semantics, named widget headings and progress bars, remove nonfunctional ellipsis, accessible focus indicators, system reduced-motion coverage and safe-area notice dismissal. Audit secondary workspace state: mirror note updates, persist and synchronize shortcut preference on explicit changes, reject malformed imported history dates/times. Add keyboard/dialog-focus and narrow responsive settings regression in both themes. Source review and automated checks are not a formal WCAG conformance audit; new CI and device validation remain pending.

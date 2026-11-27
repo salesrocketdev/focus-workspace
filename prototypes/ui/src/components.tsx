@@ -1,5 +1,5 @@
 import { useId, type ReactNode } from 'react';
-import { Play, Pause, RotateCcw, Square, BookOpen, Music2, CalendarDays, Ellipsis, Timer, ListTodo, Target, BarChart3, StickyNote, History, CalendarClock, type LucideIcon } from 'lucide-react';
+import { Play, Pause, RotateCcw, Square, BookOpen, Music2, CalendarDays, Timer, ListTodo, Target, BarChart3, StickyNote, History, CalendarClock, type LucideIcon } from 'lucide-react';
 import { events, type WidgetType } from './model';
 import { ProviderIcon, type ProviderId } from './provider-icons';
 
@@ -20,7 +20,7 @@ export function Ring({seconds=1500,total=1500,label='Leitura',large=false,cycleL
  <div className="ring-copy"><strong>{formatTime(seconds)}</strong>{label&&<span>{label}</span>}{large&&<small>{cycleLabel}</small>}</div></div>
 }
 export function Segment({value,onChange,disabled=false}:{value:'Pomodoro'|'Livre';onChange:(v:'Pomodoro'|'Livre')=>void;disabled?:boolean}){return <div className="segment" role="group" aria-label="Método de foco">{(['Pomodoro','Livre'] as const).map(v=><button key={v} aria-pressed={value===v} disabled={disabled&&value!==v} className={value===v?'selected':''} onClick={()=>onChange(v)}>{v}</button>)}</div>}
-export function Card({title,icon:Icon,children,actions,provider}:{title:string;icon:LucideIcon;children:ReactNode;actions?:ReactNode;provider?:ProviderId}){return <section className="card"><header className="card-head"><span>{provider?<ProviderIcon provider={provider} size={16}/>:<Icon size={16} strokeWidth={1.8}/>}<span className="card-title" title={title}>{title}</span></span>{actions??<Ellipsis size={16} aria-hidden="true"/>}</header><div className="card-body">{children}</div></section>}
+export function Card({title,icon:Icon,children,actions,provider}:{title:string;icon:LucideIcon;children:ReactNode;actions?:ReactNode;provider?:ProviderId}){return <section className="card" aria-label={title}><header className="card-head"><span>{provider?<ProviderIcon provider={provider} size={16}/>:<Icon size={16} strokeWidth={1.8} aria-hidden="true"/>}<span className="card-title" role="heading" aria-level={2} title={title}>{title}</span></span>{actions}</header><div className="card-body">{children}</div></section>}
 export function Cover({album=false,title='Clean Architecture',coverStyle}:{album?:boolean;title?:string;coverStyle?:'indigo'|'forest'|'sand'}){
  const id=useId();
  return <div className={'cover '+(album?'album':'book')+(coverStyle?' mock-cover-'+coverStyle:'')} aria-hidden="true">
@@ -41,6 +41,6 @@ export function Cover({album=false,title='Clean Architecture',coverStyle}:{album
  {[4,12,22,34,66,78,91,97].map((x,i)=><g key={x} transform={`translate(${x} ${(album?76:119)+(i%3)*4}) scale(${i%2?.8:1.1})`} fill="#344955"><path d="M0 0l-3.6 7h2l-4 5h2l-4 5h14l-4-5h2l-4-5h2Z"/><rect x="-.7" y="16" width="1.4" height="5"/></g>)}
  </svg></div>
 }
-export function Progress({value}:{value:number}){return <div className="progress" role="progressbar" aria-valuenow={value} aria-valuemin={0} aria-valuemax={100}><div style={{width:Math.min(100,Math.max(0,value))+'%'}}/></div>}
+export function Progress({value,label="Progresso"}:{value:number;label?:string}){const pct=Number.isFinite(value)?Math.min(100,Math.max(0,value)):0;return <div className="progress" role="progressbar" aria-label={label} aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}><div style={{width:pct+'%'}}/></div>}
 export function AgendaRows({single=false}:{single?:boolean}){return <div className="agenda-list">{(single?events.slice(1,2):events).map(e=><div className={'event '+e.color} key={e.title}><time>{e.time}</time><ProviderIcon provider={e.provider==='Outlook'?'outlook':'google-calendar'} size={19}/><div><b>{e.title}</b><small>{e.provider}</small></div><small className="event-duration">{e.duration}</small></div>)}</div>}
 export function Transport({running,onToggle,onReset,onStop,disabled=false}:{disabled?:boolean;running:boolean;onToggle:()=>void;onReset:()=>void;onStop:()=>void}){return <div className="transport"><button className="circle-button" disabled={disabled} aria-label="Reiniciar" onClick={onReset}><RotateCcw size={22}/><span className="transport-label">Reiniciar</span></button><button className="circle-button primary big" disabled={disabled} aria-label={running?'Pausar':'Iniciar'} onClick={onToggle}>{running?<Pause size={28} fill="currentColor"/>:<Play size={28} fill="currentColor"/>}<span className="transport-label">{running?'Pausar':'Iniciar'}</span></button><button className="circle-button" disabled={disabled} aria-label="Encerrar" onClick={onStop}><Square size={20} fill="currentColor"/><span className="transport-label">Encerrar</span></button></div>}

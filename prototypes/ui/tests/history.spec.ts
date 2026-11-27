@@ -44,7 +44,7 @@ test('history filters, details and dashboard share recorded focus',async({page},
  await nav.getByRole('button',{name:'Histórico',exact:true}).click();
  await history.getByRole('button',{name:'Hoje',exact:true}).click();
  await expect(history.locator('.history-session')).toHaveCount(6);
- await expect(history.locator('.history-session').first()).toContainText('Nesta execução');
+ await expect(history.locator('.history-session').first()).toContainText('Sessão local');
  await expect(history.locator('.history-stat').first()).toContainText('2h 40min');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
 });

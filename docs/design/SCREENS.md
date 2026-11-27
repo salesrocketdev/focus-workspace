@@ -84,3 +84,6 @@ Notifications settings include opt-in session sounds, tone and alert volume, sta
 
 
 Profile and panel contains Data and backup: JSON export, confirmed replacement restore and full history CSV. History also exports the selected period and filters. Restore only in the controlling tab with no active/paused session; close other tabs before restoring. Quick notes persist locally. Native permissions, automatic shortcuts and unfinished timer state are not restored.
+
+
+Keyboard access includes a skip-to-main link, active route semantics, widget headings, labeled progress bars, visible focus and reduced-motion support. Remove decorative overflow icons that resemble actions. Notices respect safe-area insets and have a mobile dismissal hit target.

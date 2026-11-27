@@ -28,5 +28,6 @@ import './offline.css';
 import './tab-coordinator.css';
 import './session-audio.css';
 import './backup.css';
+import './accessibility.css';
 
 createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>);

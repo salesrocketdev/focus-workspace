@@ -8,10 +8,12 @@ export function shortcutUrl(minutes:number){const bounded=Number.isFinite(minute
 // Must be called synchronously from an explicit user action, after saving timer state.
 export function launchFocusShortcut(minutes:number){const anchor=document.createElement('a');anchor.href=shortcutUrl(minutes);anchor.hidden=true;document.body.appendChild(anchor);try{anchor.click()}finally{anchor.remove()}}
 export function useDistractionShield(){
- const [prefs,setPrefs]=useState(()=>{const v=readStorage(KEY);const p=v&&typeof v==='object'?v as {remind?:boolean;autoShortcut?:boolean}:null;return {remind:v===true||p?.remind===true,autoShortcut:p?.autoShortcut===true}});
- useEffect(()=>{writeStorage(KEY,prefs)},[prefs]);
+ const load=()=>{const v=readStorage(KEY);const p=v&&typeof v==='object'?v as {remind?:boolean;autoShortcut?:boolean}:null;return {remind:v===true||p?.remind===true,autoShortcut:p?.autoShortcut===true}};
+ const [prefs,setPrefs]=useState(load);
+ useEffect(()=>{const sync=(e:StorageEvent)=>{if(e.key===KEY||e.key===null)setPrefs(load())};window.addEventListener('storage',sync);return()=>window.removeEventListener('storage',sync)},[]);
+ const update=(patch:Partial<typeof prefs>)=>{const next={...load(),...patch};writeStorage(KEY,next);setPrefs(next)};
  const ios=appleMobile();
- return {remind:prefs.remind,setRemind:(v:boolean)=>setPrefs(old=>({...old,remind:v})),autoShortcut:prefs.autoShortcut&&ios,setAutoShortcut:(v:boolean)=>setPrefs(old=>({...old,autoShortcut:v})),ios};
+ return {remind:prefs.remind,setRemind:(v:boolean)=>update({remind:v}),autoShortcut:prefs.autoShortcut&&ios,setAutoShortcut:(v:boolean)=>update({autoShortcut:v}),ios};
 }
 export type ShieldPreferences=ReturnType<typeof useDistractionShield>;
 const appleMobile=()=>/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);

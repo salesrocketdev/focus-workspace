@@ -2,6 +2,7 @@ import {useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {Monitor,Info} from 'lucide-react';
 import {WORKSPACE_KEY} from './workspace-storage';
 import {PREFS_KEY} from './preferences-model';
+import {NOTES_KEY} from './backup-model';
 type Role='pending'|'owner'|'mirror'|'unsupported'|'unavailable';
 const LOCK='focus-workspace:v4:workspace-writer';
 const supported=()=>typeof navigator.locks?.request==='function';
@@ -20,7 +21,7 @@ export function useTabCoordinator(restore:()=>void){
   const abort=new AbortController();
   writable.current=false;
   const sync=()=>{if(!disposed&&!writable.current)restoreRef.current()};
-  const storage=(e:StorageEvent)=>{if(e.key===WORKSPACE_KEY||e.key===PREFS_KEY||e.key===null)sync()};
+  const storage=(e:StorageEvent)=>{if(e.key===WORKSPACE_KEY||e.key===PREFS_KEY||e.key===NOTES_KEY||e.key===null)sync()};
   const visible=()=>{if(document.visibilityState==='visible')sync()};
   window.addEventListener('storage',storage);window.addEventListener('pageshow',sync);document.addEventListener('visibilitychange',visible);
   setRole('mirror');sync();
