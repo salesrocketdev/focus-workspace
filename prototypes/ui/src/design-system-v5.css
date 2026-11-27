@@ -1,0 +1,123 @@
+/* V5 / G4 — semantic surfaces and interaction states.
+ * Keep widget geometry, editor affordances and user-selected accent/ring intact.
+ * This layer is loaded after legacy component sheets while they are migrated. */
+:root {
+  --ds-space-1: 4px;
+  --ds-space-2: 8px;
+  --ds-space-3: 12px;
+  --ds-space-4: 16px;
+  --ds-space-5: 24px;
+  --ds-text-caption: 12px;
+  --ds-text-body: 13px;
+  --ds-text-section: 16px;
+  --ds-radius-control: 8px;
+  --ds-radius-surface: 12px;
+  --ds-hover: color-mix(in srgb, var(--ui-ink) 5%, var(--ui-paper));
+  --ds-pressed: color-mix(in srgb, var(--ui-ink) 9%, var(--ui-paper));
+}
+
+:root .workspace:not(.editing) .route-content > .card,
+:root .history-surface,
+:root .activity-surface,
+:root .calendar-surface {
+  background: var(--ui-paper);
+  box-shadow: none;
+  border-color: var(--ui-line);
+  border-radius: var(--ds-radius-surface);
+}
+:root .history-stat {
+  background: transparent;
+  box-shadow: none;
+  border: 0;
+  border-bottom: 1px solid var(--ui-line);
+  border-radius: 0;
+}
+:root .history-stat-icon,
+:root .activity-stat-icon {
+  color: var(--ui-muted);
+  border: 0;
+  box-shadow: none;
+}
+.history-surface h2, .activity-surface h2 {
+  font-size: var(--ds-text-section);
+  font-weight: 650;
+  line-height: 1.35;
+}
+.history-session-copy small, .history-session-meta small,
+.activity-book-copy small, .category-row-copy small {
+  font-size: var(--ds-text-caption);
+  line-height: 1.4;
+}
+.history-session-meta b, .event time, .daily-focus-progress strong {
+  font-variant-numeric: tabular-nums;
+}
+:root .history-status.interrupted {
+  background: transparent;
+  color: var(--field-selected-ink);
+  border: 1px solid var(--field-selected-edge);
+}
+
+/* A neutral secondary action should not change to the brand color on hover.
+ * Selected/primary actions continue to use the configured accent tokens. */
+:root .ui-button.ui-secondary:not(.widget-quiet-action):not(.activity-reading-action):not(.activity-add-action):hover:not(:disabled) {
+  background: var(--ds-hover);
+  border-color: var(--field-hover);
+  color: var(--ui-ink);
+}
+:root .ui-button.ui-secondary:not(.widget-quiet-action):not(.activity-reading-action):not(.activity-add-action):active:not(:disabled) {
+  background: var(--ds-pressed);
+}
+:root .ui-icon-button:hover:not(:disabled) {
+  background: var(--ds-hover);
+}
+:root .ui-button:disabled,
+:root .ui-icon-button:disabled {
+  cursor: not-allowed;
+}
+:root .ui-button:focus-visible,
+:root .ui-icon-button:focus-visible {
+  outline: 2px solid var(--field-focus);
+  outline-offset: 2px;
+}
+:root .ui-field > small {
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+:root .ui-field > small.ui-field-error {
+  color: var(--field-error);
+}
+:root .ui-toggle-card:not([aria-checked=true]) .ui-toggle-icon {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+:root .ui-toggle-card[aria-checked=true] .ui-toggle-icon {
+  background: transparent;
+  border-color: transparent;
+}
+:root .cover.cover-placeholder.album > svg {
+  position: static;
+  width: min(50%, 28px);
+  height: auto;
+  aspect-ratio: 1;
+}
+:root .cover.cover-placeholder.book b {
+  font-size: clamp(10px, 2.6cqw, 14px);
+  line-height: 1.3;
+  letter-spacing: -.015em;
+  overflow-wrap: anywhere;
+}
+:root .dialog-book .cover.cover-placeholder.book b { font-size: 8px; }
+:root .book-panel .cover.cover-placeholder.book b { font-size: clamp(12px, 3cqw, 20px); }
+
+@media (max-width: 759px) {
+  .history-session-copy small, .history-session-meta small {
+    font-size: 11px;
+  }
+  :root .book-panel .cover.cover-placeholder.book b { font-size: 10px; }
+}
+@media (forced-colors: active) {
+  :root .ui-button:focus-visible, :root .ui-icon-button:focus-visible {
+    outline-color: Highlight;
+  }
+}
