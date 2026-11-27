@@ -9,6 +9,7 @@ test('calendar supports day week month, navigation, source filters and event det
  const calendar=page.locator('.calendar-page');
  const rows=calendar.locator('.calendar-event-list .calendar-event');
  await expect(rows).toHaveCount(3);
+ await expect(calendar.getByText('Calendários de exemplo · sem sincronização externa.')).toBeVisible();
  await page.screenshot({path:info.outputPath('calendar-day.png'),animations:'disabled',scale:'css'});
  const outlook=calendar.getByRole('button',{name:'Microsoft Outlook',exact:true});
  await outlook.click();await expect(outlook).toHaveAttribute('aria-pressed','false');
@@ -24,11 +25,13 @@ test('calendar supports day week month, navigation, source filters and event det
  await expect(event).toBeFocused();
  await calendar.getByRole('button',{name:'Semana',exact:true}).click();
  await expect(calendar.locator('.calendar-week-column')).toHaveCount(7);
+ await expect(calendar.locator('.calendar-week-day').first()).toHaveAttribute('aria-label',/1 compromisso$/);
  await page.screenshot({path:info.outputPath('calendar-week.png'),animations:'disabled',scale:'css'});
  await calendar.locator('.calendar-week-day').filter({hasText:'30'}).click();
  await expect(rows).toHaveCount(2);
  await calendar.getByRole('button',{name:'Mês',exact:true}).click();
  await expect(calendar.locator('.calendar-month-day')).toHaveCount(42);
+ await expect(calendar.locator('.calendar-month-day').filter({hasText:'Alinhamento de sprint'})).toHaveAttribute('aria-label',/3 compromissos$/);
  await page.screenshot({path:info.outputPath('calendar-month.png'),animations:'disabled',scale:'css'});
  await calendar.getByRole('button',{name:'Próximo período'}).click();
  await expect(calendar.locator('.calendar-period')).toContainText('fevereiro');
