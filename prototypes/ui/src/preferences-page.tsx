@@ -45,19 +45,19 @@ export function FocusSettings({prefs,onChange,disabled=false,wakeStatus='off'}:{
  </div>;
 }
 export function AccountOptions(){
- return <div className="account-options" aria-label="Opções de conta">
-  <button type="button" className="onboarding-choice" disabled><img className="google-signin-mark" src={googleSignIn} width={24} height={24} alt=""/><span><b>Continuar com Google</b><small>Disponível após configuração da autenticação.</small></span></button>
-  <button type="button" className="onboarding-choice" disabled><ProviderIcon provider="outlook" size={24}/><span><b>Continuar com Microsoft</b><small>Contas pessoais e corporativas · ainda indisponível.</small></span></button>
+ return <div className="account-options" role="group" aria-label="Opções de conta"><small>Login opcional · indisponível nesta versão. Seus dados locais não dependem de uma conta.</small>
+  <button type="button" className="onboarding-choice" disabled><img className="google-signin-mark" src={googleSignIn} width={24} height={24} alt=""/><span><b>Continuar com Google</b><small>Login ainda não configurado.</small></span></button>
+  <button type="button" className="onboarding-choice" disabled><ProviderIcon provider="outlook" size={24}/><span><b>Continuar com Microsoft</b><small>Login ainda não configurado.</small></span></button>
  </div>;
 }
 export function Onboarding({profile,prefs,canStartEmpty=false,onFinish,onDismiss}:{profile:Profile|null;prefs:FocusPreferences;canStartEmpty?:boolean;onFinish:(profile:Profile,prefs:FocusPreferences,preset:Preset|null,empty:boolean)=>void;onDismiss:()=>void}){
  const [step,setStep]=useState(0);
  const [draft,setDraft]=useState(prefs);
  const [startEmpty,setStartEmpty]=useState(canStartEmpty);
- return <Dialog title={step===0?'Começar no Focora':'Seu primeiro ritmo de foco'} description={step===0?'Use o temporizador, organize tarefas e acompanhe suas sessões.':'Escolha um ritmo inicial. Você pode alterar depois.'} onDismiss={onDismiss}>
+ return <Dialog title={step===0?'Começar no Focora':'Seu primeiro ritmo de foco'} description={step===0?'Escolha como começar.':'Escolha um ritmo inicial. Você pode alterar depois.'} onDismiss={onDismiss}>
  <div className="onboarding-progress" aria-label={'Etapa '+(step+1)+' de 2'}>{[0,1].map(i=><i key={i} className={i<=step?'active':''}/>)}</div>
  <div className="onboarding-step" key={step}>
- {step===0?<><AccountOptions/><div className="onboarding-local-note"><UserRound size={20}/><div><b>Continuar sem conta</b><p>Seus dados ficam neste navegador. Não é necessário criar uma conta.</p></div></div>{canStartEmpty&&<ToggleCard title="Começar sem exemplos" description="Sem tarefas, livros ou sessões fictícias. A agenda e a música ainda são demonstrações." checked={startEmpty} onChange={setStartEmpty}/>}</>:<><div className="quick-focus-presets" role="group" aria-label="Ritmo inicial">{focusPresets.map(p=><button key={p.id} type="button" aria-pressed={matchesFocusPreset(draft,p)} onClick={()=>setDraft({...draft,focus:p.focus,short:p.short,long:p.long,cycles:p.cycles})}><span><b>{p.label}</b><small>{p.description}</small></span><span className="quick-preset-duration"><strong>{p.focus/60} min</strong><small>{p.short/60} min de pausa</small></span></button>)}</div><small>Google Agenda e Outlook podem ser configurados em Integrações. Neste protótipo, são simulados.</small></>}
+ {step===0?<><AccountOptions/><div className="onboarding-local-note"><UserRound size={20}/><div><b>Continuar sem conta</b><p>Seus dados ficam neste navegador, sem login ou sincronização.</p></div></div>{canStartEmpty&&<ToggleCard title="Começar sem exemplos" description="Sem tarefas, livros ou sessões fictícias. A agenda e a música ainda são demonstrações." checked={startEmpty} onChange={setStartEmpty}/>}</>:<><div className="quick-focus-presets" role="group" aria-label="Ritmo inicial">{focusPresets.map(p=><button key={p.id} type="button" aria-pressed={matchesFocusPreset(draft,p)} onClick={()=>setDraft({...draft,focus:p.focus,short:p.short,long:p.long,cycles:p.cycles})}><span><b>{p.label}</b><small>{p.description}</small></span><span className="quick-preset-duration"><strong>{p.focus/60} min</strong><small>{p.short/60} min de pausa</small></span></button>)}</div><small>As integrações de agenda são demonstrações e não acessam suas contas.</small></>}
  </div><footer className="dialog-actions onboarding-actions">{step>0&&<Button variant="secondary" onClick={()=>setStep(0)}>Voltar</Button>}<Button onClick={()=>step===0?setStep(1):onFinish(profile??'guest',draft,null,canStartEmpty&&startEmpty)}>{step===0?'Continuar sem conta':'Começar'}<ArrowRight size={15}/></Button></footer>
  </Dialog>;
 }
