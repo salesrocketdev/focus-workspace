@@ -6,7 +6,7 @@ test('backup export, invalid import, confirmed restore and history CSV',async({p
  await page.goto('/');
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
  const settings=async()=>{await openNavigation(nav,info.project.name==='mobile'?'Ajustes':'Configurações');await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Perfil e painel',exact:true}).click()};
- await openNavigation(nav,'Atividades');
+ await openNavigation(nav,'Biblioteca');
  await page.getByRole('button',{name:'Nova categoria',exact:true}).click();
  await page.getByLabel('Nome da categoria').fill('Categoria do backup');
  await page.getByRole('button',{name:'Salvar',exact:true}).click();
@@ -17,7 +17,7 @@ test('backup export, invalid import, confirmed restore and history CSV',async({p
  const input=page.getByLabel('Arquivo de backup');
  await input.setInputFiles({name:'invalido.json',mimeType:'application/json',buffer:Buffer.from('{}')});
  await expect(page.getByRole('alert')).toContainText('incompatível');
- await openNavigation(nav,'Atividades');
+ await openNavigation(nav,'Biblioteca');
  await page.getByRole('button',{name:'Nova categoria',exact:true}).click();
  await page.getByLabel('Nome da categoria').fill('Após backup');
  await page.getByRole('button',{name:'Salvar',exact:true}).click();
@@ -27,7 +27,7 @@ test('backup export, invalid import, confirmed restore and history CSV',async({p
  await expect(dialog.getByRole('button',{name:'Restaurar dados'})).toBeDisabled();
  await dialog.getByRole('checkbox').check();
  await Promise.all([page.waitForNavigation(),dialog.getByRole('button',{name:'Restaurar dados'}).click()]);
- await openNavigation(nav,'Atividades');
+ await openNavigation(nav,'Biblioteca');
  await expect(page.getByRole('button',{name:'Iniciar foco em Categoria do backup'})).toBeVisible();
  await expect(page.getByRole('button',{name:'Iniciar foco em Após backup'})).toHaveCount(0);
  await openNavigation(nav,'Histórico');
