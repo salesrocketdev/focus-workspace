@@ -7,3 +7,5 @@
 - Acceptance gates: one batched release after changes (per CI_BATCH_POLICY), then physical iPhone/Android, keyboard/screen reader and human visual approval. Do not treat CI as a final product acceptance. M1+ remains separate.
 
 Prior V4.38 CI passed on e397845; deployed audit on adbe9a6 failed because the matching deployment was cancelled, not a verified UI regression. No intermediate validation runner requested.
+
+First-use protection compares task and book contents against known fixtures, not the restored snapshot. Existing profile re-onboarding explicitly tested; no destructive reset available. A single release checkpoint triggers validation, deployment and published audit in sequence.

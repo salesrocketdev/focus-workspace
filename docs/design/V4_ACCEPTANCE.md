@@ -18,3 +18,7 @@ Scope: prototypes/ui only. Product implementation stays in M1–M7. Reference: #
 
 ## Known prototype constraints
 Fixed demo dates and simulated calendar/music/book provider results; no real OAuth, cross-device sync, guaranteed closed-app alarms, direct native Do Not Disturb API, or transactional storage. Cache may be evicted. Cross-tab synchronization requires Web Locks and a shared storage partition. iOS Shortcuts require explicit setup. Production architecture must use repository contracts and actual dates, accessibility validation and migration tests.
+
+## V4.39 batch checkpoint
+- V4.35–38 feature refinements and editor/planning regression coverage included; previous V4.38 CI and deploy passed.
+- V4.39 adds optional first-use empty tasks/books/history, empty-state actions and compatible backup validation. CI policy now runs only explicit checkpoints. Full release pipeline required before acceptance; physical devices and maintainer approval remain open.

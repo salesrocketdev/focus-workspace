@@ -29,7 +29,7 @@ import {DashboardTasks,QuickTaskDialog} from './dashboard-actions';
 import {useEditorHistory} from './editor-history';
 import {EditorControls,LayoutPresets,WidgetPreferences,hasWidgetOptions} from './editor-preferences';
 import {QuickPresets,FocusSummary,type SessionSummary} from './focus-experience';
-import { readingContext,sameContext,progressOf,nextTaskId,priorityCount,toggleTaskPriority,completeTask,taskContext,dashboardTasks,MAX_PRIORITIES,type Book,type FocusContext } from './activity-model';
+import { initialTasks,initialBooks,readingContext,sameContext,progressOf,nextTaskId,priorityCount,toggleTaskPriority,completeTask,taskContext,dashboardTasks,MAX_PRIORITIES,type Book,type FocusContext } from './activity-model';
 import { ProviderIcon, ProviderLabel } from './provider-icons';
 import { Button, Field, Dialog, SelectField, Notice, SearchField, TextareaField, ToggleCard } from './ui';
 import { available, changePreset, compactVertical, displaced, endRow, firstFree, GRID_BREAKPOINT, gridStyle, planPlacement, preset, resolveLayout } from './grid-model';
@@ -251,8 +251,8 @@ export function App(){
  const timerLabel=phase==='focus'?focusContext.label:phaseName(phase);
  function changePreferences(next:FocusPreferences){if(!requireWriter()||hasSession)return;setPlannedId(undefined);setPrefs(next);setDuration(next.focus);setSeconds(mode==='Livre'?0:next.focus);if(!writeStorage(PREFS_KEY,next))setMessage('Preferências disponíveis apenas nesta sessão.');}
  function changeConnections(next:ProviderId[]){setConnections(next);if(!writeStorage(CONNECTIONS_KEY,next))setMessage('Conexões demo disponíveis apenas nesta sessão.');}
- const canStartEmpty=!profile&&!hasSession&&!records.some(r=>r.origin==='session')&&!blocks.length&&!notes.trim()&&tasks.every(t=>restored.tasks.some(o=>o.id===t.id&&JSON.stringify(o)===JSON.stringify(t)))&&books.every(b=>restored.books.some(o=>o.id===b.id&&JSON.stringify(o)===JSON.stringify(b)));
- function finishOnboarding(identity:Profile,next:FocusPreferences,preset:Preset|null,empty=false){if(!requireWriter())return;if(empty&&canStartEmpty){const c=categories[0];setTasks([]);setBooks([]);setRecords([]);setReadingId('');setFocusContext({kind:'activity',id:c.id,title:c.name,label:c.name,categoryId:c.id});setSummaryPoint(null);setSessionSummary(null)}setProfile(identity);writeStorage(ONBOARDING_KEY,identity);changePreferences(next);if(preset){const nextLayouts=suggestedLayout(preset);setLayouts(nextLayouts);writeStorage(STORAGE,nextLayouts)}setShowOnboarding(false);setMessage('Seu espaço foi personalizado.');}
+ const canStartEmpty=!profile&&!hasSession&&!records.some(r=>r.origin==='session')&&!blocks.length&&!notes.trim()&&tasks.every(t=>initialTasks.some(o=>o.id===t.id&&JSON.stringify(o)===JSON.stringify(t)))&&books.every(b=>initialBooks.some(o=>o.id===b.id&&JSON.stringify(o)===JSON.stringify(b)));
+ function finishOnboarding(identity:Profile,next:FocusPreferences,preset:Preset|null,empty=false){if(!requireWriter())return;if(empty&&!canStartEmpty){setMessage('Não foi possível iniciar sem exemplos: existem alterações locais. Seus dados foram preservados.');return}if(empty&&canStartEmpty){const c=categories[0];setTasks([]);setBooks([]);setRecords([]);setReadingId('');setFocusContext({kind:'activity',id:c.id,title:c.name,label:c.name,categoryId:c.id});setSummaryPoint(null);setSessionSummary(null)}setProfile(identity);writeStorage(ONBOARDING_KEY,identity);changePreferences(next);if(preset){const nextLayouts=suggestedLayout(preset);setLayouts(nextLayouts);writeStorage(STORAGE,nextLayouts)}setShowOnboarding(false);setMessage('Seu espaço foi personalizado.');}
  function skipOnboarding(){if(!profile){setProfile('guest');writeStorage(ONBOARDING_KEY,'guest')}setShowOnboarding(false);}
  function chooseFocusContext(ctx:FocusContext){
   if(!requireWriter())return;

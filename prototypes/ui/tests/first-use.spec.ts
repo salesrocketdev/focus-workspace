@@ -18,11 +18,27 @@ test('empty first-use workspace is usable and persists without fixture records',
  await page.getByRole('button',{name:'Voltar',exact:true}).click();
  await page.locator('[data-widget=reading]').getByRole('button',{name:'Adicionar livro',exact:true}).click();
  await page.getByRole('button',{name:'Adicionar primeiro livro'}).click();
- await dialog.getByLabel('Título').fill('Meu primeiro livro');
+ await dialog.getByLabel('Título do livro',{exact:true}).fill('Meu primeiro livro');
  await dialog.getByLabel('Autor').fill('Autora');
  await dialog.getByRole('button',{name:'Salvar',exact:true}).click();
  await nav.getByRole('button',{name:'Hoje',exact:true}).click();
  await expect(page.locator('[data-widget=reading]')).toContainText('Meu primeiro livro');
  const data=await page.evaluate(()=>JSON.parse(localStorage.getItem('focus-workspace:v4:workspace')!));
  expect(data.records).toEqual([]);expect(data.tasks).toEqual([]);expect(data.books).toHaveLength(1);
+});
+
+test('refazer onboarding não oferece remoção de dados existentes',async({page},info)=>{
+ await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')));
+ await page.goto('/');
+ const nav=page.getByRole('navigation',{name:'Navegação principal'});
+ const mobile=info.project.name==='mobile';
+ await nav.getByRole('button',{name:mobile?'Ajustes':'Configurações',exact:true}).click();
+ await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Perfil e painel',exact:true}).click();
+ await page.getByRole('button',{name:'Refazer onboarding'}).click();
+ const dialog=page.getByRole('dialog');
+ for(let i=0;i<3;i++)await dialog.getByRole('button',{name:'Continuar',exact:true}).click();
+ await expect(dialog.getByRole('switch',{name:'Começar sem exemplos'})).toHaveCount(0);
+ await dialog.getByRole('button',{name:'Começar',exact:true}).click();
+ const data=await page.evaluate(()=>JSON.parse(localStorage.getItem('focus-workspace:v4:workspace')!));
+ expect(data.books.length).toBeGreaterThan(0);expect(data.tasks.length).toBeGreaterThan(0);expect(data.records.length).toBeGreaterThan(0);
 });
