@@ -22,7 +22,7 @@ test('manual task management preserves source and preview without a dev capture 
  await page.getByRole('button',{name:'Nova tarefa',exact:true}).click();
  const dialog=page.getByRole('dialog');
  await dialog.getByLabel('Título da tarefa').fill('Responder à proposta de orçamento');
- await dialog.getByRole('button',{name:'Origem e link',exact:true}).click();
+ await dialog.getByRole('button',{name:'Origem',exact:true}).click();
  await dialog.getByRole('combobox',{name:'Origem',exact:true}).click();
  await page.getByRole('option',{name:'Gmail',exact:true}).click();
  await dialog.getByRole('button',{name:'Adicionar tarefa',exact:true}).click();
@@ -31,7 +31,7 @@ test('manual task management preserves source and preview without a dev capture 
  await page.keyboard.press('Escape');
  await page.getByRole('button',{name:'Nova tarefa',exact:true}).click();
  await dialog.getByLabel('Título da tarefa').fill('Alinhamento semanal do produto');
- await dialog.getByRole('button',{name:'Origem e link',exact:true}).click();
+ await dialog.getByRole('button',{name:'Origem',exact:true}).click();
  await dialog.getByRole('combobox',{name:'Origem',exact:true}).click();
  await page.getByRole('option',{name:'Google Meet',exact:true}).click();
  await dialog.getByRole('button',{name:'Adicionar tarefa',exact:true}).click();
@@ -60,7 +60,7 @@ test('keeps planned dates, deadlines and completion history independently', asyn
  await page.getByRole('button',{name:'Nova tarefa',exact:true}).click();
  const dialog=page.getByRole('dialog');
  await dialog.getByLabel('Título da tarefa').fill('Fechar apontamentos');
- await dialog.getByRole('button',{name:'Adicionar datas e detalhes'}).click();
+ await dialog.getByRole('button',{name:'Planejamento',exact:true}).click();
  await dialog.getByLabel('Planejada para',{exact:true}).fill('2027-04-12');
  await dialog.getByLabel('Prazo',{exact:true}).fill('2027-04-14');
  await dialog.getByRole('combobox',{name:'Repetição',exact:true}).click();
