@@ -8,7 +8,7 @@ export function MobileMasthead({notification}:{notification?:ReactNode}={}){
 
 export function PageHeader({title,subtitle,actions,notification,editing=false}:{title:string;subtitle:string;actions?:ReactNode;notification?:ReactNode;editing?:boolean}){
  return <header className={'page-head workspace-page-header'+(editing?' edit-page-head':'')}>
-  <div className="page-heading"><h1>{title}</h1><p>{subtitle}</p></div>
+  <div className="page-heading"><h1>{title}</h1>{subtitle&&<p>{subtitle}</p>}</div>
   {(actions||notification)&&<div className="page-header-actions">{actions}{notification&&<div className="desktop-notification">{notification}</div>}</div>}
  </header>;
 }
