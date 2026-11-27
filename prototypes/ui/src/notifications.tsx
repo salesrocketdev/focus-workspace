@@ -40,7 +40,7 @@ export function useNotifications(){
  function savePrefs(next:Preferences){prefsRef.current=next;setPrefs(next);if(!writeStorage(KEY,next))setFeedback('Preferências não puderam ser salvas.')}
  function saveInbox(next:Entry[]){setEntries(next);writeStorage(INBOX,next)}
  useEffect(()=>{
-  const sync=(e:StorageEvent)=>{if(e.key===KEY||e.key===null){const next=loadPrefs();prefsRef.current=next;setPrefs(next)}if(e.key===INBOX||e.key===null){const next=loadInbox();inboxRef.current=next;setEntries(next)}};
+  const sync=(e:StorageEvent)=>{if(e.key===KEY||e.key===null){const next=loadPrefs();prefsRef.current=next;setPrefs(next)}if(e.key===INBOX||e.key===null){const next=loadInbox();setEntries(next)}};
   window.addEventListener('storage',sync);return()=>window.removeEventListener('storage',sync);
  },[]);
  useEffect(()=>{const refresh=()=>setQuietActive(quietAt(prefs.quiet,prefs.quietStart,prefs.quietEnd));refresh();const id=window.setInterval(refresh,15000);document.addEventListener('visibilitychange',refresh);return()=>{clearInterval(id);document.removeEventListener('visibilitychange',refresh)}},[prefs.quiet,prefs.quietStart,prefs.quietEnd]);

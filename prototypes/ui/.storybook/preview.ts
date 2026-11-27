@@ -24,6 +24,7 @@ import '../src/activity-polish.css';
 import '../src/offline.css';
 import '../src/tab-coordinator.css';
 import '../src/session-audio.css';
+import '../src/backup.css';
 import type { Preview } from '@storybook/react';
 const preview:Preview={parameters:{layout:'centered'}};
 export default preview;

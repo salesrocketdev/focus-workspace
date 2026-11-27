@@ -81,3 +81,6 @@ When Web Locks is supported, one tab owns the workspace and other tabs display t
 
 
 Notifications settings include opt-in session sounds, tone and alert volume, start/completion previews and daily quiet hours. Quiet hours do not pause the timer; alerts stay in the internal inbox without audio or native delivery attempts. The settings summary indicates active quiet hours.
+
+
+Profile and panel contains Data and backup: JSON export, confirmed replacement restore and full history CSV. History also exports the selected period and filters. Restore only in the controlling tab with no active/paused session; close other tabs before restoring. Quick notes persist locally. Native permissions, automatic shortcuts and unfinished timer state are not restored.

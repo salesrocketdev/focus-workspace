@@ -7,7 +7,7 @@ export interface WorkspaceSnapshot {version:1;timer:TimerSnapshot;tasks:Task[];c
 const integer=(v:unknown,min=0,max=Number.MAX_SAFE_INTEGER):v is number=>typeof v==='number'&&Number.isSafeInteger(v)&&v>=min&&v<=max;
 const string=(v:unknown):v is string=>typeof v==='string'&&v.length>0;
 function contextValid(v:FocusContext|undefined){return !!v&&string(v.id)&&string(v.title)&&string(v.label)&&(v.kind==='reading'?v.label==='Leitura':(v.kind==='activity'||v.kind==='task')&&string(v.categoryId))}
-function valid(value:unknown):value is WorkspaceSnapshot{
+export function validWorkspace(value:unknown):value is WorkspaceSnapshot{
  if(!value||typeof value!=='object')return false;
  const v=value as Partial<WorkspaceSnapshot>,t=v.timer;
  return v.version===1&&!!t&&['Pomodoro','Livre'].includes(t.mode)&&['focus','short','long'].includes(t.phase)&&integer(t.cycle,0,12)&&integer(t.duration,1,7200)&&integer(t.seconds)&&typeof t.running==='boolean'&&integer(t.startedAt)&&(!t.running||t.startedAt>0)&&contextValid(t.context)&&string(t.readingId)&&
@@ -18,7 +18,7 @@ function valid(value:unknown):value is WorkspaceSnapshot{
 }
 export function loadWorkspace(prefs:FocusPreferences):WorkspaceSnapshot{
  const saved=readStorage(WORKSPACE_KEY);
- if(valid(saved)){
+ if(validWorkspace(saved)){
   const t=saved.timer;
   if(t.running){const elapsed=Math.max(0,Math.floor((Date.now()-t.startedAt)/1000));return {...saved,timer:{...t,seconds:t.mode==='Livre'?elapsed:Math.max(0,t.duration-elapsed)}}}
   return saved;

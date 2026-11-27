@@ -119,3 +119,7 @@ Offline CI and Pages passed. Add exclusive Web Locks writer, read-only mirrors v
 
 ## Local session audio and quiet hours (V4.32)
 Previous cross-tab CI and Pages succeeded. Add opt-in start/completion audio, three original synthesized tones, alert volume, previews, daily overnight quiet hours and all-day behavior for equal bounds. Preserve inbox during quiet hours; suppress audio/native notification attempts. Persist preference/inbox actions and mirror via storage events. Test with fake AudioContext and timer clock. Actual audibility and native Focus behavior require device review; CI pending.
+
+
+## Backup, restore and CSV (V4.33)
+V4.32 build failed on a leftover inboxRef reference; removed it. Add versioned JSON backup with strict known-key validation, local restore preview/confirmation, writer and idle-session guard, best-effort rollback on write failure, reset unfinished timers and device-specific permissions/shortcut opt-in. Persist quick notes. CSV exports current history filters or all from profile, UTF-8 BOM and semicolon separator, escaped cells with formula-injection protection. No remote upload. Test export, invalid backup, confirmed restoration and CSV. New pipeline pending.

@@ -27,5 +27,6 @@ import './activity-polish.css';
 import './offline.css';
 import './tab-coordinator.css';
 import './session-audio.css';
+import './backup.css';
 
 createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>);
