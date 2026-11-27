@@ -12,10 +12,62 @@
 .home-focus-window strong{font-size:15px;font-variant-numeric:tabular-nums;line-height:1.4}
 .home-focus-window strong span{font-weight:400;color:var(--ui-muted)}
 .home-focus-window .ui-button{flex-shrink:0}
-.workspace[data-route=today] .widget>.card{background:transparent;box-shadow:none;border:0;border-radius:0;border-bottom:1px solid var(--ui-line)}
-.workspace[data-route=today] .widget:not([data-widget=focus]) .card-head>span>svg{display:none}
-.workspace[data-route=today] .widget .card-head{color:var(--ui-ink)}
-.workspace[data-route=today] .widget[data-widget=focus].large>.card{border-bottom:1px solid var(--ui-line)}
+/* Separate the workspace canvas from widget surfaces; never change saved spans. */
+:root{
+ --dashboard-canvas:#eee8e1;
+ --dashboard-card:#fffdfa;
+ --dashboard-edge:#d6c9bd;
+ --dashboard-edge-strong:#c8b6a5;
+ --dashboard-divider:#ebe3da;
+ --dashboard-shadow:0 2px 6px #5b40210a,0 8px 22px #5b402107;
+}
+:root[data-theme=dark]{
+ --dashboard-canvas:#25211e;
+ --dashboard-card:#38322e;
+ --dashboard-edge:#65594f;
+ --dashboard-edge-strong:#827064;
+ --dashboard-divider:#51463e;
+ --dashboard-shadow:0 2px 6px #0003,0 8px 22px #0002;
+}
+:root .app:has(.workspace[data-route=today]){background:var(--dashboard-canvas)}
+.workspace[data-route=today] .widget-grid{gap:16px;align-items:stretch}
+.workspace[data-route=today] .widget>.card{
+ background:var(--dashboard-card);border:1px solid var(--dashboard-edge);
+ border-radius:12px;box-shadow:var(--dashboard-shadow);min-width:0;
+}
+.workspace[data-route=today] .widget:is([data-widget=focus],[data-widget=tasks],[data-widget=agenda])>.card{border-color:var(--dashboard-edge-strong)}
+.workspace[data-route=today] .widget .card-head{
+ color:var(--ui-ink);font-weight:650;flex-shrink:0;min-width:0;
+ padding-bottom:6px;border-bottom:1px solid var(--dashboard-divider);
+}
+.workspace[data-route=today] .widget .card-head>span{min-width:0;gap:7px}
+.workspace[data-route=today] .widget .card-head>span>svg{display:block;color:var(--ui-muted);width:16px;height:16px}
+.workspace[data-route=today] .widget[data-widget=focus] .card-head>span>svg{color:var(--field-focus)}
+.workspace[data-route=today] .widget .card-title{min-width:0;overflow-wrap:anywhere;line-height:1.3}
+.workspace[data-route=today] .widget>.card:focus-within{border-color:var(--field-focus)}
+@media(hover:hover){.workspace[data-route=today] .widget>.card:hover:not(:focus-within){border-color:var(--dashboard-edge-strong)}}
+@media(min-width:1151px){.workspace[data-route=today] .widget-grid.coordinate-grid{--grid-gap:16px;gap:var(--grid-gap)}}
+@media(max-width:759px){
+ .workspace[data-route=today] .widget-grid{gap:14px}
+ .workspace[data-route=today] .widget>.card{padding:14px;gap:10px}
+ .workspace[data-route=today] .widget.small>.card{padding:10px;gap:7px}
+ .workspace[data-route=today] .widget .card-head{padding-bottom:4px}
+}
+@container(max-height:185px){
+ .workspace[data-route=today] .widget .card-head{padding-bottom:3px}
+}
+@container(max-width:220px){
+ .workspace[data-route=today] .widget .card-head>span>svg{width:14px;height:14px}
+ .workspace[data-route=today] .widget .card-head>span{gap:4px}
+}
+/* Editor previews share the same surface tokens; existing selected states and
+   grid dimensions are deliberately preserved. */
+.workspace.editing .widget>.card{background:var(--dashboard-card);border-color:var(--dashboard-edge)}
+.workspace.editing .widget.is-selected>.card{border-color:var(--field-focus)}
+@media(forced-colors:active){
+ .workspace[data-route=today] .widget>.card,.workspace.editing .widget>.card{border:1px solid CanvasText;box-shadow:none}
+ .workspace[data-route=today] .widget>.card:focus-within{border-color:Highlight}
+}
 .workspace[data-route=today] .widget[data-widget=focus].large .focus-widget{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px;padding:0;min-width:0}
 :root[data-ring=classic] .workspace[data-route=today] .widget[data-widget=focus].large .timer-ring{width:100%;height:auto;aspect-ratio:auto;min-height:0;display:grid;place-items:center}
 :root[data-ring=classic] .workspace[data-route=today] .widget[data-widget=focus].large .timer-ring>svg{display:none}
