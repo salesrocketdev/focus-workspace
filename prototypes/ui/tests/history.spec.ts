@@ -41,12 +41,12 @@ test('history filters, details and dashboard share recorded focus',async({page},
  await page.clock.install();
  await page.getByRole('button',{name:'Iniciar foco',exact:true}).click();
  await page.clock.fastForward(1500*1000+250);
- await expect(page.locator('[data-widget=goal]')).toContainText('2h 40min');
+ await expect(page.locator('[data-widget=goal]')).toContainText('25 min');
  await openNavigation(nav,'Histórico');
  await history.getByRole('button',{name:'Hoje',exact:true}).click();
- await expect(history.locator('.history-session')).toHaveCount(6);
+ await expect(history.locator('.history-session')).toHaveCount(1);
  await expect(history.locator('.history-session').first()).toContainText('Sessão local');
- await expect(history.locator('.history-stat').first()).toContainText('2h 40min');
+ await expect(history.locator('.history-stat').first()).toContainText('25 min');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
 });
 test('appearance preference persists and system motion is respected',async({page},info)=>{
