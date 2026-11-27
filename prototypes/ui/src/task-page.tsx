@@ -14,20 +14,22 @@ export function TaskEditor({task,categories,canPriority,onSave,onDismiss}:{
  task?:Task;categories:Category[];canPriority:boolean;onSave:(draft:Omit<Task,'id'|'done'>)=>boolean;onDismiss:()=>void;
 }){
  const [draft,setDraft]=useState<Omit<Task,'id'|'done'>>(task??{title:'',categoryId:categories[0]?.id??''});
- const [details,setDetails]=useState(Boolean(task));
+ const [details,setDetails]=useState(false);
+ const [contentOpen,setContentOpen]=useState(false);
+ const [sourceOpen,setSourceOpen]=useState(false);
  const [scope,setScope]=useState(task?.recurrenceDate?'occurrence':'series');
  const [error,setError]=useState('');
  const [steps,setSteps]=useState(task?.checklist?.map(step=>step.title).join('\n')??'');
  function change(patch:Partial<Task>){setDraft(value=>({...value,...patch}));}
- return <Dialog className={task?'task-details-dialog':undefined} title={task?'Detalhes da tarefa':'Nova tarefa'} onDismiss={onDismiss}>
+ return <Dialog className="compact-dialog task-editor-dialog" title={task?'Detalhes da tarefa':'Nova tarefa'} onDismiss={onDismiss}>
   <form className="dialog-form planning-form" onSubmit={event=>{
    event.preventDefault();
    const title=draft.title.trim();
    const sourceUrl=draft.sourceUrl?.trim();
    if(!title){setError('Informe o título.');return;}
-   if((draft.repeat||scope==='occurrence')&&!draft.plannedDate){setError('Escolha a data planejada para iniciar a repetição.');return;}
-   if((draft.plannedDate&&!validDay(draft.plannedDate))||(draft.dueDate&&!validDay(draft.dueDate))){setError('Informe uma data válida.');return;}
-   if(sourceUrl&&!httpsLink(sourceUrl)){setError('Use um link HTTPS válido.');return;}
+   if((draft.repeat||scope==='occurrence')&&!draft.plannedDate){setDetails(true);setError('Escolha a data planejada para iniciar a repetição.');return;}
+   if((draft.plannedDate&&!validDay(draft.plannedDate))||(draft.dueDate&&!validDay(draft.dueDate))){setDetails(true);setError('Informe uma data válida.');return;}
+   if(sourceUrl&&!httpsLink(sourceUrl)){setSourceOpen(true);setError('Use um link HTTPS válido.');return;}
    const checklist=steps.split('\n').map(title=>title.trim()).filter(Boolean)
     .map(title=>({title,done:draft.checklist?.find(step=>step.title===title)?.done??false}));
    const monthDay=draft.repeat==='monthly'&&draft.plannedDate
@@ -48,9 +50,8 @@ export function TaskEditor({task,categories,canPriority,onSave,onDismiss}:{
    <Field label="Título da tarefa" disabled={scope==='occurrence'} required maxLength={120} value={draft.title} onChange={e=>change({title:e.target.value})}/>
    <SelectField label="Categoria" disabled={scope==='occurrence'} value={draft.categoryId} options={categories.map(c=>({value:c.id,label:c.name}))} onValueChange={categoryId=>change({categoryId})}/>
    <label className="planning-check"><input type="checkbox" checked={Boolean(draft.priority)} disabled={scope==='occurrence'||!canPriority&&!draft.priority||task?.done} onChange={e=>change({priority:e.target.checked})}/> Destacar no painel</label>
-   <Button variant="secondary" size="sm" aria-expanded={details} onClick={()=>setDetails(!details)}>{details?'Recolher detalhes':'Adicionar datas e detalhes'}</Button>
+   <Button className="dialog-disclosure" variant="secondary" aria-expanded={details} onClick={()=>setDetails(!details)}>{details?'Ocultar planejamento':'Adicionar datas e detalhes'}</Button>
    {details&&<>
-    <TextareaField disabled={scope==='occurrence'} label="Descrição" value={draft.description??''} onChange={e=>change({description:e.target.value})}/>
     <div className="planning-fields">
      <Field label="Planejada para" type="date" value={draft.plannedDate??''} onChange={e=>change({plannedDate:e.target.value||undefined})}/>
      <Field label="Prazo" type="date" value={draft.dueDate??''} onChange={e=>change({dueDate:e.target.value||undefined})}/>
@@ -61,12 +62,19 @@ export function TaskEditor({task,categories,canPriority,onSave,onDismiss}:{
     </div>
     {draft.repeat==='monthly'&&<Field label="Intervalo em meses" type="number" min={1} max={12} disabled={scope==='occurrence'} value={draft.repeatInterval??1} onChange={e=>change({repeatInterval:e.target.value?Number(e.target.value):undefined})}/>}
     {draft.repeat==='weekly'&&<fieldset disabled={scope==='occurrence'} className="planning-weekdays"><legend>Dias da semana</legend>{weekdays.map((day,i)=><label key={day}><input type="checkbox" checked={draft.repeatDays?.includes(i)??false} onChange={e=>change({repeatDays:e.target.checked?[...(draft.repeatDays??[]),i]:draft.repeatDays?.filter(n=>n!==i)})}/>{day}</label>)}</fieldset>}
+   </>}
+   <Button className="dialog-disclosure" variant="secondary" aria-expanded={contentOpen} onClick={()=>setContentOpen(v=>!v)}>{contentOpen?'Ocultar descrição e checklist':'Descrição e checklist'}{!contentOpen&&(draft.description||steps.trim())?' · preenchido':''}</Button>
+   {contentOpen&&<>
+    <TextareaField disabled={scope==='occurrence'} label="Descrição" value={draft.description??''} onChange={e=>change({description:e.target.value})}/>
     {draft.checklist?.length? <div className="planning-checklist">{draft.checklist.map((step,i)=><label className="planning-check" key={i}><input type="checkbox" disabled={scope==='occurrence'} checked={step.done} onChange={e=>change({checklist:draft.checklist?.map((item,n)=>i===n?{...item,done:e.target.checked}:item)})}/>{step.title}</label>)}</div>:null}
     <TextareaField disabled={scope==='occurrence'} label="Passos do checklist (um por linha)" value={steps} onChange={e=>setSteps(e.target.value)}/>
+   </>}
+   <Button className="dialog-disclosure" variant="secondary" aria-expanded={sourceOpen} onClick={()=>setSourceOpen(v=>!v)}>{sourceOpen?'Ocultar origem e link':'Origem e link'}{!sourceOpen&&draft.source?' · '+sources[draft.source]:''}</Button>
+   {sourceOpen&&<>
     <SelectField disabled={scope==='occurrence'} label="Origem" value={draft.source??'manual'} options={[{value:'manual',label:'Manual'},...Object.entries(sources).map(([value,label])=>({value,label}))]} onValueChange={value=>change({source:value==='manual'?undefined:value as TaskSource})}/>
     <Field disabled={scope==='occurrence'} label={meeting(draft.source)?'Link da reunião':'Link de origem'} type="url" value={draft.sourceUrl??''} onChange={e=>change({sourceUrl:e.target.value})}/>
    </>}
-   {error&&<p role="alert">{error}</p>}
+   {error&&<p role="alert" className="ui-field-error">{error}</p>}
    <footer className="dialog-actions"><Button variant="secondary" onClick={onDismiss}>Cancelar</Button><Button type="submit">{task?'Salvar':'Adicionar tarefa'}</Button></footer>
   </form>
  </Dialog>;
