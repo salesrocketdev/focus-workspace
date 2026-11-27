@@ -40,3 +40,24 @@
 .active-focus-quiet .timer-ring{margin-block:8px}
 .focus-header-trailing>.ui-button{flex-shrink:0}
 @media(max-width:759px){.focus-top:has(.active-focus-quiet),.focus-header-trailing{min-width:0}.focus-header-trailing>.ui-button{min-height:44px}.focus-top:has(.focus-header-trailing>.ui-button) .zen-toggle,.focus-top:has(.focus-header-trailing>.ui-button) .focus-header-trailing>button[aria-label="Abrir foco compacto"]{display:none}.active-focus-quiet .transport .circle-button{min-height:44px}}
+
+/* V5: calm typographic placeholders, flatter lists, and honest account states. */
+.cover.cover-placeholder{position:relative;display:grid;place-items:center;overflow:hidden;background:#e4e8df;color:#38483c;border:1px solid #c8cfc2;border-radius:4px;box-shadow:none;padding:8px}
+.cover.cover-placeholder.mock-cover-indigo{background:#e3e5ef;color:#414a6a;border-color:#c6cadd}
+.cover.cover-placeholder.mock-cover-sand{background:#eee1d0;color:#654c34;border-color:#d9c8b3}
+.cover.cover-placeholder.album{background:#e3e3e1;color:#535650;border-color:#cccec9}
+.cover.cover-placeholder b{position:static;inset:auto;max-width:100%;font-size:clamp(9px,1.4cqw,14px);line-height:1.25;letter-spacing:-.02em;white-space:normal;overflow-wrap:anywhere;color:inherit;text-shadow:none;text-align:left}
+[data-theme=dark] .cover.cover-placeholder{background:#39433d;color:#e5ede5;border-color:#536157}
+[data-theme=dark] .cover.cover-placeholder.mock-cover-indigo{background:#3a3d53;color:#e4e6f0;border-color:#555b76}
+[data-theme=dark] .cover.cover-placeholder.mock-cover-sand{background:#4c4035;color:#f1e4d5;border-color:#68594b}
+[data-theme=dark] .cover.cover-placeholder.album{background:#383a37;color:#d8dcd5;border-color:#51534e}
+.account-options{display:grid;gap:8px;min-width:0}
+.account-options .onboarding-choice:disabled{opacity:1;cursor:not-allowed;background:var(--ui-surface)}
+.account-options .onboarding-choice:disabled small{color:var(--ui-muted);font-size:12px}
+.onboarding-local-note{display:flex;gap:12px;align-items:flex-start;padding:12px 0}
+.onboarding-local-note>div{min-width:0}
+.onboarding-local-note p{font-size:12px;color:var(--ui-muted);line-height:1.5;margin-top:4px}
+.onboarding-progress>i{flex:1}
+.activity-stat-icon,.history-stat-icon{background:transparent!important;box-shadow:none}
+.history-status-spacer{display:block}
+@media(min-width:1151px){.workspace[data-route=today] .widget[data-widget=goal] .daily-focus-progress{grid-template-columns:1fr auto;gap:5px 12px}.workspace[data-route=today] .widget[data-widget=goal] .daily-focus-progress .progress{grid-column:1/-1}.workspace[data-route=today] .widget[data-widget=goal] .daily-focus-progress>small:last-child{grid-column:1/-1}.workspace[data-route=today] .widget[data-widget=goal] .daily-focus-progress strong{font-size:24px}}
