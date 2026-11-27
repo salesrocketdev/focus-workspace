@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { BookOpen, BriefcaseBusiness, GraduationCap, Layers, CheckCircle2, ListTodo, Search, Plus, Play, Pencil, Folder, Clock, Ellipsis, Star } from 'lucide-react';
+import { BookOpen, BriefcaseBusiness, GraduationCap, Layers, CheckCircle2, ListTodo, Search, Plus, Play, Pencil, Folder, Clock, Ellipsis, Star, CalendarPlus, Timer as TimerIcon } from 'lucide-react';
 import { Cover,Progress } from './components';
 import { BookImport,BookDetails } from './book-import';
 import { Button,Dialog,Field,SelectField,SearchField } from './ui';
 import { nextTaskId,progressOf,readingContext,priorityCount,toggleTaskPriority,completeTask,MAX_PRIORITIES,type Book,type Category,type Task,type FocusContext } from './activity-model';
 
 export type ActivityTab='overview'|'tasks'|'books';
+import {taskPomodoros} from './planning-model';
+import type {FocusRecord} from './history-model';
 type Tab=ActivityTab;
 type FormKind='category'|'task'|'book';
 const tabs:{id:Tab;label:string}[]=[{id:'overview',label:'Visão geral'},{id:'tasks',label:'Tarefas'},{id:'books',label:'Leituras'}];
@@ -14,7 +16,7 @@ export function CategoryMark({category}:{category:Category}){
  const Icon=categoryIcons[category.id as keyof typeof categoryIcons]??Folder;
  return <span className={'category-mark tone-'+category.tone}><Icon size={19} strokeWidth={1.75}/></span>;
 }
-export function ActivitiesPage({categories,tasks,books,onCategories,onTasks,onBooks,onFocus,onReading,readOnly=false,initialTab='overview'}:{initialTab?:ActivityTab;readOnly?:boolean;categories:Category[];tasks:Task[];books:Book[];onCategories:(next:Category[])=>void;onTasks:(next:Task[])=>void;onBooks:(next:Book[])=>void;onFocus:(ctx:FocusContext)=>void;onReading:(book:Book)=>void}){
+export function ActivitiesPage({categories,tasks,books,onCategories,onTasks,onBooks,onFocus,onReading,readOnly=false,initialTab='overview',records=[],onPlan}:{records?:FocusRecord[];onPlan?:(task:Task)=>void;initialTab?:ActivityTab;readOnly?:boolean;categories:Category[];tasks:Task[];books:Book[];onCategories:(next:Category[])=>void;onTasks:(next:Task[])=>void;onBooks:(next:Book[])=>void;onFocus:(ctx:FocusContext)=>void;onReading:(book:Book)=>void}){
  const [tab,setTab]=useState<Tab>(initialTab);
  const [filter,setFilter]=useState('all');
  const [status,setStatus]=useState<'all'|'pending'|'done'>('all');
@@ -28,6 +30,7 @@ export function ActivitiesPage({categories,tasks,books,onCategories,onTasks,onBo
  const [category,setCategory]=useState('work');
  const [author,setAuthor]=useState('');
  const [pages,setPages]=useState('200');
+ const [estimate,setEstimate]=useState('');
  const [error,setError]=useState('');
  const normalize=(value:string)=>value.trim().toLocaleLowerCase('pt-BR');
  const query=normalize(search);
@@ -35,7 +38,7 @@ export function ActivitiesPage({categories,tasks,books,onCategories,onTasks,onBo
  const visibleBooks=books.filter(b=>normalize(b.title+' '+b.author).includes(query));
  const completed=tasks.filter(t=>t.done).length;
  const pending=tasks.length-completed;
- function open(kind:FormKind,task?:Task){if(readOnly)return;setError('');setForm(kind);setEditing(task?.id??null);setName(task?.title??'');setCategory(task?.categoryId??(filter!=='all'?filter:categories[0].id));setAuthor('');setPages('200')}
+ function open(kind:FormKind,task?:Task){if(readOnly)return;setError('');setForm(kind);setEditing(task?.id??null);setName(task?.title??'');setEstimate(task?.estimate?String(task.estimate):'');setCategory(task?.categoryId??(filter!=='all'?filter:categories[0].id));setAuthor('');setPages('200')}
  function save(){
   if(readOnly)return;
   const title=name.trim();if(!title){setError('Informe um nome.');return}
@@ -43,8 +46,9 @@ export function ActivitiesPage({categories,tasks,books,onCategories,onTasks,onBo
    if(categories.some(c=>normalize(c.name)===normalize(title))){setError('Já existe uma categoria com esse nome.');return}
    const id='category-'+crypto.randomUUID();onCategories([...categories,{id,name:title,tone:'orange'}]);
   }else if(form==='task'){
-   if(editing!==null)onTasks(tasks.map(t=>t.id===editing?{...t,title,categoryId:category}:t));
-   else onTasks([...tasks,{id:nextTaskId(tasks),title,categoryId:category,done:false}]);
+   const n=estimate?Number(estimate):undefined;if(n!==undefined&&(!Number.isInteger(n)||n<1||n>20)){setError('Informe de 1 a 20 Pomodoros.');return}
+   if(editing!==null)onTasks(tasks.map(t=>t.id===editing?{...t,title,categoryId:category,estimate:n}:t));
+   else onTasks([...tasks,{id:nextTaskId(tasks),title,categoryId:category,done:false,estimate:n}]);
    setFilter('all');setStatus('all');
   }else if(form==='book'){
    const total=Number(pages);
@@ -56,7 +60,7 @@ export function ActivitiesPage({categories,tasks,books,onCategories,onTasks,onBo
  function focusTask(t:Task){const c=categories.find(x=>x.id===t.categoryId)!;onFocus({kind:'task',id:String(t.id),title:t.title,label:c.name,categoryId:c.id})}
  function renderTasks(){return <section className="activity-surface activity-task-section"><header className="activity-section-head"><div><h2><ListTodo size={18}/> Tarefas</h2><small>{pending} pendentes · {completed} concluídas · {priorityCount(tasks)}/{MAX_PRIORITIES} prioridades</small></div><Button className="activity-add-action" disabled={readOnly} variant="secondary" size="sm" onClick={()=>open('task')}><Plus size={15}/> Nova tarefa</Button></header>
   <div className="activity-task-filters"><div className="activity-tabs small-tabs" role="group" aria-label="Status das tarefas">{([{id:'all',label:'Todas'},{id:'pending',label:'Pendentes'},{id:'done',label:'Concluídas'}] as const).map(s=><button key={s.id} aria-pressed={status===s.id} onClick={()=>setStatus(s.id)}>{s.label}</button>)}</div><SelectField label="Filtrar por categoria" hideLabel compact value={filter} onValueChange={setFilter} options={[{value:'all',label:'Todas as categorias'},...categories.map(c=>({value:c.id,label:c.name}))]}/><button type="button" className="activity-filter-reset" disabled={filter==='all'&&status==='all'} onClick={()=>{setFilter('all');setStatus('all')}}>Limpar filtros</button></div>
-  <div className="activity-task-list">{visibleTasks.length?visibleTasks.map(t=>{const c=categories.find(x=>x.id===t.categoryId)!;return <div className={'activity-task-row '+(t.done?'task-completed':'')} key={t.id}><label><input type="checkbox" checked={t.done} disabled={readOnly} onChange={()=>onTasks(tasks.map(x=>x.id===t.id?completeTask(x,!x.done):x))}/><span className="activity-task-title">{t.title}</span></label><span className={'category-pill tone-'+c.tone}>{c.name}</span><div className="activity-row-actions"><button type="button" className="ui-icon-button priority-action" aria-label={'Prioridade: '+t.title} aria-pressed={!!t.priority&&!t.done} title={t.priority?'Remover prioridade':'Marcar como prioridade'} disabled={readOnly||t.done||(!t.priority&&priorityCount(tasks)>=MAX_PRIORITIES)} onClick={()=>onTasks(toggleTaskPriority(tasks,t.id))}><Star size={15} fill={t.priority&&!t.done?'currentColor':'none'}/></button><button className="ui-icon-button" aria-label={'Editar '+t.title} disabled={readOnly} onClick={()=>open('task',t)}><Pencil size={15}/></button><button className="ui-icon-button task-play" aria-label={'Focar em '+t.title} disabled={t.done||readOnly} onClick={()=>focusTask(t)}><Play size={15} fill="currentColor"/></button></div></div>}):<div className="activity-empty"><CheckCircle2 size={28} strokeWidth={1.5}/><b>Nenhuma tarefa encontrada</b><small>Altere os filtros ou crie uma nova tarefa.</small></div>}</div>
+  <div className="activity-task-list">{visibleTasks.length?visibleTasks.map(t=>{const c=categories.find(x=>x.id===t.categoryId)!;return <div className={'activity-task-row '+(t.done?'task-completed':'')} key={t.id}><label><input type="checkbox" checked={t.done} disabled={readOnly} onChange={()=>onTasks(tasks.map(x=>x.id===t.id?completeTask(x,!x.done):x))}/><span className="activity-task-title">{t.title}{t.estimate&&<small className="task-estimate"><TimerIcon/> {taskPomodoros(t,records)}/{t.estimate} Pomodoros</small>}</span></label><span className={'category-pill tone-'+c.tone}>{c.name}</span><div className="activity-row-actions"><button type="button" className="ui-icon-button priority-action" aria-label={'Prioridade: '+t.title} aria-pressed={!!t.priority&&!t.done} title={t.priority?'Remover prioridade':'Marcar como prioridade'} disabled={readOnly||t.done||(!t.priority&&priorityCount(tasks)>=MAX_PRIORITIES)} onClick={()=>onTasks(toggleTaskPriority(tasks,t.id))}><Star size={15} fill={t.priority&&!t.done?'currentColor':'none'}/></button><button className="ui-icon-button" aria-label={'Editar '+t.title} disabled={readOnly} onClick={()=>open('task',t)}><Pencil size={15}/></button>{onPlan&&<button type="button" className="ui-icon-button task-plan-action" aria-label={'Planejar foco em '+t.title} disabled={t.done||readOnly} onClick={()=>onPlan(t)}><CalendarPlus size={15}/></button>}<button className="ui-icon-button task-play" aria-label={'Focar em '+t.title} disabled={t.done||readOnly} onClick={()=>focusTask(t)}><Play size={15} fill="currentColor"/></button></div></div>}):<div className="activity-empty"><CheckCircle2 size={28} strokeWidth={1.5}/><b>Nenhuma tarefa encontrada</b><small>Altere os filtros ou crie uma nova tarefa.</small></div>}</div>
  </section>}
  function renderBooks(){return <section className="activity-surface"><header className="activity-section-head"><div><h2><BookOpen size={18}/> Biblioteca de leitura</h2><small>{books.length} livros na biblioteca</small></div><div className="book-header-actions"><Button className="activity-add-action" disabled={readOnly} variant="secondary" size="sm" onClick={()=>setShowImport(true)}><Search size={16}/> Buscar livro</Button><Button className="activity-add-action book-add-manual" disabled={readOnly} variant="secondary" size="sm" aria-label="Adicionar livro" title="Adicionar livro manualmente" onClick={()=>open('book')}><Plus size={18}/><span>Adicionar livro</span></Button></div></header>
   <div className="activity-library">{visibleBooks.length?visibleBooks.map(b=><article className="activity-book" key={b.id}><Cover title={b.title} coverStyle={b.metadata?.coverStyle}/><div className="activity-book-copy"><b>{b.title}</b><small>{b.author}</small>{b.metadata&&<small>{b.metadata.language} · {b.metadata.year} · demo</small>}<Progress value={progressOf(b)} label={'Progresso de leitura: '+b.title}/><small>Pág. {b.page} de {b.pages} · {progressOf(b)}%</small><div className="book-row-actions"><Button className="activity-reading-action" disabled={readOnly} variant="soft" size="sm" onClick={()=>onReading(b)}><Play size={14}/> {b.page>0?'Continuar leitura':'Iniciar leitura'}</Button><button type="button" className="ui-icon-button book-details-action" disabled={readOnly} aria-label={'Detalhes de '+b.title} title="Detalhes e capítulos" onClick={()=>setDetailsId(b.id)}><Ellipsis size={19}/></button></div></div></article>):<div className="activity-empty"><BookOpen size={28}/><b>Nenhuma leitura encontrada</b></div>}</div>
@@ -72,7 +76,7 @@ export function ActivitiesPage({categories,tasks,books,onCategories,onTasks,onBo
   {detailsBook&&<BookDetails book={detailsBook} onChange={book=>onBooks(books.map(b=>b.id===book.id?book:b))} onDismiss={()=>setDetailsId(null)}/>}
   {form&&<Dialog title={form==='category'?'Nova categoria':form==='book'?'Adicionar livro':editing!==null?'Editar tarefa':'Nova tarefa'} description="Organize o que você quer realizar." onDismiss={()=>setForm(null)}><form className="dialog-form" onSubmit={e=>{e.preventDefault();save()}}>
   <Field label={form==='book'?'Título do livro':form==='category'?'Nome da categoria':'Título da tarefa'} value={name} onChange={e=>setName(e.target.value)} required maxLength={80}/>
-  {form==='task'&&<SelectField label="Categoria" value={category} onValueChange={setCategory} options={categories.map(c=>({value:c.id,label:c.name}))}/>}
+  {form==='task'&&<><SelectField label="Categoria" value={category} onValueChange={setCategory} options={categories.map(c=>({value:c.id,label:c.name}))}/><Field label="Estimativa de Pomodoros (opcional)" type="number" min="1" max="20" step="1" value={estimate} onChange={e=>setEstimate(e.target.value)}/></>}
   {form==='book'&&<><Field label="Autor" value={author} onChange={e=>setAuthor(e.target.value)} required maxLength={80}/><Field label="Total de páginas" type="number" min="1" max="10000" step="1" required value={pages} onChange={e=>setPages(e.target.value)}/></>}
   {error&&<p role="alert" className="activity-error">{error}</p>}
   <footer className="dialog-actions"><Button variant="secondary" onClick={()=>setForm(null)}>Cancelar</Button><Button type="submit">Salvar</Button></footer></form></Dialog>}

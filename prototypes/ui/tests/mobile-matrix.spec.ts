@@ -92,6 +92,7 @@ for(const size of sizes){
   await dialogFits(page,'session detail');
   await page.getByRole('button',{name:'Fechar diálogo'}).click();
   await go('Agenda');
+  await page.getByRole('button',{name:'Planejar foco das 09:30 às 11:00'}).click();await dialogFits(page,'plan focus');await page.getByRole('button',{name:'Fechar diálogo'}).click();
   const source=page.getByRole('button',{name:'Microsoft Outlook',exact:true});await contained(source,page.locator('.calendar-source-options'),'calendar source');await source.click();await expect(source).toHaveAttribute('aria-pressed','false');await source.click();await expect(source).toHaveAttribute('aria-pressed','true');
   for(const view of ['Dia','Semana','Mês']){
    await page.getByRole('group',{name:'Visualização da agenda'}).getByRole('button',{name:view,exact:true}).click();

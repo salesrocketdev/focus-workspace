@@ -62,7 +62,7 @@ export function loadNotes(){const value=readStorage(NOTES_KEY);return typeof val
 export function makeBackup():Backup{
  const prefs=loadPreferences(),current=loadWorkspace(prefs);
  // Export committed data, not an unfinished session that could replay on import.
- const w={...current,timer:{...current.timer,phase:'focus' as const,cycle:0,running:false,startedAt:0,duration:prefs.focus,seconds:current.timer.mode==='Livre'?0:prefs.focus}};
+ const w={...current,timer:{...current.timer,plannedId:undefined,phase:'focus' as const,cycle:0,running:false,startedAt:0,duration:prefs.focus,seconds:current.timer.mode==='Livre'?0:prefs.focus}};
  const data=Object.fromEntries((Object.keys(keys) as Key[]).map(k=>[k,readStorage(keys[k])])) as Data;
  data.workspace=w;data.preferences=prefs;
  return parseBackup(JSON.stringify({format:'focora-backup',version:1,exportedAt:new Date().toISOString(),data}));

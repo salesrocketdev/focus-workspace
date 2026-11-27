@@ -4,7 +4,7 @@ export type CalendarProvider='google-calendar'|'outlook';
 export type CalendarView='day'|'week'|'month';
 export interface CalendarEvent {
  id:string; day:string; title:string; start:number; end:number;
- provider:CalendarProvider; color:'lavender'|'blue'|'orange';
+ provider:CalendarProvider|'local-focus'; color:'lavender'|'blue'|'orange';
 }
 export const DEMO_DAY='2025-01-29';
 const dayMs=86_400_000;
@@ -42,9 +42,9 @@ export function freeWindows(day:string,items:CalendarEvent[],start=540,end=1080)
  for(const e of eventsOn(day,items)){
   if(e.end<=start||e.start>=end)continue;
   const left=Math.max(start,e.start),right=Math.min(end,e.end);
-  if(left-cursor>=25)intervals.push({start:cursor,end:left});
+  if(left-cursor>=15)intervals.push({start:cursor,end:left});
   cursor=Math.max(cursor,right);
  }
- if(end-cursor>=25)intervals.push({start:cursor,end});
+ if(end-cursor>=15)intervals.push({start:cursor,end});
  return intervals;
 }

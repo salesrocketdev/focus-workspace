@@ -1,7 +1,7 @@
 import { tasksInitial } from './model';
 
 export interface Category { id:string; name:string; tone:'blue'|'lavender'|'green'|'orange' }
-export interface Task { id:number; title:string; done:boolean; categoryId:string; priority?:boolean }
+export interface Task { id:number; title:string; done:boolean; categoryId:string; priority?:boolean; estimate?:number }
 export interface BookChapter {id:string;title:string;done:boolean}
 export type BookCoverStyle='indigo'|'forest'|'sand';
 export interface BookMetadata {source:'mock';editionId:string;isbn:string;publisher:string;year:number;language:string;coverStyle?:BookCoverStyle}

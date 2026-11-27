@@ -4,7 +4,7 @@ import type { FocusContext } from './activity-model';
 export type SessionStatus='completed'|'interrupted';
 export type SessionMode='Pomodoro'|'Livre';
 export interface FocusRecord{
- id:string;day:string;time:string;title:string;categoryId:string;category:string;seconds:number;mode:SessionMode;status:SessionStatus;origin:'fixture'|'session';
+ id:string;day:string;time:string;title:string;categoryId:string;category:string;seconds:number;mode:SessionMode;status:SessionStatus;origin:'fixture'|'session';taskId?:number;plannedId?:string;
 }
 const fixtures:[number,string,string,string,string,number,SessionMode,SessionStatus][]=[
  [0,'09:00','Revisar documentação','work','Trabalho',25,'Pomodoro','completed'],
@@ -25,8 +25,8 @@ const fixtures:[number,string,string,string,string,number,SessionMode,SessionSta
  [-22,'15:00','Projeto pessoal','personal','Projetos pessoais',45,'Livre','completed'],
 ];
 export const initialRecords:FocusRecord[]=fixtures.map(([offset,time,title,categoryId,category,minutes,mode,status],i)=>({id:'fixture-'+i,day:addDays(DEMO_DAY,offset),time,title,categoryId,category,seconds:minutes*60,mode,status,origin:'fixture'}));
-export function recordSession(context:FocusContext,seconds:number,mode:SessionMode,status:SessionStatus):FocusRecord{
- return {id:crypto.randomUUID(),day:DEMO_DAY,time:new Intl.DateTimeFormat('pt-BR',{hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date()),title:context.title,categoryId:context.kind==='reading'?'reading':context.categoryId,category:context.label,seconds:Math.floor(seconds),mode,status,origin:'session'};
+export function recordSession(context:FocusContext,seconds:number,mode:SessionMode,status:SessionStatus,plannedId?:string):FocusRecord{
+ return {id:crypto.randomUUID(),day:DEMO_DAY,time:new Intl.DateTimeFormat('pt-BR',{hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date()),title:context.title,categoryId:context.kind==='reading'?'reading':context.categoryId,category:context.label,seconds:Math.floor(seconds),mode,status,origin:'session',...(context.kind==='task'?{taskId:Number(context.id)}:{}),...(plannedId?{plannedId}:{})};
 }
 export const totalSeconds=(records:FocusRecord[])=>records.reduce((n,r)=>n+r.seconds,0);
 export function durationLabel(seconds:number){

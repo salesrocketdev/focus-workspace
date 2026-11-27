@@ -5,6 +5,7 @@ import { EditIconButton, EditTextButton, EditCardToolbar, WidgetSizeOptions, Edi
 import { PageHeader, MobileMasthead } from './layout';
 import { CompactFocus,CommandPalette,QuickActionButton,type QuickAction } from './quick-actions';
 import { CalendarPage } from './calendar-page';
+import {conflict,validBlock,contextExists,type FocusBlock} from './planning-model';
 import { HistoryPage } from './history-page';
 import { MiniTrend } from './charts';
 import {useDistractionShield,DistractionDialog,launchFocusShortcut} from './distraction-shield';
@@ -108,11 +109,14 @@ export function App(){
  const [showProgress,setShowProgress]=useState(false);
  const [pageInput,setPageInput]=useState('72');
  const [records,setRecords]=useState(restored.records);
+ const [blocks,setBlocks]=useState<FocusBlock[]>(restored.blocks??[]);
+ const [plannedId,setPlannedId]=useState<string|undefined>(restored.timer.plannedId);
+ const [planTask,setPlanTask]=useState<number|undefined>();
  const todayRecords=filterPeriod(records,1),todaySeconds=totalSeconds(todayRecords);
  const lastWeek=dailyTotals(records,7),yesterdaySeconds=lastWeek[lastWeek.length-2].seconds;
  const changePercent=yesterdaySeconds?Math.round((todaySeconds-yesterdaySeconds)/yesterdaySeconds*100):null;
  const [summaryPoint,setSummaryPoint]=useState<{day:string;seconds:number;count:number}|null>(null);
- function saveFocusRecord(elapsed:number,status:SessionStatus,finishedCycle=0){if(elapsed<=0)return;const record=recordSession(focusContext,elapsed,mode,status);setRecords(old=>[record,...old]);setSessionSummary({record,context:{...focusContext},cycle:finishedCycle,cycleGoal:prefs.cycles});}
+ function saveFocusRecord(elapsed:number,status:SessionStatus,finishedCycle=0){if(elapsed<=0)return;const record=recordSession(focusContext,elapsed,mode,status,plannedId);setRecords(old=>[record,...old]);setSessionSummary({record,context:{...focusContext},cycle:finishedCycle,cycleGoal:prefs.cycles});}
  const key=mobile?'mobile':'desktop';
  const editing=view==='edit';
  const rawWidgets=editing && draft ? draft : layouts[key];
@@ -130,15 +134,15 @@ export function App(){
   const nextPrefs=loadPreferences(),snapshot=loadWorkspace(nextPrefs),t=snapshot.timer;
   clock.current=t.startedAt;recoverExpired.current=t.running&&t.mode==='Pomodoro'&&t.seconds===0;
   setPrefs(nextPrefs);setMode(t.mode);setPhase(t.phase);setCycle(t.cycle);setDuration(t.duration);setSeconds(t.seconds);setRunning(t.running);
-  setFocusContext(t.context);setReadingId(t.readingId);setTasks(snapshot.tasks);setCategories(snapshot.categories);setBooks(snapshot.books);setRecords(snapshot.records);setNotes(loadNotes());setConfirmReset(false);setSessionSummary(null);
+  setFocusContext(t.context);setReadingId(t.readingId);setTasks(snapshot.tasks);setCategories(snapshot.categories);setBooks(snapshot.books);setRecords(snapshot.records);setBlocks(snapshot.blocks??[]);setPlannedId(t.plannedId);setNotes(loadNotes());setConfirmReset(false);setSessionSummary(null);
  });
  function requireWriter(){if(tabs.isWriter())return true;setMessage('Outra aba controla o Focora. Feche-a para assumir o controle.');return false}
  const wakeStatus=useScreenWakeLock(prefs.keepAwake===true,tabs.canWrite&&running&&phase==='focus');
  useLayoutEffect(()=>{
   if(!tabs.canWrite||!tabs.isWriter())return;
-  const saved=saveWorkspace({version:1,timer:{mode,phase,cycle,duration,seconds,running,startedAt:clock.current,context:focusContext,readingId},tasks,categories,books,records});
+  const saved=saveWorkspace({version:1,timer:{mode,phase,cycle,duration,seconds,running,startedAt:clock.current,context:focusContext,readingId,plannedId},tasks,categories,books,records,blocks});
   if(!saved&&!storageWarning.current){storageWarning.current=true;setMessage('Armazenamento local indisponível. A sessão poderá ser perdida ao fechar.')}
- },[tabs.canWrite,mode,phase,cycle,duration,seconds,running,focusContext,readingId,tasks,categories,books,records]);
+ },[tabs.canWrite,mode,phase,cycle,duration,seconds,running,focusContext,readingId,tasks,categories,books,records,blocks,plannedId]);
  useEffect(()=>{
   if(!running){tickRef.current=()=>{};return}
   let finished=false;
@@ -152,7 +156,7 @@ export function App(){
     const recovered=recoverExpired.current||elapsed-duration>5;
     recoverExpired.current=false;
     const next=nextPhase(phase,cycle,prefs);
-    if(phase==='focus')saveFocusRecord(duration,'completed',next.cyclesDone);
+    if(phase==='focus'){saveFocusRecord(duration,'completed',next.cyclesDone);setPlannedId(undefined)}
     setConfirmReset(false);
     if(next.phase==='focus'&&next.auto&&!recovered)setSessionSummary(null);
     setPhase(next.phase);setCycle(next.cyclesDone);
@@ -167,8 +171,8 @@ export function App(){
   const resume=()=>{if(document.visibilityState==='visible')tick()};
   document.addEventListener('visibilitychange',resume);window.addEventListener('pageshow',resume);window.addEventListener('focus',resume);
   return()=>{finished=true;window.clearInterval(id);document.removeEventListener('visibilitychange',resume);window.removeEventListener('pageshow',resume);window.removeEventListener('focus',resume);tickRef.current=()=>{}};
- },[tabs.canWrite,running,mode,duration,phase,cycle,prefs,focusContext,notifications.prefs]);
- function setMethod(value:'Pomodoro'|'Livre'){if(!requireWriter()||hasSession||value===mode)return;setMode(value);setPhase('focus');setCycle(0);setDuration(prefs.focus);setSeconds(value==='Livre'?0:prefs.focus)}
+ },[tabs.canWrite,running,mode,duration,phase,cycle,prefs,focusContext,plannedId,notifications.prefs]);
+ function setMethod(value:'Pomodoro'|'Livre'){if(!requireWriter()||hasSession||value===mode)return;setPlannedId(undefined);setMode(value);setPhase('focus');setCycle(0);setDuration(prefs.focus);setSeconds(value==='Livre'?0:prefs.focus)}
  function toggle(){
   if(!requireWriter())return;
   if(running){
@@ -184,12 +188,12 @@ export function App(){
   notifications.sessionStart(fresh);
   if(fresh&&shield.autoShortcut){
    // Persist synchronously before handing off to another application.
-   const saved=saveWorkspace({version:1,timer:{mode,phase,cycle,duration,seconds:initial,running:true,startedAt:clock.current,context:focusContext,readingId},tasks,categories,books,records});
+   const saved=saveWorkspace({version:1,timer:{mode,phase,cycle,duration,seconds:initial,running:true,startedAt:clock.current,context:focusContext,readingId,plannedId},tasks,categories,books,records,blocks});
    if(saved){try{launchFocusShortcut((mode==='Livre'?prefs.focus:initial)/60)}catch{setMessage('Não foi possível abrir o atalho. Ative Não Perturbe manualmente.');setShowShield(true)}}
    else{setMessage('Não foi possível salvar a sessão antes de abrir Atalhos. Ative Não Perturbe manualmente.');setShowShield(true)}
   }else if(fresh&&shield.remind)setShowShield(true);
  }
- function reset(){if(!requireWriter())return;setConfirmReset(false);recoverExpired.current=false;setRunning(false);setPhase('focus');setCycle(0);setDuration(prefs.focus);setSeconds(mode==='Livre'?0:prefs.focus);setSessionSummary(null)}
+ function reset(){if(!requireWriter())return;setPlannedId(undefined);setConfirmReset(false);recoverExpired.current=false;setRunning(false);setPhase('focus');setCycle(0);setDuration(prefs.focus);setSeconds(mode==='Livre'?0:prefs.focus);setSessionSummary(null)}
  function requestReset(){
   if(!requireWriter())return;
   if(running&&mode==='Pomodoro'&&Date.now()-clock.current>=duration*1000){tickRef.current();return}
@@ -200,8 +204,8 @@ export function App(){
   if(running&&mode==='Pomodoro'&&Date.now()-clock.current>=duration*1000){setConfirmReset(false);tickRef.current();return}
   reset();
  }
- function stop(){if(!requireWriter())return;recoverExpired.current=false;setRunning(false);if(phase==='focus'){const elapsed=running?Math.max(0,Math.floor((Date.now()-clock.current)/1000)):mode==='Livre'?seconds:duration-seconds;saveFocusRecord(mode==='Livre'?elapsed:Math.min(duration,elapsed),mode==='Livre'||elapsed>=duration?'completed':'interrupted');}setPhase('focus');setCycle(0);setDuration(prefs.focus);setSeconds(mode==='Livre'?0:prefs.focus);setConfirmReset(false);setMessage('Sessão encerrada.')}
- function navigate(next:View,tab:ActivityTab='overview'){if(editing&&next!=='edit'){setMessage('Salve ou cancele a edição antes de sair.');return}if(next==='activities')setActivityTab(tab);if(next==='settings'){if(view!=='settings')setSettingsSection('focus');if(mobile)setMobileSettingsDetail(false)}setView(next)}
+ function stop(){if(!requireWriter())return;recoverExpired.current=false;setRunning(false);if(phase==='focus'){const elapsed=running?Math.max(0,Math.floor((Date.now()-clock.current)/1000)):mode==='Livre'?seconds:duration-seconds;saveFocusRecord(mode==='Livre'?elapsed:Math.min(duration,elapsed),mode==='Livre'||elapsed>=duration?'completed':'interrupted');}setPhase('focus');setCycle(0);setDuration(prefs.focus);setSeconds(mode==='Livre'?0:prefs.focus);setPlannedId(undefined);setConfirmReset(false);setMessage('Sessão encerrada.')}
+ function navigate(next:View,tab:ActivityTab='overview'){if(editing&&next!=='edit'){setMessage('Salve ou cancele a edição antes de sair.');return}if(next==='activities')setActivityTab(tab);if(next==='calendar')setPlanTask(undefined);if(next==='settings'){if(view!=='settings')setSettingsSection('focus');if(mobile)setMobileSettingsDetail(false)}setView(next)}
  function startEdit(){setCompact(false);setOpenMenu(null);setPushNeighbors(false);setCataloguePreview(null);catalogueDrag.current=null;setQuery('');setEditKey(key);setShowLayoutPresets(false);setWidgetOptionsId(null);editHistory.begin((key==='desktop'?resolveLayout(layouts[key]):layouts[key]).map(w=>({...w,placement:w.placement?{...w.placement}:undefined})));setSelected(layouts[key][0]?.id??'');setShowCatalogue(false);setView('edit')}
  function closeEdit(save:boolean){setOpenMenu(null);setCataloguePreview(null);catalogueDrag.current=null;if(save&&draft){const next={...layouts,[editKey]:editKey==='desktop'?resolveLayout(draft):draft};try{localStorage.setItem(STORAGE,JSON.stringify(next))}catch{setMessage('Não foi possível salvar no navegador.');return}setLayouts(next);setMessage('Painel salvo.')}editHistory.begin(null);setShowLayoutPresets(false);setWidgetOptionsId(null);setView('today')}
  function applyLayoutPreset(id:DashboardPreset){const next=presetLayout(id,editKey==='mobile');setDraft(editKey==='desktop'?resolveLayout(next):next);setSelected(next[0]?.id??'');setOpenMenu(null);setShowLayoutPresets(false);setShowCatalogue(false)}
@@ -245,7 +249,7 @@ export function App(){
  const pct=progressOf(readingBook);
  const hasSession=running||phase!=='focus'||(mode==='Livre'?seconds>0:seconds>0&&seconds<duration);
  const timerLabel=phase==='focus'?focusContext.label:phaseName(phase);
- function changePreferences(next:FocusPreferences){if(!requireWriter()||hasSession)return;setPrefs(next);setDuration(next.focus);setSeconds(mode==='Livre'?0:next.focus);if(!writeStorage(PREFS_KEY,next))setMessage('Preferências disponíveis apenas nesta sessão.');}
+ function changePreferences(next:FocusPreferences){if(!requireWriter()||hasSession)return;setPlannedId(undefined);setPrefs(next);setDuration(next.focus);setSeconds(mode==='Livre'?0:next.focus);if(!writeStorage(PREFS_KEY,next))setMessage('Preferências disponíveis apenas nesta sessão.');}
  function changeConnections(next:ProviderId[]){setConnections(next);if(!writeStorage(CONNECTIONS_KEY,next))setMessage('Conexões demo disponíveis apenas nesta sessão.');}
  function finishOnboarding(identity:Profile,next:FocusPreferences,preset:Preset|null){if(!requireWriter())return;setProfile(identity);writeStorage(ONBOARDING_KEY,identity);changePreferences(next);if(preset){const nextLayouts=suggestedLayout(preset);setLayouts(nextLayouts);writeStorage(STORAGE,nextLayouts)}setShowOnboarding(false);setMessage('Seu espaço foi personalizado.');}
  function skipOnboarding(){if(!profile){setProfile('guest');writeStorage(ONBOARDING_KEY,'guest')}setShowOnboarding(false);}
@@ -253,20 +257,33 @@ export function App(){
   if(!requireWriter())return;
   if(hasSession){setMessage('Encerre ou reinicie a sessão antes de trocar de atividade.');return}
   if(ctx.kind==='reading')setReadingId(ctx.id);
-  setFocusContext(ctx);setSeconds(mode==='Livre'?0:prefs.focus);setDuration(prefs.focus);setShowFocusPicker(false);
+  setPlannedId(undefined);setFocusContext(ctx);setSeconds(mode==='Livre'?0:prefs.focus);setDuration(prefs.focus);setShowFocusPicker(false);
  }
  function openContext(ctx:FocusContext){
   if(!requireWriter())return;
   if(hasSession&&!sameContext(focusContext,ctx)){setMessage('Encerre ou reinicie a sessão atual antes de trocar de atividade.');return}
-  if(!sameContext(focusContext,ctx)){setFocusContext(ctx);setSeconds(mode==='Livre'?0:duration)}
+  if(!sameContext(focusContext,ctx)){setPlannedId(undefined);setFocusContext(ctx);setDuration(prefs.focus);setSeconds(mode==='Livre'?0:prefs.focus)}
   navigate('focus');
+ }
+ function prepareBlock(b:FocusBlock){
+  if(!requireWriter())return;
+  if(hasSession){setMessage('Encerre a sessão atual antes de preparar outro bloco.');return}
+  if(!blocks.some(x=>x.id===b.id)||!contextExists(b.context,tasks,categories,books)){setMessage('A atividade planejada não está mais disponível.');return}
+  if(b.context.kind==='task'&&tasks.some(t=>String(t.id)===b.context.id&&t.done)){setMessage('Esta tarefa já está concluída.');return}
+  setMode('Pomodoro');setPhase('focus');setCycle(0);setFocusContext(b.context);if(b.context.kind==='reading')setReadingId(b.context.id);
+  const length=(b.end-b.start)*60;setDuration(length);setSeconds(length);setPlannedId(b.id);setSessionSummary(null);navigate('focus');
+ }
+ function saveBlock(b:FocusBlock):string|null{
+  if(!requireWriter())return 'Outra aba controla o Focora.';
+  if(!validBlock(b)||!contextExists(b.context,tasks,categories,books)||blocks.length>=2000||conflict(b,blocks))return 'Este horário não está disponível. Escolha outro intervalo.';
+  setBlocks(old=>[...old,b]);setMessage('Bloco reservado localmente.');return null;
  }
  function openReading(book:Book){
   if(!requireWriter())return;
   const ctx=readingContext(book);
   if(hasSession&&!sameContext(focusContext,ctx)){setMessage('Encerre ou reinicie a sessão atual antes de trocar de atividade.');return}
   setReadingId(book.id);setFocusContext(ctx);
-  if(!hasSession){setDuration(prefs.focus);setSeconds(mode==='Livre'?0:prefs.focus)}
+  if(!hasSession){setPlannedId(undefined);setDuration(prefs.focus);setSeconds(mode==='Livre'?0:prefs.focus)}
   navigate('focus');
  }
  useLayoutEffect(()=>{
@@ -326,7 +343,7 @@ export function App(){
  <a className="skip-content" href="#main-content" onClick={e=>{e.preventDefault();document.getElementById('main-content')?.focus()}}>Ir para o conteúdo</a>
  {view!=='focus'&&<aside className="sidebar"><Brand/><nav aria-label="Navegação principal">{navigation.map(n=><button key={n.id} aria-current={view===n.id||editing&&n.id==='today'?'page':undefined} className={view===n.id||editing&&n.id==='today'?'active':''} onClick={()=>navigate(n.id)}><n.icon size={18} strokeWidth={1.8}/>{n.title}</button>)}</nav><div className="connection"><span><i/> {profile==='google-demo'?'Perfil Google (demo)':'Dados de demonstração'}</span><ProviderLabel provider="google-calendar" size={16}/><ProviderLabel provider="outlook" size={16}/></div></aside>}
  <main id="main-content" tabIndex={-1} className={"main "+(view==='focus'?'focus-main':'workspace-main')}>
- {view==='focus'?<><header className="focus-top"><div className="focus-header-leading"><button className="ui-icon-button" onClick={()=>setView('today')} aria-label="Voltar"><ArrowLeft size={19}/></button><Brand/></div><h1 className="focus-breadcrumb">{focusContext.kind==='reading'?<BookOpen size={16}/>:<Layers size={16}/>}<span>{focusContext.label}<span className="desktop-focus-title"> · {focusContext.title}</span></span></h1><div className="focus-header-trailing"><button type="button" className="ui-icon-button zen-toggle" aria-label="Modo Zen" title={zen?'Sair do modo Zen':'Modo Zen'} aria-pressed={zen} onClick={()=>setZen(v=>!v)}>{zen?<Eye size={18}/>:<EyeOff size={18}/>}</button><button className="ui-icon-button" aria-label="Abrir foco compacto" title="Foco compacto" onClick={openCompact}><Minimize2 size={18}/></button><button className="ui-icon-button" onClick={()=>setView('today')} aria-label="Fechar foco"><X size={21}/></button></div></header><TabIndicator tabs={tabs}/><div className={'immersive-grid route-enter'+(zen?' zen-mode':'')} data-route="focus">{focusContext.kind==='reading'?<div className="book-panel"><Cover title={readingBook.title} coverStyle={readingBook.metadata?.coverStyle}/><h2>{readingBook.title}</h2><p>{readingBook.author}</p><Progress value={pct} label={'Progresso de leitura: '+readingBook.title}/><small>Pág. {page} de {readingBook.pages} · {pct}%</small><Button variant="secondary" disabled={!tabs.canWrite} onClick={()=>{setPageInput(String(page));setShowProgress(true)}}>Atualizar progresso</Button></div>:<div className="focus-activity-panel"><CategoryMark category={contextCategory}/><small>{focusContext.kind==='task'?'Tarefa':'Atividade'} · {contextCategory.name}</small><h2>{focusContext.title}</h2><p>Concentre-se em uma atividade por vez.</p>{focusContext.kind==='task'&&<label className="focus-task-check"><input type="checkbox" checked={tasks.some(t=>String(t.id)===focusContext.id&&t.done)} disabled={!tabs.canWrite} onChange={e=>setTasks(old=>old.map(t=>String(t.id)===focusContext.id?completeTask(t,e.target.checked):t))}/> Marcar tarefa como concluída</label>}<Button variant="secondary" onClick={()=>navigate('activities')}>Ver atividades</Button></div>}<div className="focus-center"><button className="focus-context-picker" disabled={hasSession||!tabs.canWrite} aria-label="Escolher atividade" onClick={()=>setShowFocusPicker(true)}><span>{focusContext.kind==='reading'?<BookOpen size={17}/>:<Layers size={17}/>}</span><span><small>Atividade atual</small><b>{focusContext.title}</b></span><ChevronDown size={17}/></button><Segment value={mode} onChange={setMethod} disabled={hasSession||!tabs.canWrite}/><Ring seconds={seconds} total={duration} large label={timerLabel} cycleLabel={mode==='Livre'?'Foco livre':phase==='focus'?'Ciclo '+Math.min(cycle+1,prefs.cycles)+' de '+prefs.cycles:phaseName(phase)}/><Transport disabled={!tabs.canWrite} running={running} onToggle={toggle} onReset={requestReset} onStop={stop}/><div className="immersive-actions"><Button variant="secondary" size="sm" disabled={hasSession||!tabs.canWrite} aria-label="Ritmos de foco" onClick={()=>setShowPresets(true)}><Timer size={16}/> Ritmos</Button><Button variant="secondary" size="sm" aria-label="Configurar sessão de foco" onClick={()=>setShowFocusSettings(true)}><Settings size={16}/><span className="focus-action-desktop">Configurar sessão de foco</span><span className="focus-action-mobile" aria-hidden="true">Ajustes</span></Button><Button variant="secondary" size="sm" onClick={()=>setShowShield(true)}><Moon size={16}/> Não Perturbe</Button></div></div><aside className="focus-side"><Card title="Próximo compromisso" icon={CalendarDays}><AgendaRows single/></Card><Card title="Música · Spotify (demo)" icon={Music2} provider="spotify">{player()}<label className="volume"><Volume2 size={16}/><input type="range" min="0" max="100" value={volume} onChange={e=>setVolume(Number(e.target.value))} aria-label="Volume simulado"/></label></Card></aside></div>{summaryPanel()}<FocusLandscape scene={normalizeScene(appearance.scene)}/></>:<>
+ {view==='focus'?<><header className="focus-top"><div className="focus-header-leading"><button className="ui-icon-button" onClick={()=>setView('today')} aria-label="Voltar"><ArrowLeft size={19}/></button><Brand/></div><h1 className="focus-breadcrumb">{focusContext.kind==='reading'?<BookOpen size={16}/>:<Layers size={16}/>}<span>{focusContext.label}<span className="desktop-focus-title"> · {focusContext.title}</span></span></h1><div className="focus-header-trailing"><button type="button" className="ui-icon-button zen-toggle" aria-label="Modo Zen" title={zen?'Sair do modo Zen':'Modo Zen'} aria-pressed={zen} onClick={()=>setZen(v=>!v)}>{zen?<Eye size={18}/>:<EyeOff size={18}/>}</button><button className="ui-icon-button" aria-label="Abrir foco compacto" title="Foco compacto" onClick={openCompact}><Minimize2 size={18}/></button><button className="ui-icon-button" onClick={()=>setView('today')} aria-label="Fechar foco"><X size={21}/></button></div></header><TabIndicator tabs={tabs}/><div className={'immersive-grid route-enter'+(zen?' zen-mode':'')} data-route="focus">{focusContext.kind==='reading'?<div className="book-panel"><Cover title={readingBook.title} coverStyle={readingBook.metadata?.coverStyle}/><h2>{readingBook.title}</h2><p>{readingBook.author}</p><Progress value={pct} label={'Progresso de leitura: '+readingBook.title}/><small>Pág. {page} de {readingBook.pages} · {pct}%</small><Button variant="secondary" disabled={!tabs.canWrite} onClick={()=>{setPageInput(String(page));setShowProgress(true)}}>Atualizar progresso</Button></div>:<div className="focus-activity-panel"><CategoryMark category={contextCategory}/><small>{focusContext.kind==='task'?'Tarefa':'Atividade'} · {contextCategory.name}</small><h2>{focusContext.title}</h2><p>Concentre-se em uma atividade por vez.</p>{focusContext.kind==='task'&&<label className="focus-task-check"><input type="checkbox" checked={tasks.some(t=>String(t.id)===focusContext.id&&t.done)} disabled={!tabs.canWrite} onChange={e=>setTasks(old=>old.map(t=>String(t.id)===focusContext.id?completeTask(t,e.target.checked):t))}/> Marcar tarefa como concluída</label>}<Button variant="secondary" onClick={()=>navigate('activities')}>Ver atividades</Button></div>}<div className="focus-center">{plannedId&&<small className="planned-focus-label"><CalendarDays size={14}/> Bloco planejado · {duration/60} min</small>}<button className="focus-context-picker" disabled={hasSession||!tabs.canWrite} aria-label="Escolher atividade" onClick={()=>setShowFocusPicker(true)}><span>{focusContext.kind==='reading'?<BookOpen size={17}/>:<Layers size={17}/>}</span><span><small>Atividade atual</small><b>{focusContext.title}</b></span><ChevronDown size={17}/></button><Segment value={mode} onChange={setMethod} disabled={hasSession||!tabs.canWrite}/><Ring seconds={seconds} total={duration} large label={timerLabel} cycleLabel={mode==='Livre'?'Foco livre':phase==='focus'?'Ciclo '+Math.min(cycle+1,prefs.cycles)+' de '+prefs.cycles:phaseName(phase)}/><Transport disabled={!tabs.canWrite} running={running} onToggle={toggle} onReset={requestReset} onStop={stop}/><div className="immersive-actions"><Button variant="secondary" size="sm" disabled={hasSession||!tabs.canWrite} aria-label="Ritmos de foco" onClick={()=>setShowPresets(true)}><Timer size={16}/> Ritmos</Button><Button variant="secondary" size="sm" aria-label="Configurar sessão de foco" onClick={()=>setShowFocusSettings(true)}><Settings size={16}/><span className="focus-action-desktop">Configurar sessão de foco</span><span className="focus-action-mobile" aria-hidden="true">Ajustes</span></Button><Button variant="secondary" size="sm" onClick={()=>setShowShield(true)}><Moon size={16}/> Não Perturbe</Button></div></div><aside className="focus-side"><Card title="Próximo compromisso" icon={CalendarDays}><AgendaRows single/></Card><Card title="Música · Spotify (demo)" icon={Music2} provider="spotify">{player()}<label className="volume"><Volume2 size={16}/><input type="range" min="0" max="100" value={volume} onChange={e=>setVolume(Number(e.target.value))} aria-label="Volume simulado"/></label></Card></aside></div>{summaryPanel()}<FocusLandscape scene={normalizeScene(appearance.scene)}/></>:<>
  <OfflineIndicator offline={offline}/><TabIndicator tabs={tabs}/>
  <MobileMasthead notification={<div className="quick-header-actions"><QuickActionButton onClick={()=>setShowCommands(true)}/><NotificationBell unread={notifications.unread} onClick={()=>setShowNotifications(true)}/></div>}/>
  <PageHeader notification={!editing?<div className="quick-header-actions"><QuickActionButton onClick={()=>setShowCommands(true)}/><NotificationBell unread={notifications.unread} onClick={()=>setShowNotifications(true)}/></div>:undefined} title={editing?'Editar painel':view==='today'?'Meu dia':navigation.find(n=>n.id===view)?.title??''}
@@ -339,8 +356,8 @@ export function App(){
  {view==='today'&&summaryPanel()}
  {(view==='today'||editing)&&<div key={'workspace-'+view} className={'workspace workspace-enter '+(editing?'editing':'')} data-route={view}>{editing&&mobile?(!showCatalogue&&mobileEditor()):<div ref={gesture.gridRef} className={'widget-grid '+(freeGrid?'coordinate-grid ':'')+(activePreview?'grid-gesturing':'')} onDragOver={previewCatalogue} onDrop={dropCatalogue} onDragLeave={e=>{if(!e.currentTarget.contains(e.relatedTarget as Node|null))setCataloguePreview(null)}}>{widgets.map(renderWidget)}{activePreview&&freeGrid&&<GridGhost preview={activePreview}/>}{editing&&<AddWidgetTile style={addPlacement?gridStyle(addPlacement):freeGrid?{gridColumn:'1 / -1',gridRow:(endRow(widgets)+1)+' / span 3'}:undefined} onClick={()=>{setShowCatalogue(true);document.querySelector<HTMLInputElement>('.search')?.focus()}}/>}{!widgets.length&&!editing&&<div className="empty">Seu painel está vazio. <button className="primary" onClick={startEdit}>Adicionar widgets</button></div>}</div>}{editing&&<div className={'catalogue-wrap '+(showCatalogue?'visible':'')}>{cataloguePanel()}</div>}</div>}
  <div key={'route-'+view} className="route-content route-enter" data-route={view==='today'||editing?undefined:view} hidden={view==='today'||editing}>
- {view==='calendar'&&<CalendarPage/>}
- {view==='activities'&&<ActivitiesPage key={activityTab} initialTab={activityTab} readOnly={!tabs.canWrite} categories={categories} tasks={tasks} books={books} onCategories={next=>{if(requireWriter())setCategories(next)}} onTasks={next=>{if(requireWriter())setTasks(next)}} onBooks={next=>{if(requireWriter())setBooks(next)}} onFocus={openContext} onReading={openReading}/>}
+ {view==='calendar'&&<CalendarPage blocks={blocks} tasks={tasks} categories={categories} books={books} records={records} preferredMinutes={prefs.focus/60} initialTask={planTask} readOnly={!tabs.canWrite} activePlanId={plannedId} onSave={saveBlock} onRemove={id=>{if(requireWriter()&&id!==plannedId)setBlocks(old=>old.filter(b=>b.id!==id))}} onPrepare={prepareBlock}/>}
+ {view==='activities'&&<ActivitiesPage key={activityTab} initialTab={activityTab} readOnly={!tabs.canWrite} categories={categories} tasks={tasks} books={books} onCategories={next=>{if(requireWriter())setCategories(next)}} onTasks={next=>{if(requireWriter())setTasks(next)}} onBooks={next=>{if(requireWriter())setBooks(next)}} records={records} onPlan={task=>{if(requireWriter()){navigate('calendar');setPlanTask(task.id)}}} onFocus={openContext} onReading={openReading}/>}
  {view==='history'&&<HistoryPage records={records} goal={prefs.goal} mobile={mobile}/>}
  {view==='settings'&&<SettingsPage section={settingsSection} mobile={mobile} detail={mobileSettingsDetail} onSection={section=>{setSettingsSection(section);setMobileSettingsDetail(true)}} onBack={()=>setMobileSettingsDetail(false)} summaries={{focus:prefs.focus/60+' min de foco · '+prefs.short/60+' min de pausa',notifications:notifications.quietActive?'Horário silencioso ativo':(notifications.prefs.focus||notifications.prefs.breaks)?'Avisos de sessão ativos':'Avisos de sessão desativados',appearance:({light:'Tema claro',dark:'Tema escuro',system:'Tema do sistema'})[appearance.theme],integrations:connections.length?connections.length+' conexão(ões) de demonstração':'Nenhum serviço conectado',profile:profile==='google-demo'?'Perfil Google (demo)':'Modo visitante'}}>{settingsSection==='focus'&&<section className="settings-surface"><header className="settings-section-header"><Settings size={20}/><div><h2>Sessões de foco</h2><p>Personalize seu ritmo de concentração e descanso.</p></div></header><FocusSettings prefs={prefs} onChange={changePreferences} disabled={hasSession||!tabs.canWrite} wakeStatus={wakeStatus}/></section>}{settingsSection==='notifications'&&<NotificationSettings notifications={notifications} shield={shield} onShield={()=>setShowShield(true)}/>}{settingsSection==='integrations'&&<IntegrationPanel connections={connections} onChange={changeConnections}/>}{settingsSection==='appearance'&&<AppearancePanel appearance={appearance} onChange={updateAppearance}/>}{settingsSection==='profile'&&<section className="settings-surface"><header className="settings-section-header"><LayoutGrid size={20}/><div><h2>Perfil e personalização</h2><p>{profile==='google-demo'?'Perfil Google fictício':'Modo visitante'} · somente neste navegador.</p></div></header><div className="settings-action-group"><Button variant="secondary" disabled={hasSession||!tabs.canWrite} onClick={()=>setShowOnboarding(true)}>Refazer onboarding</Button><Button variant="secondary" onClick={()=>{const next={desktop:defaultLayout(),mobile:defaultLayout(true)};try{localStorage.setItem(STORAGE,JSON.stringify(next));setLayouts(next);setMessage('Layouts restaurados.')}catch{setMessage('Não foi possível persistir.')}}}><RotateCcw size={15}/> Restaurar painéis</Button></div><OfflineSettings offline={offline}/><BackupPanel canWrite={tabs.canWrite} canRestore={tabs.canWrite&&!hasSession} records={records} onRestore={backup=>{if(!tabs.isWriter()||hasSession)throw new Error('Encerre a sessão e use a aba responsável.');restoreBackup(backup);window.location.reload()}}/><small>Atividades, sessões e preferências são salvas neste navegador. Nenhuma autenticação real.</small></section>}</SettingsPage>}
  </div>

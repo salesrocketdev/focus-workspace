@@ -1,0 +1,15 @@
+/* Local focus planning follows the agenda's existing visual language. */
+.calendar-slot.plan-slot-button{width:100%;text-align:left;min-width:0;min-height:52px;cursor:pointer;justify-content:flex-start}
+.plan-slot-button .plan-slot-add{margin-left:auto;flex-shrink:0}
+.plan-slot-button:not(:disabled):hover{border-color:var(--field-selected-edge);background:var(--field-selected);color:var(--field-selected-ink)}
+.plan-slot-button:disabled{opacity:.65;cursor:default}
+.plan-window,.plan-preview{display:flex;align-items:center;gap:8px;min-width:0;background:var(--field-selected);color:var(--field-selected-ink);border-radius:8px;padding:10px;font-size:12px}
+.plan-window>span{display:grid;gap:4px;min-width:0}.plan-window small{font-size:11px}
+.plan-preview{flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.plan-detail-tag,.planned-focus-label{display:flex;align-items:center;gap:6px;color:var(--field-selected-ink);font-size:12px;min-width:0}
+.task-estimate{display:flex;align-items:center;gap:4px;font-size:10px;line-height:1.35;color:var(--ui-muted);margin-top:4px;text-decoration:none}
+.task-estimate svg{width:12px;height:12px;flex-shrink:0}
+.activity-task-title{min-width:0;overflow-wrap:anywhere}
+.activity-task-row .activity-row-actions{flex-wrap:wrap;justify-content:flex-end}
+.plan-task-hint{color:var(--field-selected-ink)}
+@media(max-width:759px){.activity-task-row .activity-row-actions{max-width:88px}.task-plan-action{min-width:44px;min-height:44px}.calendar-slot.plan-slot-button{min-height:54px}.calendar-detail+.dialog-actions{flex-wrap:wrap}.calendar-detail+.dialog-actions>.ui-button{min-height:44px;white-space:normal}}
