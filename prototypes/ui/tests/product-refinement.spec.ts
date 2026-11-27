@@ -170,7 +170,7 @@ test('V5 scene cards share geometry and immersive art remains prominent in focus
  const options=page.getByRole('group',{name:'Cenário do modo foco'});
  await expect(options.getByRole('button')).toHaveCount(6);
  const dimensions=await options.getByRole('button').evaluateAll(nodes=>nodes.map(e=>{const r=e.getBoundingClientRect();const p=e.querySelector('.scene-sample')!.getBoundingClientRect();return {w:r.width,h:r.height,pw:p.width,ph:p.height}}));
- for(const key of ['w','h','pw','ph'] as const)expect(Math.max(...dimensions.map(d=>d[key]))-Math.min(...dimensions.map(d=>d[key]))).toBeLessThanOrEqual(1);
+ for(const key of ['w','h','pw','ph'] as const)expect(Math.max(...dimensions.map(d=>d[key]))-Math.min(...dimensions.map(d=>d[key])), 'scene geometry '+key+' '+JSON.stringify(dimensions)).toBeLessThanOrEqual(1);
  await options.getByRole('button',{name:'Aurora',exact:true}).click();
  await options.screenshot({path:info.outputPath('scene-cards.png'),animations:'disabled'});
  await nav.getByRole('button',{name:'Hoje',exact:true}).click();
