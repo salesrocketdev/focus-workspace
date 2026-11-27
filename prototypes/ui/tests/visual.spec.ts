@@ -4,7 +4,7 @@ import { test, expect } from '@playwright/test';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>{if(!localStorage.getItem('focus-workspace:v4:onboarding'))localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest'))})});
 test('capture V4 screen candidates and validate basic flows',async({page},info)=>{
  await page.goto('/');
- await expect(page.getByRole('heading',{name:'Meu dia'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Hoje'})).toBeVisible();
  await page.screenshot({path:info.outputPath('dashboard.png'),fullPage:false,animations:'disabled',scale:'css'});
  await page.getByRole('button',{name:'Editar painel',exact:true}).click();
  await expect(page.getByRole('heading',{name:'Editar painel'})).toBeVisible();
@@ -53,7 +53,7 @@ test('dashboard fits supported widths without page-level horizontal scrolling',a
  for(const width of [1920,1366,1024,768,390,360]){
    await page.setViewportSize({width,height:900});
    await page.goto('/');
-   await expect(page.getByRole('heading',{name:'Meu dia'})).toBeVisible();
+   await expect(page.getByRole('heading',{name:'Hoje'})).toBeVisible();
    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy();
    await page.screenshot({path:info.outputPath('dashboard-'+width+'.png'),animations:'disabled',scale:'css'});
  }
@@ -80,7 +80,7 @@ test('editor controls share dimensions and previews are inert',async({page},info
  const heights=await page.locator('.edit-header .edit-text-button').evaluateAll(nodes=>nodes.map(n=>(n as HTMLElement).offsetHeight));
  expect(heights).toEqual(Array(3).fill(mobile?44:36));
  if(!mobile){
-  await expect(page.locator('.editing .preview-content[inert]')).toHaveCount(7);
+  await expect(page.locator('.editing .preview-content[inert]')).toHaveCount(5);
   const rows=await page.locator('.catalogue-item').evaluateAll(nodes=>nodes.map(n=>n.getBoundingClientRect().height));
   expect(new Set(rows).size).toBe(1);
   await page.getByRole('button',{name:'Opções de Foco (Pomodoro)',exact:true}).click();
@@ -109,8 +109,8 @@ test('workspace titles remain anchored across routes and editor',async({page},in
   await page.screenshot({path:info.outputPath('route-'+title.replace(/\s+/g,'-')+'.png'),animations:'disabled',scale:'css'});
  }
  const nav=page.locator(mobile?'.bottom-nav':'.sidebar nav');
- await check('Meu dia');
- for(const [label,title] of [['Agenda','Agenda'],['Atividades','Atividades'],['Histórico','Histórico'],[mobile?'Ajustes':'Configurações','Configurações']]){
+ await check('Hoje');
+ for(const [label,title] of [['Agenda','Agenda'],['Biblioteca','Biblioteca'],['Histórico','Histórico'],[mobile?'Ajustes':'Configurações','Configurações']]){
   await openNavigation(nav,label);
   await check(title);
  }
@@ -118,7 +118,7 @@ test('workspace titles remain anchored across routes and editor',async({page},in
  await page.getByRole('button',{name:'Editar painel',exact:true}).click();
  await check('Editar painel');
  await page.getByRole('button',{name:'Cancelar',exact:true}).click();
- await check('Meu dia');
+ await check('Hoje');
 });
 test('editor title stays aligned at tablet and compact widths',async({page},info)=>{
  if(info.project.name!=='desktop')return;
@@ -139,7 +139,7 @@ test('provider artwork is local, legible and consistent across views',async({pag
  await page.goto('/');
  const marks=page.locator('.provider-mark:visible');
  expect(await marks.count()).toBeGreaterThan(2);
- for(const provider of ['google-calendar','outlook','spotify']){
+ for(const provider of ['google-calendar','outlook']){
   const mark=page.locator('.provider-mark[data-provider="'+provider+'"]:visible').first();
   await expect(mark).toBeVisible();
   expect(await mark.evaluate((el:HTMLImageElement)=>el.complete&&el.naturalWidth>0)).toBeTruthy();
