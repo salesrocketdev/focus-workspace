@@ -19,10 +19,10 @@ export const catalogue: {type:WidgetType; title:string; description:string; size
 // V5 curated starting layout. Existing saved layouts are loaded unchanged.
 const homeLayout: Widget[]=[
  {id:'focus',type:'focus',size:'large',placement:{x:0,y:0,w:12,h:6}},
- {id:'goal',type:'goal',size:'medium',placement:{x:0,y:6,w:12,h:5}},
- {id:'tasks',type:'tasks',size:'large',placement:{x:0,y:11,w:6,h:5}},
- {id:'agenda',type:'agenda',size:'large',placement:{x:6,y:11,w:6,h:6}},
- {id:'reading',type:'reading',size:'medium',placement:{x:0,y:16,w:6,h:5}},
+ {id:'goal',type:'goal',size:'medium',placement:{x:0,y:6,w:12,h:3}},
+ {id:'tasks',type:'tasks',size:'large',placement:{x:0,y:9,w:6,h:5}},
+ {id:'agenda',type:'agenda',size:'large',placement:{x:6,y:9,w:6,h:6}},
+ {id:'reading',type:'reading',size:'medium',placement:{x:0,y:14,w:6,h:5}},
 ];
 export const defaultLayout = (mobile = false): Widget[] => homeLayout.map(w=>({...w,size:mobile?(w.type==='focus'?'large':'medium'):w.size,placement:mobile?undefined:{...w.placement!}}));
 export const defaults = (): Layouts => ({desktop:defaultLayout(),mobile:defaultLayout(true)});
