@@ -23,3 +23,7 @@ Second CI 46005706005: 149 passed, 2 failed, 18 skipped; build/Storybook passed.
 ## Fourth checkpoint
 
 Third full CI 46007307196: TypeScript/build, Storybook and all 151 executed functional tests passed (18 skipped). Two offline tests failed because their old Atividades navigation name was not migrated. Updated offline selectors to Biblioteca without weakening cache, timer persistence or offline data assertions. Application source unchanged from second checkpoint. Run full `[check]` again; no full acceptance until offline passes.
+
+## Validated preview baseline
+
+CI run 46008582449 on 5fd0b44 succeeded in all steps, including functional and offline regression suites. Publish identical application source using `[publish]`; visual approval and outstanding G4–G6 scope remain pending. This does not close #33, #42 or #43.
