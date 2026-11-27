@@ -1,0 +1,76 @@
+/* Compact, aligned filter controls and intentional selection semantics. */
+@media(min-width:760px){
+ .history-page .desktop-filter-bar{display:grid;grid-template-columns:auto repeat(3,minmax(0,1fr)) auto;align-items:end;gap:12px;padding:12px 14px;border:1px solid var(--ui-line);border-radius:11px;background:var(--ui-paper);min-width:0}
+ .desktop-filter-bar .filter-bar-label{display:flex;align-items:center;gap:6px;min-height:36px;white-space:nowrap;color:var(--ui-muted)}
+ .desktop-filter-bar .filter-bar-label small{font-size:10px;color:var(--field-selected-ink)}
+ .history-page .desktop-filter-bar>.ui-field{display:grid;gap:5px;min-width:0;max-width:none;width:100%}
+ .history-page .desktop-filter-bar>.ui-field>label{font-size:11px;display:block;color:var(--ui-muted);font-weight:550}
+ .history-page .desktop-filter-bar>.ui-field .ui-select-trigger,.activities-page .activity-task-filters>.ui-field .ui-select-trigger{border:1px solid var(--field-edge);background:var(--ui-paper);border-radius:8px;color:var(--ui-ink);height:36px;min-height:36px;padding:0 10px}
+ .history-page .desktop-filter-bar>.ui-field .ui-select-trigger[aria-expanded=true]{border-color:var(--field-focus)}
+ .desktop-filter-bar .filter-reset,.activity-filter-reset{height:36px;min-height:36px;background:transparent;border-color:transparent;color:var(--field-selected-ink);font-size:12px;white-space:nowrap;box-shadow:none}
+ .desktop-filter-bar .filter-reset:hover:not(:disabled),.activity-filter-reset:hover:not(:disabled){background:var(--field-selected)}
+ .activity-task-filters{display:grid;grid-template-columns:minmax(0,1fr) minmax(150px,220px) auto;align-items:center;gap:10px}
+ .activity-task-filters>.ui-field{width:100%;max-width:none}
+}
+@media(min-width:760px) and (max-width:1050px){
+ .history-page .desktop-filter-bar{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+ .desktop-filter-bar .filter-bar-label{grid-column:1/3;grid-row:1;min-height:28px}
+ .desktop-filter-bar .filter-reset{grid-column:3;grid-row:1;justify-self:end;min-height:28px;height:28px}
+ .activity-task-filters{grid-template-columns:minmax(0,1fr) auto}
+ .activity-task-filters>.small-tabs{grid-column:1/-1}
+}
+@media(max-width:759px){.activity-filter-reset{display:none}}
+.calendar-surface .calendar-source-panel{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px 14px;padding:12px 16px;background:transparent;border-block:1px solid var(--ui-line)}
+.calendar-source-heading{display:grid;gap:5px;min-width:0}
+.calendar-source-heading>span{display:flex;align-items:center;gap:6px;color:var(--ui-ink);font-size:12px}
+.calendar-source-heading>small{font-size:10px}
+.calendar-source-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;min-width:0}
+.calendar-source-button{display:flex;justify-content:flex-start;align-items:center;gap:8px;min-height:58px;text-align:left;padding:8px 10px;border:1px solid var(--ui-line);border-radius:10px;background:var(--ui-paper);min-width:0}
+.calendar-source-button[aria-pressed=true]{border-color:var(--field-selected-edge);background:var(--field-selected)}
+.calendar-source-button[aria-pressed=false] .calendar-source-mark{opacity:.6}
+.calendar-source-mark{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;background:var(--ui-paper);border:1px solid var(--ui-line);border-radius:8px}
+.calendar-source-copy{display:grid;gap:3px;min-width:0;flex:1}
+.calendar-source-copy b{font-size:12px;line-height:1.25;overflow-wrap:anywhere}
+.calendar-source-copy small{font-size:10px}
+.calendar-source-eye{display:grid;place-items:center;color:var(--ui-muted);flex-shrink:0}
+.calendar-source-button[aria-pressed=true] .calendar-source-eye{color:var(--field-selected-ink)}
+.calendar-source-panel .calendar-demo{grid-column:1/-1;margin:0;width:auto}
+@media(max-width:1050px){.calendar-surface .calendar-source-panel{grid-template-columns:minmax(0,1fr);gap:7px}.calendar-source-heading{display:flex;justify-content:space-between;align-items:center}}
+@media(max-width:759px){.calendar-surface .calendar-source-panel{padding:10px 12px;gap:8px}.calendar-source-options{gap:6px}.calendar-source-button{gap:6px;padding:7px;min-height:64px}.calendar-source-mark{width:30px;height:30px;flex-basis:30px}.calendar-source-mark img{width:20px;height:20px}.calendar-source-copy b{font-size:11px}.calendar-source-eye svg{width:15px;height:15px}}
+@media(max-width:359px){.calendar-source-button{gap:4px;padding:6px}.calendar-source-mark{width:26px;height:26px;flex-basis:26px}.calendar-source-eye svg{width:13px;height:13px}}
+.calendar-integration-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;border:0;background:transparent;padding:0}
+.settings-shell .calendar-integration-grid .integration-service{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding:14px;border:1px solid var(--ui-line);border-radius:12px;background:var(--ui-paper);align-content:start}
+.calendar-integration-grid .integration-service>.ui-button{justify-self:end;min-width:96px}
+@media(max-width:900px){.calendar-integration-grid{grid-template-columns:1fr}}
+/* Real task/checklist checkboxes retain native semantics and keyboard support. */
+:where(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]{
+ appearance:none;-webkit-appearance:none;width:18px;height:18px;flex:0 0 18px;min-width:18px;min-height:18px;margin:0;display:grid;place-items:center;border:1.5px solid var(--field-focus);border-radius:5px;background:var(--ui-paper);cursor:pointer;
+}
+:where(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]:checked{background:var(--action);border-color:var(--action)}
+:where(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]:checked::after{content:'';width:8px;height:4px;border-left:2px solid white;border-bottom:2px solid white;transform:translateY(-1px) rotate(-45deg)}
+:where(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]:disabled{opacity:.55;cursor:default}
+:where(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]:focus-visible{outline:2px solid var(--field-focus);outline-offset:3px}
+@media(forced-colors:active){:where(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]{appearance:auto}}
+/* Prevent a small caption or heading from overflowing its own column. */
+.activity-section-head>div:first-child{flex:1;min-width:0}
+.activity-section-head>div:first-child h2,.activity-section-head>div:first-child small{overflow-wrap:anywhere;white-space:normal;min-width:0;max-width:100%}
+.activity-section-head>div:first-child small{display:block}
+.activity-section-head>.activity-add-action{flex-shrink:0}
+@media(max-width:359px){.activity-section-head>div:first-child small{font-size:10px;line-height:1.4}.activity-section-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}}
+.scene-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-width:760px}
+.scene-options>button{display:grid;position:relative;justify-items:stretch;align-content:start;gap:8px;padding:7px;min-width:0;border:1px solid var(--ui-line);background:var(--ui-paper);border-radius:11px;text-align:left}
+.scene-options>button[aria-pressed=true]{border-color:var(--field-selected-edge);background:var(--field-selected)}
+.scene-sample{position:relative;display:grid;place-items:center;overflow:hidden;aspect-ratio:16/9;background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:7px}
+.scene-sample svg{position:absolute;bottom:0;width:100%;height:55%;opacity:.82}
+.scene-sample-clock{font-size:14px;font-weight:650;letter-spacing:-.04em;font-variant-numeric:tabular-nums;z-index:1}
+.scene-copy{display:grid;gap:3px;min-width:0;padding:0 3px 3px}
+.scene-copy b{font-size:12px;line-height:1.3;overflow-wrap:anywhere}
+.scene-copy small{font-size:10px;line-height:1.3}
+.scene-check{position:absolute;right:10px;top:10px;color:var(--field-selected-ink);background:var(--ui-paper);border-radius:50%}
+[data-theme=dark] .scene-sample svg{opacity:.45}
+@media(max-width:759px){.scene-options{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}}
+/* The chosen scene is a subtle, non-interactive footer; no overlay on controls. */
+.focus-landscape{overflow:hidden}
+@media(max-width:759px){.immersive .focus-landscape{display:block;height:64px;opacity:.35}}
+@media(max-width:759px) and (max-height:600px){.immersive .focus-landscape{height:44px}}
+[data-theme=dark] .immersive .focus-landscape{opacity:.28}

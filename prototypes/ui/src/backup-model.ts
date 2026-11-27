@@ -41,7 +41,7 @@ function validate(key:Key,x:unknown){
  if(x===null)return true;
  switch(key){
  case 'layouts':return layouts(x);
- case 'appearance':return object(x)&&one(x.theme,['light','dark','system'])&&one(x.motion,['system','reduced'])&&typeof x.accent==='string'&&/^#[a-f0-9]{6}$/i.test(x.accent)&&one(x.ring,['classic','dial','segmented','minimal']);
+ case 'appearance':return object(x)&&one(x.theme,['light','dark','system'])&&one(x.motion,['system','reduced'])&&typeof x.accent==='string'&&/^#[a-f0-9]{6}$/i.test(x.accent)&&one(x.ring,['classic','dial','segmented','minimal'])&&optional(x.scene,v=>one(v,['forest','ocean','aurora','desert','gradient','none']));
  case 'notifications':return object(x)&&bool(x.focus)&&bool(x.breaks)&&bool(x.native)&&optional(x.sound,bool)&&optional(x.startSound,bool)&&optional(x.tone,v=>one(v,['soft','bell','digital']))&&optional(x.volume,v=>int(v,0,100))&&optional(x.quiet,bool)&&optional(x.quietStart,time)&&optional(x.quietEnd,time);
  case 'inbox':return Array.isArray(x)&&x.length<=50&&x.every(e=>object(e)&&str(e.id)&&str(e.title)&&str(e.body)&&int(e.at,0,Number.MAX_SAFE_INTEGER)&&bool(e.read)&&one(e.kind,['focus','break','test']));
  case 'shield':return bool(x)||object(x)&&bool(x.remind)&&bool(x.autoShortcut);

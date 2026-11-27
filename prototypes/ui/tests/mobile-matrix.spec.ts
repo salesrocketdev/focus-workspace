@@ -24,7 +24,7 @@ async function separate(a:Locator,b:Locator,label:string){
 async function fit(page:Page,label:string){
  const out=await page.evaluate(()=>{
   const visible=(e:Element)=>{const s=getComputedStyle(e),r=e.getBoundingClientRect();return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.height>0&&!e.closest('[inert],[aria-hidden=true]')};
-  const selectors=['.history-export-header','.activity-section-head','.category-focus-row','.book-row-actions','.history-session','.backup-row','.dialog-header','.dialog-actions','.focus-center .transport','.calendar-date-controls'];
+  const selectors=['.history-export-header','.activity-section-head','.category-focus-row','.book-row-actions','.history-session','.backup-row','.dialog-header','.dialog-actions','.focus-center .transport','.calendar-date-controls','.calendar-source-options','.calendar-source-button','.scene-options','.scene-copy'];
   return {page:document.documentElement.scrollWidth-innerWidth,internal:Array.from(document.querySelectorAll(selectors.join(','))).filter(visible).filter(e=>e.scrollWidth>e.clientWidth+2).map(e=>({class:e.className,width:e.clientWidth,scroll:e.scrollWidth,children:Array.from(e.children).filter(visible).map(child=>({class:child.getAttribute('class'),width:Math.round(child.getBoundingClientRect().width),right:Math.round(child.getBoundingClientRect().right-e.getBoundingClientRect().right)}))}))};
  });
  expect.soft(out.page,label+' horizontal page overflow').toBeLessThanOrEqual(1);
@@ -90,6 +90,7 @@ for(const size of sizes){
   await dialogFits(page,'session detail');
   await page.getByRole('button',{name:'Fechar diálogo'}).click();
   await go('Agenda');
+  const source=page.getByRole('button',{name:'Microsoft Outlook',exact:true});await contained(source,page.locator('.calendar-source-options'),'calendar source');await source.click();await expect(source).toHaveAttribute('aria-pressed','false');await source.click();await expect(source).toHaveAttribute('aria-pressed','true');
   for(const view of ['Dia','Semana','Mês']){
    await page.getByRole('group',{name:'Visualização da agenda'}).getByRole('button',{name:view,exact:true}).click();
    await fit(page,'agenda '+view);
@@ -115,7 +116,7 @@ for(const size of sizes){
   for(const section of ['Sessões de foco','Notificações','Integrações','Perfil e painel','Aparência']){
    await settings.getByRole('button',{name:section,exact:true}).click();
    await fit(page,section);
-   if(section==='Aparência')await page.getByRole('button',{name:'Escuro',exact:true}).click();
+   if(section==='Aparência'){await page.getByRole('button',{name:'Escuro',exact:true}).click();await page.getByRole('button',{name:'Oceano',exact:true}).click();await fit(page,'scene options');}
    if(narrow)await page.getByRole('button',{name:'Voltar às configurações'}).click();
   }
   await go('Histórico');await fit(page,'dark history');
@@ -127,6 +128,7 @@ for(const size of sizes){
   await go('Hoje');
   await page.getByRole('button',{name:'Abrir sessão de foco',exact:true}).click();
   await fit(page,'focus');
+  await expect(page.locator('.focus-landscape')).toHaveAttribute('data-focus-scene','ocean');
   const transport=page.locator('.focus-center .transport'),start=transport.getByRole('button',{name:'Iniciar',exact:true});
   await contained(start,transport,'focus start');
   await start.scrollIntoViewIfNeeded();

@@ -3,8 +3,8 @@ import { createPortal } from 'react-dom';
 import { Check,ChevronDown,Search,X } from 'lucide-react';
 
 type Option={value:string;label:string;disabled?:boolean};
-interface SelectProps {label:string;value?:string|number;defaultValue?:string|number;options:Option[];onValueChange?:(value:string)=>void;hint?:string;disabled?:boolean;hideLabel?:boolean;compact?:boolean;placeholder?:string}
-export function SelectField({label,value,defaultValue,options,onValueChange,hint,disabled=false,hideLabel=false,compact=false,placeholder='Selecionar…'}:SelectProps){
+interface SelectProps {label:string;visibleLabel?:string;value?:string|number;defaultValue?:string|number;options:Option[];onValueChange?:(value:string)=>void;hint?:string;disabled?:boolean;hideLabel?:boolean;compact?:boolean;placeholder?:string}
+export function SelectField({label,visibleLabel,value,defaultValue,options,onValueChange,hint,disabled=false,hideLabel=false,compact=false,placeholder='Selecionar…'}:SelectProps){
  const id=useId(),trigger=useRef<HTMLButtonElement>(null),popup=useRef<HTMLDivElement>(null);
  const [local,setLocal]=useState(String(defaultValue??options.find(o=>!o.disabled)?.value??''));
  const current=String(value??local),chosen=options.find(o=>o.value===current);
@@ -53,7 +53,7 @@ export function SelectField({label,value,defaultValue,options,onValueChange,hint
  useEffect(()=>{if(open&&active>=0){const menu=popup.current,item=menu?.querySelector<HTMLElement>('[data-option-index="'+active+'"]');if(menu&&item){if(item.offsetTop<menu.scrollTop)menu.scrollTop=item.offsetTop;else if(item.offsetTop+item.offsetHeight>menu.scrollTop+menu.clientHeight)menu.scrollTop=item.offsetTop+item.offsetHeight-menu.clientHeight}}},[open,active]);
  const portalTarget=trigger.current?.closest('dialog')??(typeof document!=='undefined'?document.body:null);
  return <div className={'ui-field ui-select-field'+(compact?' field-compact':'')}>
-  <label id={id+'-label'} htmlFor={id} className={hideLabel?'ui-sr-only':undefined}>{label}</label>
+  <label id={id+'-label'} htmlFor={id} className={hideLabel?'ui-sr-only':undefined}>{visibleLabel??label}{visibleLabel&&label.startsWith(visibleLabel)&&<span className="ui-sr-only">{label.slice(visibleLabel.length)}</span>}</label>
   <button ref={trigger} id={id} type="button" role="combobox" aria-labelledby={id+'-label'} aria-describedby={hint?id+'-hint':undefined} aria-expanded={open} aria-haspopup="listbox" aria-controls={open?id+'-list':undefined} aria-activedescendant={open&&active>=0?id+'-opt-'+active:undefined} className="ui-select-trigger" disabled={disabled} onClick={()=>open?close():show()} onKeyDown={onKeyDown} onBlur={close}><span className={chosen?'':'ui-placeholder'}>{chosen?.label??placeholder}</span><ChevronDown size={17} aria-hidden="true"/></button>
   {hint&&<small id={id+'-hint'}>{hint}</small>}
   {open&&portalTarget&&createPortal(<div ref={popup} id={id+'-list'} role="listbox" aria-labelledby={id+'-label'} className="ui-select-popup">{options.map((o,i)=><div key={o.value} id={id+'-opt-'+i} data-option-index={i} role="option" aria-selected={o.value===current} aria-disabled={o.disabled||undefined} className={'ui-select-option'+(active===i?' option-active':'')} onPointerMove={()=>{if(!o.disabled)setActive(i)}} onPointerDown={e=>e.preventDefault()} onClick={()=>choose(i)}><span>{o.label}</span>{o.value===current&&<Check size={16} aria-hidden="true"/>}</div>)}</div>,portalTarget)}

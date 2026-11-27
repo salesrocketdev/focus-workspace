@@ -10,11 +10,11 @@ test('calendar supports day week month, navigation, source filters and event det
  const rows=calendar.locator('.calendar-event-list .calendar-event');
  await expect(rows).toHaveCount(3);
  await page.screenshot({path:info.outputPath('calendar-day.png'),animations:'disabled',scale:'css'});
- const outlook=calendar.getByLabel('Microsoft Outlook',{exact:true});
- await outlook.uncheck();
+ const outlook=calendar.getByRole('button',{name:'Microsoft Outlook',exact:true});
+ await outlook.click();await expect(outlook).toHaveAttribute('aria-pressed','false');
  await expect(rows).toHaveCount(2);
  await expect(calendar.locator('.calendar-slots')).toContainText('09:30 – 11:00');
- await outlook.check();
+ await outlook.click();await expect(outlook).toHaveAttribute('aria-pressed','true');
  const event=rows.filter({hasText:'Alinhamento de sprint'});
  await event.click();
  const dialog=page.getByRole('dialog',{name:'Alinhamento de sprint'});

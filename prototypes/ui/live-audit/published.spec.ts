@@ -51,7 +51,7 @@ test('published screens, navigation, controls and visual evidence',async({page},
   const settings=['Sessões de foco','Notificações','Integrações','Perfil e painel','Aparência'];
   for(const [i,label] of settings.entries()){
    await sections.getByRole('button',{name:label,exact:true}).click();await audit('11-settings-'+i);
-   if(label==='Aparência'){await page.getByRole('button',{name:'Escuro',exact:true}).click();await audit('12-dark-settings')}
+   if(label==='Aparência'){await page.getByRole('button',{name:'Escuro',exact:true}).click();await page.getByRole('button',{name:'Aurora',exact:true}).click();await audit('12-dark-settings')}
    if(mobile)await page.getByRole('button',{name:'Voltar às configurações'}).click();
   }
   await go('Hoje');await audit('13-dark-dashboard');
