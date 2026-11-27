@@ -15,3 +15,7 @@ Maintainer requested publishing the current preview for hands-on testing. Build 
 ## Second checkpoint
 
 Preview publication succeeded in run 46004201843. First validation 46003528874: build and Storybook passed; Playwright 108 passed, 43 failed, 18 skipped; offline skipped after failure. Addressed hidden mobile settings action and alternate timer face regression; migrated failing selector and explicit layout fixture contracts for task, calendar, focus, history widgets and geometry. Second full `[check]` run required; no acceptance until reviewed.
+
+## Third checkpoint
+
+Second CI 46005706005: 149 passed, 2 failed, 18 skipped; build/Storybook passed. Both failures are the same ambiguous category selector on desktop and mobile, now scoped to the New Task dialog. Offline stage was skipped. Re-run full `[check]` before accepting or publishing the corrections.
