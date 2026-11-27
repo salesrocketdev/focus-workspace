@@ -22,13 +22,13 @@ test('WebKit mobile: immersive header, real route animation and sheet filters',a
  await sheet.getByRole('combobox',{name:'Categoria do histórico'}).click();
  await page.getByRole('option',{name:'Leitura',exact:true}).click();
  await sheet.getByRole('button',{name:'Aplicar filtros'}).click();
- await expect(page.getByText('1 filtro(s) aplicado(s)')).toBeVisible();
+ await expect(page.getByText('1 filtro aplicado')).toBeVisible();
  await page.getByRole('button',{name:'Abrir filtros do histórico'}).click();
  await sheet.getByRole('button',{name:'Limpar',exact:true}).click();
  await sheet.getByRole('button',{name:'Fechar diálogo'}).click();
- await expect(page.getByText('1 filtro(s) aplicado(s)')).toBeVisible();
+ await expect(page.getByText('1 filtro aplicado')).toBeVisible();
  await page.getByRole('button',{name:'Limpar filtros',exact:true}).click();
- await expect(page.getByText('1 filtro(s) aplicado(s)')).toHaveCount(0);
+ await expect(page.getByText('1 filtro aplicado')).toHaveCount(0);
 });
 test('WebKit mobile: sheet opens without focusing text and fits resized visual viewport',async({page},info)=>{
  await page.goto('/');
