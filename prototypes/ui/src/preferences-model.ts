@@ -36,3 +36,22 @@ export const focusPresets=[
  {id:'quick',label:'Foco rápido',description:'Para começar sem pressão.',focus:900,short:180,long:600,cycles:3},
 ] as const;
 export function matchesFocusPreset(p:FocusPreferences,preset:typeof focusPresets[number]){return p.focus===preset.focus&&p.short===preset.short&&p.long===preset.long&&p.cycles===preset.cycles}
+
+export const CUSTOM_RHYTHMS_KEY='focus-workspace:v4:custom-rhythms';
+export type CustomRhythm={id:string;label:string;focus:number;short:number;long:number;cycles:number};
+export function validCustomRhythm(value:unknown):value is CustomRhythm{
+ if(!value||typeof value!=='object')return false;
+ const r=value as Partial<CustomRhythm>;
+ return typeof r.id==='string'&&r.id.startsWith('custom-')&&r.id.length<=80&&typeof r.label==='string'&&r.label.trim().length>0&&r.label.length<=48&&integer(r.focus,60,7200)&&integer(r.short,60,1800)&&integer(r.long,60,3600)&&integer(r.cycles,1,12);
+}
+export function validCustomRhythms(value:unknown):value is CustomRhythm[]{
+ return Array.isArray(value)&&value.length<=12&&value.every(validCustomRhythm)&&new Set(value.map(r=>r.id)).size===value.length&&new Set([...focusPresets,...value].map(r=>r.label.trim().toLocaleLowerCase('pt-BR'))).size===focusPresets.length+value.length;
+}
+export function loadCustomRhythms():CustomRhythm[]{
+ const value=readStorage(CUSTOM_RHYTHMS_KEY);
+ if(validCustomRhythms(value))return value;
+ // Recover individually valid legacy entries without accepting duplicate names or IDs.
+ const result:CustomRhythm[]=[];
+ if(Array.isArray(value))for(const item of value)if(validCustomRhythm(item)&&validCustomRhythms([...result,item]))result.push(item);
+ return result;
+}
