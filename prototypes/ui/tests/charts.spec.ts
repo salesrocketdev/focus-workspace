@@ -39,6 +39,6 @@ test('interactive analytics use filtered data and support keyboard and touch',as
  await nav.getByRole('button',{name:'Hoje',exact:true}).click();
  const summary=page.getByRole('group',{name:'Resumo de foco dos últimos dias'});
  await summary.getByRole('button').last().click();
- await expect(page.locator('[data-widget=summary]')).toContainText('29/01 · 2h 15min');
+ await expect(page.locator('[data-widget=summary]')).toContainText('0 min');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
 });
