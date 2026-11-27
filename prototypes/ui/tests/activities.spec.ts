@@ -17,9 +17,9 @@ test('activities share tasks, categories, books and timer context with dashboard
  await openNavigation(nav,'Tarefas');
  await page.getByRole('button',{name:'Nova tarefa',exact:true}).click();
  await page.getByLabel('Título da tarefa').fill('Praticar conversação');
- await page.getByRole('combobox',{name:'Categoria',exact:true}).click();
+ await page.getByRole('dialog',{name:'Nova tarefa',exact:true}).getByRole('combobox',{name:'Categoria',exact:true}).click();
  await page.getByRole('option',{name:'Inglês',exact:true}).click();
- await page.getByRole('button',{name:'Adicionar tarefa',exact:true}).click();
+ await page.getByRole('dialog',{name:'Nova tarefa',exact:true}).getByRole('button',{name:'Adicionar tarefa',exact:true}).click();
  const task=page.locator('.planning-row').filter({hasText:'Praticar conversação'});
  await expect(task).toBeVisible();
  await page.getByLabel('Buscar tarefas').fill('conversação');
