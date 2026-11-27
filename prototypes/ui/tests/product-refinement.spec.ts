@@ -227,3 +227,43 @@ test('V5 real dates and touch targets remain correct in narrow layouts',async({p
   }
  }
 });
+
+test('V5 dashboard surfaces remain visually distinct in both themes',async({page},info)=>{
+ await guest(page);
+ await page.emulateMedia({reducedMotion:'reduce'});
+ const nav=page.getByRole('navigation',{name:'Navegação principal'}).filter({visible:true});
+ const workspace=page.locator('.workspace[data-route=today]');
+ const cards=workspace.locator('.widget>.card');
+ const placement=await workspace.locator('.widget').evaluateAll(nodes=>nodes.map(e=>({id:e.getAttribute('data-widget'),placement:e.getAttribute('data-placement')})));
+ for(const [theme,label] of [['light','Claro'],['dark','Escuro']] as const){
+  await openNavigation(nav,'Configurações');
+  await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Aparência',exact:true}).click();
+  await page.getByRole('button',{name:label,exact:true}).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme',theme);
+  await nav.getByRole('button',{name:'Hoje',exact:true}).click();
+  await expect(cards).toHaveCount(5);
+  const surfaces=await cards.evaluateAll(nodes=>nodes.map(node=>{
+   const c=getComputedStyle(node),canvas=getComputedStyle(node.closest('.app')!),head=getComputedStyle(node.querySelector('.card-head')!);
+   const luminance=(s:string)=>{
+    const rgb=s.match(/[\d.]+/g)?.slice(0,3).map(Number);
+    if(!rgb||rgb.length!==3)throw new Error('Unexpected color '+s);
+    return rgb.map(v=>{const n=v/255;return n<=.04045?n/12.92:Math.pow((n+.055)/1.055,2.4)}).reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0);
+   };
+   const contrast=(a:string,b:string)=>{const x=luminance(a),y=luminance(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
+   return {surface:contrast(c.backgroundColor,canvas.backgroundColor),edge:contrast(c.borderTopColor,c.backgroundColor),shadow:c.boxShadow,radius:parseFloat(c.borderTopLeftRadius),border:parseFloat(c.borderTopWidth),header:contrast(head.color,c.backgroundColor)};
+  }));
+  for(const s of surfaces){
+   expect(s.surface).toBeGreaterThanOrEqual(1.12);
+   expect(s.edge).toBeGreaterThanOrEqual(1.18);
+   expect(s.header).toBeGreaterThanOrEqual(4.5);
+   expect(s.border).toBe(1);
+   expect(s.radius).toBeGreaterThanOrEqual(10);
+   expect(s.shadow).not.toBe('none');
+  }
+  const grid=workspace.locator('.widget-grid');
+  expect(await grid.evaluate(e=>parseFloat(getComputedStyle(e).gap))).toBeGreaterThanOrEqual(info.project.name==='desktop'?16:14);
+  expect(await workspace.locator('.widget').evaluateAll(nodes=>nodes.map(e=>({id:e.getAttribute('data-widget'),placement:e.getAttribute('data-placement')})))).toEqual(placement);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
+  await page.screenshot({path:info.outputPath('dashboard-surfaces-'+theme+'.png'),animations:'disabled',fullPage:true});
+ }
+});
