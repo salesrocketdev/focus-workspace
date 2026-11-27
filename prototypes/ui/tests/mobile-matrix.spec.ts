@@ -54,6 +54,7 @@ for(const size of sizes){
   const nav=page.getByRole('navigation',{name:'Navegação principal'});
   const go=async(label:string)=>nav.getByRole('button',{name:label,exact:true}).click();
   await fit(page,'dashboard');
+  await page.getByRole('button',{name:'Adicionar tarefa rápida'}).click();await dialogFits(page,'quick task');await page.getByRole('button',{name:'Fechar diálogo'}).click();
   await go('Histórico');
   const header=page.locator('.history-export-header'),copy=header.locator('.history-export-copy'),csv=header.getByRole('button',{name:'CSV',exact:true});
   await contained(csv,header,'CSV header');

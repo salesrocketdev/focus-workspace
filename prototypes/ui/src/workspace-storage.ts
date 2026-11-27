@@ -11,7 +11,7 @@ export function validWorkspace(value:unknown):value is WorkspaceSnapshot{
  if(!value||typeof value!=='object')return false;
  const v=value as Partial<WorkspaceSnapshot>,t=v.timer;
  return v.version===1&&!!t&&['Pomodoro','Livre'].includes(t.mode)&&['focus','short','long'].includes(t.phase)&&integer(t.cycle,0,12)&&integer(t.duration,1,7200)&&integer(t.seconds)&&typeof t.running==='boolean'&&integer(t.startedAt)&&(!t.running||t.startedAt>0)&&contextValid(t.context)&&string(t.readingId)&&
- Array.isArray(v.tasks)&&v.tasks.every(x=>x&&integer(x.id)&&string(x.title)&&typeof x.done==='boolean'&&string(x.categoryId))&&
+ Array.isArray(v.tasks)&&v.tasks.every(x=>x&&integer(x.id)&&string(x.title)&&typeof x.done==='boolean'&&string(x.categoryId)&&(x.priority===undefined||typeof x.priority==='boolean'))&&
  Array.isArray(v.categories)&&v.categories.every(x=>x&&string(x.id)&&string(x.name)&&['blue','lavender','green','orange'].includes(x.tone))&&
  Array.isArray(v.books)&&v.books.length>0&&v.books.every(x=>x&&string(x.id)&&string(x.title)&&string(x.author)&&integer(x.pages,1,10000)&&integer(x.page,0,x.pages)&&(!x.chapters||Array.isArray(x.chapters)&&x.chapters.every(c=>c&&string(c.id)&&string(c.title)&&typeof c.done==='boolean')))&&
  Array.isArray(v.records)&&v.records.every(x=>x&&string(x.id)&&string(x.day)&&string(x.title)&&string(x.categoryId)&&string(x.category)&&string(x.time)&&integer(x.seconds)&&['Pomodoro','Livre'].includes(x.mode)&&['completed','interrupted'].includes(x.status)&&['fixture','session'].includes(x.origin));

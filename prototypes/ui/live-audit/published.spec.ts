@@ -32,6 +32,7 @@ test('published screens, navigation, controls and visual evidence',async({page},
  }
  try{
   await audit('01-dashboard');
+  await page.getByRole('button',{name:'Adicionar tarefa rápida'}).click();await audit('01-quick-task');await page.getByRole('button',{name:'Fechar diálogo'}).click();
   if(mobile){
    const targets=page.locator('.quick-action-button:visible,[data-widget=music] .player-controls button:visible,[data-widget=focus] .timer-start:visible');
    const rects=await targets.evaluateAll(nodes=>nodes.map(n=>{const r=n.getBoundingClientRect();return [r.width,r.height]}));
