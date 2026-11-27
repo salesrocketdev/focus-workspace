@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CalendarPlus, Link2, Play, Plus, Repeat2, SkipForward } from 'lucide-react';
+import { CalendarPlus, Play, Plus, Repeat2, SkipForward, Star } from 'lucide-react';
 import { priorityCount, MAX_PRIORITIES, type Category, type Task } from './activity-model';
 import type { FocusRecord } from './history-model';
 import { taskPomodoros } from './planning-model';
@@ -89,7 +89,6 @@ export function TaskPage({tasks,categories,records,readOnly,onSave,onFinish,onFo
  const [query,setQuery]=useState('');
  const [category,setCategory]=useState('all');
  const [edit,setEdit]=useState<Task|'new'>();
- const [capture,setCapture]=useState(false);
  const [preview,setPreview]=useState<Task>();
  const today=dayKey();
  const previewExample=examples.find(example=>example.source===preview?.source&&example.title===preview.title);
@@ -105,7 +104,7 @@ export function TaskPage({tasks,categories,records,readOnly,onSave,onFinish,onFo
  }).sort((a,b)=>Number(overdue(b))-Number(overdue(a))||Number(Boolean(b.priority))-Number(Boolean(a.priority))||(a.plannedDate??a.dueDate??'9999').localeCompare(b.plannedDate??b.dueDate??'9999'));
  return <section className="activity-surface planning-page">
   <header className="activity-section-head"><div><h2>Minhas tarefas</h2><small>{tasks.filter(task=>!task.done&&overdue(task)).length} atrasadas · {priorityCount(tasks)} prioridades</small></div>
-   <div className="planning-actions"><Button variant="secondary" disabled={readOnly} onClick={()=>setCapture(true)}><Link2 size={16}/> Capturar exemplo</Button><Button disabled={readOnly} onClick={()=>setEdit('new')}><Plus size={16}/> Nova tarefa</Button></div></header>
+   <div className="planning-actions"><Button disabled={readOnly} onClick={()=>setEdit('new')}><Plus size={16}/> Nova tarefa</Button></div></header>
   <div className="planning-toolbar"><div className="activity-tabs small-tabs" role="group" aria-label="Visões de tarefas">{tabs.map(item=><button type="button" key={item.id} aria-pressed={tab===item.id} onClick={()=>setTab(item.id)}>{item.label}</button>)}</div>
    <div className="planning-actions"><SearchField label="Buscar tarefas" placeholder="Buscar tarefas" value={query} onValueChange={setQuery}/><SelectField label="Categoria" value={category} options={[{value:'all',label:'Todas as categorias'},...categories.map(c=>({value:c.id,label:c.name}))]} onValueChange={setCategory}/></div></div>
   {visible.length===0&&<p className="planning-empty">Nenhuma tarefa nesta visão.</p>}
@@ -116,22 +115,19 @@ export function TaskPage({tasks,categories,records,readOnly,onSave,onFinish,onFo
    return <li key={task.id} className="planning-row">
     <input type="checkbox" aria-label={(task.done?'Reabrir ':'Concluir ')+task.title} checked={task.done} disabled={readOnly||task.done&&tasks.some(item=>item.previousOccurrence===task.id)} onChange={e=>onFinish(task,e.target.checked)}/>
     <div className="planning-row-body"><button type="button" className="planning-title" disabled={readOnly} onClick={()=>setEdit(task)}>{source&&<ProviderIcon provider={source} size={16}/>} {task.title}</button>
-     <div className="planning-meta">{task.plannedDate&&<span>Planejada {dateLabel(task.plannedDate)}</span>}{task.dueDate&&<span className={overdue(task)&&!task.done?'planning-overdue':''}>Prazo {dateLabel(task.dueDate)}</span>}{task.repeat&&<span><Repeat2 size={14}/> {repeats.find(rule=>rule.value===task.repeat)?.label}</span>}{task.estimate&&<span>{taskPomodoros(task,records)}/{task.estimate} Pomodoros</span>}{focusedMinutes>0&&<span>{focusedMinutes} min de foco</span>}{task.reminderAt&&!task.done&&<span>Lembrete {new Date(task.reminderAt).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</span>}{task.skipped&&<span>Ocorrência pulada</span>}</div>
+     <div className="planning-meta"><span>{categories.find(c=>c.id===task.categoryId)?.name??"Sem categoria"}</span>{task.plannedDate&&<span>Planejada {dateLabel(task.plannedDate)}</span>}{task.dueDate&&<span className={overdue(task)&&!task.done?'planning-overdue':''}>Prazo {dateLabel(task.dueDate)}</span>}{task.repeat&&<span><Repeat2 size={14}/> {repeats.find(rule=>rule.value===task.repeat)?.label}</span>}{task.estimate&&<span>{taskPomodoros(task,records)}/{task.estimate} Pomodoros</span>}{focusedMinutes>0&&<span>{focusedMinutes} min de foco</span>}{task.reminderAt&&!task.done&&<span>Lembrete {new Date(task.reminderAt).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</span>}{task.skipped&&<span>Ocorrência pulada</span>}</div>
     </div>
     <div className="planning-actions">
      {source&&meeting(source)&&<Button variant="secondary" size="sm" onClick={()=>setPreview(task)}><ProviderIcon provider={source} size={16}/> Entrar no {sources[source]}</Button>}
      {source&&!meeting(source)&&<Button variant="secondary" size="sm" onClick={()=>setPreview(task)}><ProviderIcon provider={source} size={16}/> Ver e-mail</Button>}
      {!source&&sourceUrl&&<a href={sourceUrl} target="_blank" rel="noreferrer">Abrir origem</a>}
-     {!task.done&&<><Button variant="secondary" size="sm" disabled={readOnly} onClick={()=>onPlan(task)}><CalendarPlus size={15}/> Planejar foco</Button><Button variant="secondary" size="sm" disabled={readOnly} onClick={()=>onFocus(task)}><Play size={15}/> Preparar foco</Button></>}
+     {!task.done&&<><button type="button" className="ui-icon-button priority-action" aria-label={"Prioridade: "+task.title} aria-pressed={!!task.priority} title={task.priority?"Remover prioridade":"Marcar como prioridade"} disabled={readOnly||(!task.priority&&priorityCount(tasks)>=MAX_PRIORITIES)} onClick={()=>onSave({...task,priority:!task.priority},task)}><Star size={16} fill={task.priority?"currentColor":"none"}/></button><Button variant="secondary" size="sm" disabled={readOnly} onClick={()=>onPlan(task)}><CalendarPlus size={15}/> Agendar</Button><Button variant="soft" size="sm" disabled={readOnly} onClick={()=>onFocus(task)}><Play size={15}/> Abrir foco</Button></>}
      {!task.done&&tab==='today'&&<Button variant="secondary" size="sm" disabled={readOnly} onClick={()=>onSave({...task,plannedDate:shiftDay(today,1),recurrenceDate:task.repeat?(task.recurrenceDate??task.plannedDate):undefined,recurrenceDueDate:task.repeat?(task.recurrenceDate?task.recurrenceDueDate:task.dueDate):undefined},task)}>Planejar amanhã</Button>}
      {!task.done&&task.repeat&&<Button variant="secondary" size="sm" disabled={readOnly} onClick={()=>onFinish(task,true,true)}><SkipForward size={15}/> Pular ocorrência</Button>}
     </div>
    </li>;
   })}</ul>
   {edit&&<TaskEditor task={edit==='new'?undefined:edit} categories={categories} canPriority={priorityCount(tasks)<MAX_PRIORITIES} onSave={draft=>onSave(draft,edit==='new'?undefined:edit)} onDismiss={()=>setEdit(undefined)}/>}
-  {capture&&<Dialog title="Capturar exemplo" description="Escolha um e-mail ou convite fictício. A tarefa fica na Entrada." onDismiss={()=>setCapture(false)}>
-   <div className="planning-capture">{examples.map(example=><Button key={example.source} variant="secondary" disabled={readOnly} onClick={()=>{if(onSave({...example,categoryId:categories[0].id})){setTab('inbox');setCategory('all');setQuery('');setCapture(false);}}}><ProviderIcon provider={example.source} size={19}/> {sources[example.source]} · {example.title}</Button>)}</div>
-  </Dialog>}
   {preview&&preview.source&&<Dialog title={meeting(preview.source)?'Entrar no '+sources[preview.source]:'E-mail do '+sources[preview.source]} description={preview.title} onDismiss={()=>setPreview(undefined)}>
    {previewExample?.sender&&<div className="planning-email"><strong>{previewExample.sender}</strong><p>{previewExample.excerpt}</p></div>}
    <p>{preview.description}</p>{preview.sourceUrl&&httpsLink(preview.sourceUrl)?<a href={httpsLink(preview.sourceUrl)} target="_blank" rel="noreferrer">Abrir link informado</a>:<p>Demonstração com dados fictícios.</p>}
