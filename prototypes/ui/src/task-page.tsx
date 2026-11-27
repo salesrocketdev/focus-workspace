@@ -14,22 +14,23 @@ export function TaskEditor({task,categories,canPriority,onSave,onDismiss}:{
  task?:Task;categories:Category[];canPriority:boolean;onSave:(draft:Omit<Task,'id'|'done'>)=>boolean;onDismiss:()=>void;
 }){
  const [draft,setDraft]=useState<Omit<Task,'id'|'done'>>(task??{title:'',categoryId:categories[0]?.id??''});
- const [details,setDetails]=useState(false);
- const [contentOpen,setContentOpen]=useState(false);
- const [sourceOpen,setSourceOpen]=useState(false);
+ const [section,setSection]=useState<'basic'|'planning'|'content'|'source'>(task?.recurrenceDate?'planning':'basic');
  const [scope,setScope]=useState(task?.recurrenceDate?'occurrence':'series');
  const [error,setError]=useState('');
  const [steps,setSteps]=useState(task?.checklist?.map(step=>step.title).join('\n')??'');
- function change(patch:Partial<Task>){setDraft(value=>({...value,...patch}));}
- return <Dialog className="compact-dialog task-editor-dialog" title={task?'Detalhes da tarefa':'Nova tarefa'} onDismiss={onDismiss}>
+ function change(patch:Partial<Task>){setDraft(value=>({...value,...patch}));setError('');}
+ function go(next:typeof section){setSection(next);setError('');}
+ return <Dialog className="compact-dialog structured-dialog task-editor-dialog" title={task?'Detalhes da tarefa':'Nova tarefa'} onDismiss={onDismiss}>
   <form className="dialog-form planning-form" onSubmit={event=>{
    event.preventDefault();
    const title=draft.title.trim();
    const sourceUrl=draft.sourceUrl?.trim();
-   if(!title){setError('Informe o título.');return;}
-   if((draft.repeat||scope==='occurrence')&&!draft.plannedDate){setDetails(true);setError('Escolha a data planejada para iniciar a repetição.');return;}
-   if((draft.plannedDate&&!validDay(draft.plannedDate))||(draft.dueDate&&!validDay(draft.dueDate))){setDetails(true);setError('Informe uma data válida.');return;}
-   if(sourceUrl&&!httpsLink(sourceUrl)){setSourceOpen(true);setError('Use um link HTTPS válido.');return;}
+   if(!title){setSection('basic');setError('Informe o título.');return;}
+   if((draft.repeat||scope==='occurrence')&&!draft.plannedDate){setSection('planning');setError('Escolha a data planejada para iniciar a repetição.');return;}
+   if((draft.plannedDate&&!validDay(draft.plannedDate))||(draft.dueDate&&!validDay(draft.dueDate))){setSection('planning');setError('Informe uma data válida.');return;}
+   if(sourceUrl&&!httpsLink(sourceUrl)){setSection('source');setError('Use um link HTTPS válido.');return;}
+   if(draft.estimate!==undefined&&(!Number.isInteger(draft.estimate)||draft.estimate<1||draft.estimate>20)){setSection('planning');setError('Informe uma estimativa de 1 a 20 Pomodoros.');return;}
+   if(draft.repeat==='monthly'&&draft.repeatInterval!==undefined&&(!Number.isInteger(draft.repeatInterval)||draft.repeatInterval<1||draft.repeatInterval>12)){setSection('planning');setError('Informe um intervalo de 1 a 12 meses.');return;}
    const checklist=steps.split('\n').map(title=>title.trim()).filter(Boolean)
     .map(title=>({title,done:draft.checklist?.find(step=>step.title===title)?.done??false}));
    const monthDay=draft.repeat==='monthly'&&draft.plannedDate
@@ -47,11 +48,17 @@ export function TaskEditor({task,categories,canPriority,onSave,onDismiss}:{
    if(onSave(updated))onDismiss();
    else setError('Não foi possível salvar a tarefa. Confira a categoria e as prioridades.');
   }}>
+   <nav className="dialog-section-nav" aria-label="Seções da tarefa">
+    {([{id:'basic',label:'Geral'},{id:'planning',label:'Planejamento'},{id:'content',label:'Conteúdo'},{id:'source',label:'Origem'}] as const).map(item=><button type="button" key={item.id} aria-pressed={section===item.id} onClick={()=>go(item.id)}>{item.label}</button>)}
+   </nav>
+   <div className="dialog-scroll-body" key={section}>
+   {section==='basic'&&<>
    <Field label="Título da tarefa" disabled={scope==='occurrence'} required maxLength={120} value={draft.title} onChange={e=>change({title:e.target.value})}/>
    <SelectField label="Categoria" disabled={scope==='occurrence'} value={draft.categoryId} options={categories.map(c=>({value:c.id,label:c.name}))} onValueChange={categoryId=>change({categoryId})}/>
-   <label className="planning-check"><input type="checkbox" checked={Boolean(draft.priority)} disabled={scope==='occurrence'||!canPriority&&!draft.priority||task?.done} onChange={e=>change({priority:e.target.checked})}/> Destacar no painel</label>
-   <Button className="dialog-disclosure" variant="secondary" aria-expanded={details} onClick={()=>setDetails(!details)}>{details?'Ocultar planejamento':'Adicionar datas e detalhes'}</Button>
-   {details&&<>
+   <label className="task-priority-control"><input type="checkbox" checked={Boolean(draft.priority)} disabled={scope==='occurrence'||!canPriority&&!draft.priority||task?.done} onChange={e=>change({priority:e.target.checked})}/><span><b>Destacar no painel</b><small>{!canPriority&&!draft.priority?"Limite de prioridades atingido.":"Mostrar entre as tarefas prioritárias."}</small></span><Star size={17} aria-hidden="true"/></label>
+   <p className="dialog-section-hint">Planejamento, conteúdo e origem são opcionais. Você pode salvar agora.</p>
+   </>}
+   {section==='planning'&&<>
     <div className="planning-fields">
      <Field label="Planejada para" type="date" value={draft.plannedDate??''} onChange={e=>change({plannedDate:e.target.value||undefined})}/>
      <Field label="Prazo" type="date" value={draft.dueDate??''} onChange={e=>change({dueDate:e.target.value||undefined})}/>
@@ -63,18 +70,17 @@ export function TaskEditor({task,categories,canPriority,onSave,onDismiss}:{
     {draft.repeat==='monthly'&&<Field label="Intervalo em meses" type="number" min={1} max={12} disabled={scope==='occurrence'} value={draft.repeatInterval??1} onChange={e=>change({repeatInterval:e.target.value?Number(e.target.value):undefined})}/>}
     {draft.repeat==='weekly'&&<fieldset disabled={scope==='occurrence'} className="planning-weekdays"><legend>Dias da semana</legend>{weekdays.map((day,i)=><label key={day}><input type="checkbox" checked={draft.repeatDays?.includes(i)??false} onChange={e=>change({repeatDays:e.target.checked?[...(draft.repeatDays??[]),i]:draft.repeatDays?.filter(n=>n!==i)})}/>{day}</label>)}</fieldset>}
    </>}
-   <Button className="dialog-disclosure" variant="secondary" aria-expanded={contentOpen} onClick={()=>setContentOpen(v=>!v)}>{contentOpen?'Ocultar descrição e checklist':'Descrição e checklist'}{!contentOpen&&(draft.description||steps.trim())?' · preenchido':''}</Button>
-   {contentOpen&&<>
+   {section==='content'&&<>
     <TextareaField disabled={scope==='occurrence'} label="Descrição" value={draft.description??''} onChange={e=>change({description:e.target.value})}/>
     {draft.checklist?.length? <div className="planning-checklist">{draft.checklist.map((step,i)=><label className="planning-check" key={i}><input type="checkbox" disabled={scope==='occurrence'} checked={step.done} onChange={e=>change({checklist:draft.checklist?.map((item,n)=>i===n?{...item,done:e.target.checked}:item)})}/>{step.title}</label>)}</div>:null}
     <TextareaField disabled={scope==='occurrence'} label="Passos do checklist (um por linha)" value={steps} onChange={e=>setSteps(e.target.value)}/>
    </>}
-   <Button className="dialog-disclosure" variant="secondary" aria-expanded={sourceOpen} onClick={()=>setSourceOpen(v=>!v)}>{sourceOpen?'Ocultar origem e link':'Origem e link'}{!sourceOpen&&draft.source?' · '+sources[draft.source]:''}</Button>
-   {sourceOpen&&<>
+   {section==='source'&&<>
     <SelectField disabled={scope==='occurrence'} label="Origem" value={draft.source??'manual'} options={[{value:'manual',label:'Manual'},...Object.entries(sources).map(([value,label])=>({value,label}))]} onValueChange={value=>change({source:value==='manual'?undefined:value as TaskSource})}/>
     <Field disabled={scope==='occurrence'} label={meeting(draft.source)?'Link da reunião':'Link de origem'} type="url" value={draft.sourceUrl??''} onChange={e=>change({sourceUrl:e.target.value})}/>
    </>}
-   {error&&<p role="alert" className="ui-field-error">{error}</p>}
+   </div>
+   {error&&<p role="alert" className="ui-field-error dialog-section-error">{error}</p>}
    <footer className="dialog-actions"><Button variant="secondary" onClick={onDismiss}>Cancelar</Button><Button type="submit">{task?'Salvar':'Adicionar tarefa'}</Button></footer>
   </form>
  </Dialog>;
