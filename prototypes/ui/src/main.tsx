@@ -26,5 +26,6 @@ import './focus-mobile.css';
 import './activity-polish.css';
 import './offline.css';
 import './tab-coordinator.css';
+import './session-audio.css';
 
 createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>);

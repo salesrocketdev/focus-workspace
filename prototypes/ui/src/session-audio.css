@@ -1,0 +1,11 @@
+.audio-controls,.quiet-time-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:end}
+.audio-volume{display:grid;gap:8px;min-width:0;color:var(--ui-muted);font-size:12px}
+.audio-volume>span{display:flex;justify-content:space-between;gap:8px}
+.audio-volume b{color:var(--ui-ink);font-variant-numeric:tabular-nums}
+.audio-volume input{width:100%;height:44px;min-width:0;accent-color:var(--action)}
+.audio-previews{display:flex;gap:8px;flex-wrap:wrap}
+.audio-previews .ui-button{background:transparent;border-color:transparent;color:var(--field-selected-ink);box-shadow:none}
+.audio-previews .ui-button:hover{background:var(--field-selected);border-color:transparent}
+.quiet-status{display:flex;align-items:center;gap:7px;padding:9px 10px;border-radius:8px;background:var(--field-selected);color:var(--field-selected-ink);font-size:12px;line-height:1.4}
+.quiet-time-fields .ui-input{min-width:0;max-width:100%;font-variant-numeric:tabular-nums}
+@media(max-width:759px){.audio-controls{grid-template-columns:minmax(0,1fr);gap:10px}.audio-previews{gap:2px}.audio-previews .ui-button{min-height:44px;padding-inline:6px}.quiet-time-fields{gap:8px}.quiet-time-fields .ui-input{font-size:16px}}

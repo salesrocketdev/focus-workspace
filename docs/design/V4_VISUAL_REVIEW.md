@@ -115,3 +115,7 @@ Previous activity polish CI/Pages passed. Add deterministic production precache,
 
 ## Cross-tab workspace coordination
 Offline CI and Pages passed. Add exclusive Web Locks writer, read-only mirrors via storage events, automatic takeover after the writer closes, restore authoritative snapshot before acquiring writes, writer-only phase completion, record and wake lock. Guard workspace actions including activity mutations and timer controls. No forced lock stealing; suspended writer may delay completion until it resumes or closes. Unsupported browsers warn to use one tab; preferences outside workspace (appearance/layout/inbox) remain per existing behavior. Automated multi-page test; new CI/device validation pending.
+
+
+## Local session audio and quiet hours (V4.32)
+Previous cross-tab CI and Pages succeeded. Add opt-in start/completion audio, three original synthesized tones, alert volume, previews, daily overnight quiet hours and all-day behavior for equal bounds. Preserve inbox during quiet hours; suppress audio/native notification attempts. Persist preference/inbox actions and mirror via storage events. Test with fake AudioContext and timer clock. Actual audibility and native Focus behavior require device review; CI pending.

@@ -26,3 +26,7 @@ The iOS preference `Silenciar notificações ao iniciar foco` is off by default 
 
 
 The production notification worker also precaches the versioned app shell. This does not change the background notification limitation. Updates wait for existing clients to close, avoiding forced reload of active focus sessions.
+
+
+## Session sounds and quiet hours
+Optional start and completion signals, three synthesized local tone presets and independent alert volume; off by default. User gesture unlocks Web Audio before the session, and preview uses the same generator. Daily quiet hours use device-local time, support overnight intervals and equal bounds mean all day. During quiet hours, session/test entries remain in the internal inbox but app audio and native notification attempts are suppressed. OS Focus is not detectable and browser audio may not honor it. Suspended/closed pages cannot guarantee audio delivery. Settings and inbox now persist only on explicit writes and listen to storage events, reducing mirror-tab overwrites; concurrent inbox operations remain a production repository concern. No external media.

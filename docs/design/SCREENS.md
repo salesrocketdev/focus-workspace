@@ -78,3 +78,6 @@ Profile and panel settings show offline cache readiness and waiting updates. The
 
 
 When Web Locks is supported, one tab owns the workspace and other tabs display the shared timer, history and activity data in read-only mode. Closing the owner transfers control to the next waiting tab; no restart. A quiet banner describes the state. Unsupported environments retain single-tab mode with a warning.
+
+
+Notifications settings include opt-in session sounds, tone and alert volume, start/completion previews and daily quiet hours. Quiet hours do not pause the timer; alerts stay in the internal inbox without audio or native delivery attempts. The settings summary indicates active quiet hours.
