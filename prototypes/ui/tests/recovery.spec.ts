@@ -23,8 +23,8 @@ test('active and paused timers restore after reload; expiry logs once',async({pa
  const nav=page.locator(info.project.name==='mobile'?'.bottom-nav':'.sidebar nav');
  await openNavigation(nav,'Histórico');
  await page.locator('.history-page').getByRole('button',{name:'Hoje',exact:true}).click();
- await expect(page.locator('.history-session')).toHaveCount(6);
- await expect(page.locator('.history-stat').first()).toContainText('2h 40min');
+ await expect(page.locator('.history-session')).toHaveCount(1);
+ await expect(page.locator('.history-stat').first()).toContainText('25 min');
 });
 test('wake lock is opt-in and released when paused',async({page},info)=>{
  await page.addInitScript(()=>{let requests=0,releases=0;Object.defineProperty(window,'wakeDemo',{get:()=>({requests,releases})});Object.defineProperty(navigator,'wakeLock',{configurable:true,value:{request:async()=>{requests++;const sentinel=new EventTarget() as EventTarget&{released:boolean;release:()=>Promise<void>};sentinel.released=false;sentinel.release=async()=>{if(!sentinel.released){sentinel.released=true;releases++;sentinel.dispatchEvent(new Event('release'))}};return sentinel}}})});
