@@ -35,7 +35,7 @@ test('calendar supports day week month, navigation, source filters and event det
  await page.screenshot({path:info.outputPath('calendar-month.png'),animations:'disabled',scale:'css'});
  await calendar.getByRole('button',{name:'Próximo período'}).click();
  await expect(calendar.locator('.calendar-period')).toContainText('fevereiro');
- await calendar.getByRole('button',{name:'Hoje (demo)',exact:true}).click();
+ await calendar.getByRole('button',{name:'Exemplos',exact:true}).click();
  await expect(calendar.locator('.calendar-period')).toContainText('janeiro');
  await calendar.getByRole('button',{name:'Dia',exact:true}).click();
  await expect(rows).toHaveCount(3);
@@ -44,5 +44,9 @@ test('calendar supports day week month, navigation, source filters and event det
  await calendar.getByRole('button',{name:'Próximo período'}).click();
  await calendar.getByRole('button',{name:'Próximo período'}).click();
  await expect(calendar.getByText('Nenhum compromisso visível')).toBeVisible();
+ await calendar.getByRole('button',{name:'Hoje',exact:true}).click();
+ await expect(calendar.getByRole('button',{name:'Agenda local',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect(calendar.getByText('Agenda local · Google Agenda e Outlook não sincronizados.')).toBeVisible();
+ await expect(rows).toHaveCount(0);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
 });
