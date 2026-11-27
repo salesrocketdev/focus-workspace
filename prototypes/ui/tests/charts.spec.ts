@@ -27,10 +27,10 @@ test('interactive analytics use filtered data and support keyboard and touch',as
  await expect(history.getByRole('status',{name:'Detalhes da categoria'})).toContainText('30 min');
  await history.getByRole('button',{name:/da meta diária. Ver detalhes/}).click();
  await expect(history.locator('.goal-tooltip')).toContainText('Realizado: 2h 15min');
- if(info.project.name==='mobile')await history.getByRole('button',{name:'Abrir filtros do histórico'}).click();
- await history.getByRole('combobox',{name:'Categoria do histórico'}).click();
+ await history.getByRole('button',{name:'Abrir filtros do histórico'}).click();
+ await page.getByRole('dialog',{name:'Filtros do histórico'}).getByRole('combobox',{name:'Categoria do histórico'}).click();
  await page.getByRole('option',{name:'Leitura',exact:true}).click();
- if(info.project.name==='mobile')await history.getByRole('button',{name:'Aplicar filtros',exact:true}).click();
+ await page.getByRole('dialog',{name:'Filtros do histórico'}).getByRole('button',{name:'Aplicar filtros',exact:true}).click();
  await expect(detail).toContainText('30 min');
  await expect(detail).toContainText('1 sessão');
  await expect(history.getByRole('status',{name:'Detalhes da categoria'})).toContainText('100%');
