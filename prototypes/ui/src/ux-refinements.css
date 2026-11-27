@@ -57,22 +57,41 @@
 .activity-section-head>div:first-child small{display:block}
 .activity-section-head>.activity-add-action{flex-shrink:0}
 @media(max-width:359px){.activity-section-head>div:first-child small{font-size:10px;line-height:1.4}.activity-section-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}}
-.scene-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-width:760px}
-.scene-options>button{display:grid;position:relative;justify-items:stretch;align-content:start;gap:8px;padding:7px;min-width:0;border:1px solid var(--ui-line);background:var(--ui-paper);border-radius:11px;text-align:left}
+/* Identical preview geometry regardless of title length or scene art. */
+.scene-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:1fr;align-items:stretch;gap:12px;max-width:760px;width:100%}
+.scene-options>button{box-sizing:border-box;display:grid;grid-template-rows:auto 1fr;position:relative;justify-items:stretch;align-content:start;gap:8px;padding:8px;min-width:0;min-height:0;height:100%;width:100%;border:1px solid var(--ui-line);background:var(--ui-paper);border-radius:11px;text-align:left}
 .scene-options>button[aria-pressed=true]{border-color:var(--field-selected-edge);background:var(--field-selected)}
-.scene-sample{position:relative;display:grid;place-items:center;overflow:hidden;aspect-ratio:16/9;background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:7px}
-.scene-sample svg{position:absolute;bottom:0;width:100%;height:55%;opacity:.82}
-.scene-sample-clock{font-size:14px;font-weight:650;letter-spacing:-.04em;font-variant-numeric:tabular-nums;z-index:1}
-.scene-copy{display:grid;gap:3px;min-width:0;padding:0 3px 3px}
+.scene-options>button:focus-visible{outline:2px solid var(--field-focus);outline-offset:2px}
+.scene-sample{position:relative;display:grid;place-items:center;overflow:hidden;width:100%;min-width:0;aspect-ratio:16/10;background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:7px;isolation:isolate}
+.scene-sample svg{position:absolute;bottom:0;width:100%;height:70%;opacity:.94;z-index:-1}
+.scene-sample-clock{font-size:clamp(14px,1.6vw,22px);font-weight:650;letter-spacing:-.04em;font-variant-numeric:tabular-nums;align-self:start;margin-top:18%;color:var(--ui-ink)}
+.scene-copy{display:grid;align-content:start;grid-template-rows:minmax(2.6em,auto) 1fr;gap:3px;min-width:0;padding:0 3px 3px;font-size:12px}
 .scene-copy b{font-size:12px;line-height:1.3;overflow-wrap:anywhere}
-.scene-copy small{font-size:10px;line-height:1.3}
-.scene-check{position:absolute;right:10px;top:10px;color:var(--field-selected-ink);background:var(--ui-paper);border-radius:50%}
-[data-theme=dark] .scene-sample svg{opacity:.45}
-@media(max-width:759px){.scene-options{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}}
-/* The chosen scene is a subtle, non-interactive footer; no overlay on controls. */
-.focus-landscape{overflow:hidden}
-@media(max-width:759px){.immersive .focus-landscape{display:block;height:64px;opacity:.35}}
-@media(max-width:759px) and (max-height:600px){.immersive .focus-landscape{height:44px}}
-[data-theme=dark] .immersive .focus-landscape{opacity:.28}
+.scene-copy small{font-size:11px;line-height:1.35;overflow-wrap:anywhere}
+.scene-check{position:absolute;right:12px;top:12px;color:var(--field-selected-ink);background:var(--ui-paper);border-radius:50%;padding:2px;width:20px;height:20px}
+[data-theme=dark] .scene-sample svg{opacity:.65}
+@media(max-width:759px){.scene-options{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.scene-sample-clock{font-size:18px}}
+/* A viewport-anchored scene gives the expanded focus view a visual identity even
+   when contextual panels scroll. The illustration remains behind all controls. */
+.app.immersive .focus-landscape{
+ position:fixed;inset:auto 0 0;display:block;height:clamp(220px,42svh,420px);width:100%;
+ overflow:hidden;z-index:-1;opacity:.88;pointer-events:none;
+}
+.app.immersive .focus-landscape svg{display:block;width:100%;height:100%}
+[data-theme=dark] .app.immersive .focus-landscape{opacity:.52}
+.app.immersive .focus-main{isolation:isolate}
+.app.immersive .focus-center{position:relative;isolation:isolate}
+.app.immersive .focus-center::before{
+ content:'';position:absolute;inset:-18px -12px;z-index:-1;pointer-events:none;
+ background:radial-gradient(ellipse at center,color-mix(in srgb,var(--ui-paper) 96%,transparent) 0%,color-mix(in srgb,var(--ui-paper) 86%,transparent) 48%,transparent 74%);
+}
+@media(max-width:759px){
+ .app.immersive .focus-landscape{height:clamp(210px,44svh,360px);opacity:.86}
+ .app.immersive .focus-center::before{inset:-12px -6px}
+}
+@media(max-height:500px) and (orientation:landscape){
+ .app.immersive .focus-landscape{height:36svh}
+}
+@media(forced-colors:active){.app.immersive .focus-landscape,.app.immersive .focus-center::before{display:none}}
 
 @media(forced-colors:active){:is(.task-list,.activity-task-list,.focus-task-check,.book-chapters,.book-import-index,.backup-confirm) input[type=checkbox]::after{display:none}}
