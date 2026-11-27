@@ -6,7 +6,7 @@ test('estimate, local reservation, reload, prepare and link completed Pomodoro',
  const nav=page.getByRole('navigation',{name:'Navegação principal'});
  await openNavigation(nav,'Tarefas');
  await page.getByRole('button',{name:'Finalizar revisão do PR',exact:true}).click();
- await page.getByRole('dialog',{name:'Detalhes da tarefa'}).getByRole('button',{name:'Adicionar datas e detalhes'}).click();
+ await page.getByRole('dialog',{name:'Detalhes da tarefa'}).getByRole('button',{name:'Planejamento',exact:true}).click();
  await page.getByLabel('Pomodoros estimados').fill('2');
  await page.getByRole('button',{name:'Salvar',exact:true}).click();
  const task=page.locator('.planning-row').filter({hasText:'Finalizar revisão do PR'});
