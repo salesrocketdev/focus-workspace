@@ -192,3 +192,38 @@ test('V5 scene cards share geometry and immersive art remains prominent in focus
  await transport.getByRole('button',{name:'Pausar',exact:true}).click();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
 });
+
+test('V5 real dates and touch targets remain correct in narrow layouts',async({page},info)=>{
+ await page.clock.install({time:new Date('2026-11-27T12:00:00')});
+ await guest(page);
+ const nav=page.getByRole('navigation',{name:'Navegação principal'}).filter({visible:true});
+ await expect(page.locator('[data-widget=goal]')).toContainText('0 min');
+ if(info.project.name!=='desktop'){
+  const b=await page.getByRole('button',{name:'Escolher atividade',exact:true}).boundingBox();
+  expect(b!.height).toBeGreaterThanOrEqual(44);
+ }
+ await page.getByRole('button',{name:'Iniciar foco',exact:true}).click();
+ await page.clock.fastForward(1500000+250);
+ await expect(page.locator('[data-widget=goal]')).toContainText('25 min');
+ const real=await page.evaluate(()=>JSON.parse(localStorage.getItem('focus-workspace:v4:workspace')!).records.filter((r:{origin:string})=>r.origin==='session'));
+ expect(real).toHaveLength(1);
+ expect(real[0].day).toBe('2026-11-27');
+ await openNavigation(nav,'Histórico');
+ await expect(page.getByRole('button',{name:'Minhas sessões'})).toHaveAttribute('aria-pressed','true');
+ await expect(page.locator('.history-stat').first()).toContainText('25 min');
+ await page.getByRole('button',{name:'Exemplos',exact:true}).click();
+ await expect(page.locator('.history-stat').first()).toContainText('10h 32min');
+ await page.getByRole('button',{name:'Minhas sessões'}).click();
+ if(info.project.name!=='desktop'){
+  const sizes=await page.locator('.history-bar-column').evaluateAll(nodes=>nodes.map(e=>e.getBoundingClientRect().width));
+  expect(Math.min(...sizes)).toBeGreaterThanOrEqual(43.9);
+ }
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();
+ await openNavigation(nav,'Tarefas');
+ if(info.project.name!=='desktop'){
+  for(const selector of ['.planning-title','.planning-actions .priority-action']){
+   const sizes=await page.locator(selector).evaluateAll(nodes=>nodes.map(e=>e.getBoundingClientRect().height));
+   expect(Math.min(...sizes)).toBeGreaterThanOrEqual(44);
+  }
+ }
+});
