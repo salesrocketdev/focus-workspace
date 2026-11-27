@@ -61,3 +61,20 @@
  .focus-center .ring-large{width:min(55vw,188px)}
  .focus-center .ring-large .ring-copy strong{font-size:34px}
 }
+
+/* Do not let the mobile history mark or disclosure glyph exceed its track.
+   Reuse exact icon dimensions; text may wrap, but the actions never overlap. */
+.history-session-copy,.history-session-meta,.history-export-copy{min-width:0}
+.history-session-copy small,.history-session-meta small{overflow-wrap:anywhere}
+.history-session-mark{flex-shrink:0}
+@media(max-width:759px){
+ .history-session-copy{align-self:center}
+ .history-session-meta{justify-self:end;align-self:center}
+ .history-session>svg{justify-self:end;align-self:center}
+ .history-list{min-width:0}
+ .history-session:focus-visible{outline-offset:-2px}
+ .backup-row>div{flex:1;min-width:0}
+ .backup-row>div>b{overflow-wrap:anywhere}
+ .book-row-actions .activity-reading-action{min-width:0;height:auto;min-height:44px;padding-block:6px}
+ .history-detail dd{min-width:0;overflow-wrap:anywhere}
+}

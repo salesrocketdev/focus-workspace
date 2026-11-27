@@ -25,10 +25,10 @@ async function fit(page:Page,label:string){
  const out=await page.evaluate(()=>{
   const visible=(e:Element)=>{const s=getComputedStyle(e),r=e.getBoundingClientRect();return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.height>0&&!e.closest('[inert],[aria-hidden=true]')};
   const selectors=['.history-export-header','.activity-section-head','.category-focus-row','.book-row-actions','.history-session','.backup-row','.dialog-header','.dialog-actions','.focus-center .transport','.calendar-date-controls'];
-  return {page:document.documentElement.scrollWidth-innerWidth,internal:Array.from(document.querySelectorAll(selectors.join(','))).filter(visible).filter(e=>e.scrollWidth>e.clientWidth+2).map(e=>({class:e.className,width:e.clientWidth,scroll:e.scrollWidth}))};
+  return {page:document.documentElement.scrollWidth-innerWidth,internal:Array.from(document.querySelectorAll(selectors.join(','))).filter(visible).filter(e=>e.scrollWidth>e.clientWidth+2).map(e=>({class:e.className,width:e.clientWidth,scroll:e.scrollWidth,children:Array.from(e.children).filter(visible).map(child=>({class:child.getAttribute('class'),width:Math.round(child.getBoundingClientRect().width),right:Math.round(child.getBoundingClientRect().right-e.getBoundingClientRect().right)}))}))};
  });
- expect(out.page,label+' horizontal page overflow').toBeLessThanOrEqual(1);
- expect(out.internal,label+' internal overflow').toEqual([]);
+ expect.soft(out.page,label+' horizontal page overflow').toBeLessThanOrEqual(1);
+ expect.soft(out.internal,label+' internal overflow').toEqual([]);
 }
 async function dialogFits(page:Page,label:string){
  const dialog=page.getByRole('dialog');
@@ -70,6 +70,16 @@ for(const size of sizes){
   for(const range of ['Hoje','7 dias','30 dias']){
    await page.getByRole('group',{name:'Período do histórico'}).getByRole('button',{name:range,exact:true}).click();
    await fit(page,'history '+range);await separate(copy,csv,'CSV '+range);
+   // Assert actual child rectangles, not just page overflow. The old 12px
+   // track clipped a 15px arrow without overflowing the document.
+   for(const row of await page.locator('.history-session').all()){
+    const arrow=row.locator('svg').last(),mark=row.locator('.history-session-mark');
+    await contained(arrow,row,'session arrow '+range);
+    await contained(mark,row,'session mark '+range);
+    await separate(row.locator('.history-session-copy'),row.locator('.history-session-meta'),'session copy and duration '+range);
+    await separate(row.locator('.history-session-meta'),arrow,'session duration and arrow '+range);
+    await separate(row.locator('.history-status'),arrow,'session status and arrow '+range);
+   }
   }
   if(narrow){
    await page.getByRole('button',{name:'Abrir filtros do histórico'}).click();
@@ -112,6 +122,8 @@ for(const size of sizes){
   await separate(copy,csv,'dark CSV');
   await header.scrollIntoViewIfNeeded();
   await header.screenshot({path:info.outputPath('history-csv-dark.png'),animations:'disabled'});
+  await page.locator('.history-list').scrollIntoViewIfNeeded();
+  await page.locator('.history-list').screenshot({path:info.outputPath('history-session-list.png'),animations:'disabled'});
   await go('Hoje');
   await page.getByRole('button',{name:'Abrir sessão de foco',exact:true}).click();
   await fit(page,'focus');
