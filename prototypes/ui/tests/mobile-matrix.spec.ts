@@ -51,7 +51,7 @@ for(const size of sizes){
   await page.emulateMedia({reducedMotion:'reduce'});
   await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')));
   await page.goto('./');
-  await expect(page.getByRole('heading',{name:'Hoje'})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Hoje',exact:true})).toBeVisible();
   const nav=page.getByRole('navigation',{name:'Navegação principal'});
   const go=async(label:string)=>openNavigation(nav,label);
   await fit(page,'dashboard');
