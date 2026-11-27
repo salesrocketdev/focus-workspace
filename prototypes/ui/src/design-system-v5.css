@@ -187,3 +187,6 @@
   .compact-focus-fields {column-gap:8px}
   .compact-focus-fields .ui-select-trigger {padding-inline:8px;font-size:12px}
 }
+
+.compact-field-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:start}
+.rhythm-dialog>.ui-button{margin-top:8px;width:100%}
