@@ -22,7 +22,9 @@ test('dashboard capture, priority, contextual routes and focus preparation',asyn
  await expect(page.locator('.focus-context-picker')).toContainText('Revisar arquitetura do Focora');
  await expect(page.locator('.focus-center .transport').getByRole('button',{name:'Iniciar',exact:true})).toBeVisible();
  await page.getByRole('button',{name:'Voltar',exact:true}).click();
- await widget.locator('.dashboard-task-row').first().getByRole('checkbox').check();
+ await widget.getByRole('checkbox',{name:'Revisar arquitetura do Focora',exact:true}).click();
  await expect(widget.getByText('Revisar arquitetura do Focora',{exact:true})).toHaveCount(0);
+ await widget.getByRole('button',{name:'Abrir todas as tarefas'}).click();
+ await expect(page.locator('.activity-task-row').filter({hasText:'Revisar arquitetura do Focora'}).getByRole('checkbox')).toBeChecked();
  await page.screenshot({path:'test-results/dashboard-actions.png',animations:'disabled'});
 });

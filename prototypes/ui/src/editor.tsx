@@ -15,8 +15,8 @@ const sizes:Size[]=['small','medium','large'];
 export function WidgetSizeOptions({value,onChange,visual=false}:{value:Size;onChange:(size:Size)=>void;visual?:boolean}){
  return <div className={visual?'mobile-size-options edit-size-options':'edit-size-options'} role="group" aria-label="Tamanho do widget">{sizes.map((size,i)=><button type="button" key={size} aria-pressed={value===size} onClick={()=>onChange(size)}>{visual&&<span className={'size-shape shape-'+size}/>}<span>{visual?['1 × 1','2 × 1','2 × 2'][i]:['P','M','G'][i]}</span></button>)}</div>;
 }
-interface ToolbarProps{title:string;open:boolean;size:Size;onOpen:()=>void;onClose:()=>void;onDragStart:(e:DragEvent<HTMLButtonElement>)=>void;onPointerMoveStart?:(e:ReactPointerEvent<HTMLButtonElement>)=>void;onNudge?:(dx:number,dy:number)=>void;onMove:(delta:number)=>void;onResize:(size:Size)=>void;onRemove:()=>void;canMoveUp:boolean;canMoveDown:boolean}
-export function EditCardToolbar({title,open,size,onOpen,onClose,onDragStart,onPointerMoveStart,onNudge,onMove,onResize,onRemove,canMoveUp,canMoveDown}:ToolbarProps){
+interface ToolbarProps{title:string;open:boolean;size:Size;onOpen:()=>void;onClose:()=>void;onDragStart:(e:DragEvent<HTMLButtonElement>)=>void;onPointerMoveStart?:(e:ReactPointerEvent<HTMLButtonElement>)=>void;onNudge?:(dx:number,dy:number)=>void;onMove:(delta:number)=>void;onResize:(size:Size)=>void;onRemove:()=>void;onConfigure?:()=>void;canMoveUp:boolean;canMoveDown:boolean}
+export function EditCardToolbar({title,open,size,onOpen,onClose,onDragStart,onPointerMoveStart,onNudge,onMove,onResize,onRemove,onConfigure,canMoveUp,canMoveDown}:ToolbarProps){
  const root=useRef<HTMLDivElement>(null);
  const trigger=useRef<HTMLButtonElement>(null);
  useEffect(()=>{
@@ -34,7 +34,7 @@ export function EditCardToolbar({title,open,size,onOpen,onClose,onDragStart,onPo
    <span className="edit-menu-caption">Posição</span>
    <button className="edit-menu-row" disabled={!canMoveUp} onClick={()=>onMove(-1)} aria-label={'Mover acima '+title}><ChevronUp size={15}/> Mover acima</button>
    <button className="edit-menu-row" disabled={!canMoveDown} onClick={()=>onMove(1)} aria-label={'Mover abaixo '+title}><ChevronDown size={15}/> Mover abaixo</button>
-   <span className="edit-menu-caption">Tamanho</span><WidgetSizeOptions value={size} onChange={onResize}/>
+   <span className="edit-menu-caption">Tamanho</span><WidgetSizeOptions value={size} onChange={onResize}/>{onConfigure&&<button type="button" className="edit-menu-row" onClick={onConfigure}><Settings size={15}/> Configurar widget</button>}
   </div>}
  </div>;
 }

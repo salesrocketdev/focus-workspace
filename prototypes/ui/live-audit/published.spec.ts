@@ -39,7 +39,7 @@ test('published screens, navigation, controls and visual evidence',async({page},
    expect.soft(rects.every(([w,h])=>w>=44&&h>=44),'dashboard controls have 44px targets').toBeTruthy();
    await expect(page.locator('[data-widget=focus] .timer-start span')).toBeVisible();
   }
-  await page.getByRole('button',{name:'Editar painel',exact:true}).click();await audit('02-editor');await page.getByRole('button',{name:'Cancelar',exact:true}).click();
+  await page.getByRole('button',{name:'Editar painel',exact:true}).click();await audit('02-editor');await page.getByRole('button',{name:'Layouts',exact:true}).click();await audit('02-layout-presets');await page.getByRole('dialog',{name:'Layouts sugeridos'}).getByRole('button',{name:'Cancelar',exact:true}).click();await page.getByRole('button',{name:'Cancelar',exact:true}).click();
   await go('Agenda');await audit('03-agenda');
   await go('Atividades');await audit('04-categories');
   await page.getByRole('button',{name:'Tarefas',exact:true}).click();await audit('05-tasks');

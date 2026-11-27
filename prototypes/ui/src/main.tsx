@@ -33,5 +33,6 @@ import './final-polish.css';
 import './ux-refinements.css';
 import './dashboard-actions.css';
 import './focus-experience.css';
+import './editor-preferences.css';
 
 createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>);

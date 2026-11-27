@@ -1,6 +1,6 @@
 import {WORKSPACE_KEY,loadWorkspace,validWorkspace,type WorkspaceSnapshot} from './workspace-storage';
 import {PREFS_KEY,CONNECTIONS_KEY,ONBOARDING_KEY,providerKeys,loadPreferences,readStorage,type FocusPreferences} from './preferences-model';
-import {STORAGE,catalogue,type Layouts,type Widget} from './model';
+import {STORAGE,catalogue,validWidgetOptions,type Layouts,type Widget} from './model';
 import {valid as validPlacement} from './grid-model';
 import type {FocusRecord} from './history-model';
 
@@ -22,7 +22,7 @@ function preferences(x:unknown):x is FocusPreferences {
 }
 function layouts(x:unknown):x is Layouts{
  if(!object(x))return false;
- const items=(v:unknown):v is Widget[]=>Array.isArray(v)&&v.length<=catalogue.length&&v.every(w=>object(w)&&str(w.id,80)&&catalogue.some(c=>c.type===w.type)&&one(w.size,['small','medium','large'])&&(w.placement===undefined||object(w.placement)&&validPlacement(w.placement as unknown as NonNullable<Widget['placement']>,w.type as Widget['type'])))&&new Set(v.map(w=>w.id)).size===v.length&&new Set(v.map(w=>w.type)).size===v.length;
+ const items=(v:unknown):v is Widget[]=>Array.isArray(v)&&v.length<=catalogue.length&&v.every(w=>object(w)&&str(w.id,80)&&catalogue.some(c=>c.type===w.type)&&one(w.size,['small','medium','large'])&&validWidgetOptions(w.options)&&(w.placement===undefined||object(w.placement)&&validPlacement(w.placement as unknown as NonNullable<Widget['placement']>,w.type as Widget['type'])))&&new Set(v.map(w=>w.id)).size===v.length&&new Set(v.map(w=>w.type)).size===v.length;
  return items(x.desktop)&&items(x.mobile);
 }
 const day=(v:string)=>/^\d{4}-\d{2}-\d{2}$/.test(v)&&Number.isFinite(Date.parse(v+'T00:00:00Z'))&&new Date(v+'T00:00:00Z').toISOString().slice(0,10)===v;
