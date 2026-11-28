@@ -1,0 +1,10 @@
+# Calendar hub
+
+Read-only Google Calendar and Outlook via OAuth; multiple accounts and calendar selection. Normalized events keyed by provider/account/calendar/event/occurrence identity, with original ID, start/end, timezone, all-day date, status, transparency/showAs, response, optional meeting link and last synced timestamp. Display local zone; preserve source timezone and all-day dates. Events are not tasks. Show upcoming, daily and weekly agenda, month overview; no external writes in P0.
+
+Sync initial bounded horizon (proposal: 30 days past, 90 future), pagination and provider-specific incremental strategy. Google sync token may be invalidated (HTTP 410 -> rebuild safely); parameters must follow provider restrictions; apply window locally if required. Microsoft calendarView delta scoped to calendar and time interval; persist opaque delta link, follow next links and rebuild when range changes/expired. Stage sync then atomically commit events+cursor; handle cancellation/deletion, recurring exceptions, duplicate events, auth expiry, rate limits and retry/backoff. Refresh on app open/resume and manual action; periodic ~5min while supported/online. Background sync on optional server later; webhooks deferred until useful. Show last successful sync, stale/offline and reconnect. Do not promise continuous background sync with app closed in local mode.
+
+Free-window algorithm: merge overlapping busy accepted/tentative per preference; ignore declined/cancelled/free events, all-day nonblocking unless marked busy per preference; subtract working-hours window and buffer. Suggest duration without automatically changing agenda. Warn before a focus session crosses meeting, allow override. Event links open via safe https URLs after user action.
+
+Acceptance: multi-account import, no duplicates on resync, changed/cancelled recurring occurrence, local timezone and DST, all-day event, offline cache, expired token, permission denial, no write scopes, no implicit focus accounting.
+Sources: https://developers.google.com/workspace/calendar/api/guides/sync ; https://learn.microsoft.com/en-us/graph/delta-query-events
