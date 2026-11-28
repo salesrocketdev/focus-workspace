@@ -1,0 +1,31 @@
+/* V4.35: work directly from existing widgets, without changing their placement. */
+.dashboard-card-actions{display:flex;align-items:center;gap:2px;flex-shrink:0}
+.dashboard-tasks{display:grid;gap:6px;min-width:0}
+.dashboard-task-list.task-list{display:grid;gap:1px}
+.dashboard-task-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:2px;min-width:0;border-bottom:1px solid var(--ui-line)}
+.dashboard-task-row:last-child{border-bottom:0}
+.dashboard-task-row label{min-width:0;gap:7px!important;font-size:12px!important;cursor:pointer;min-height:32px}
+.dashboard-task-row label>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dashboard-task-actions{display:flex;gap:0;align-items:center}
+.dashboard-task-icon{display:grid;place-items:center;width:30px;height:32px;color:var(--ui-muted);border-radius:6px;flex:0 0 30px;padding:0}
+.dashboard-task-icon:not(:disabled):hover,.dashboard-task-link:hover:not(:disabled){background:var(--field-selected);color:var(--field-selected-ink)}
+.priority-action[aria-pressed=true]{color:var(--accent-ink)!important}
+.dashboard-task-icon:disabled,.priority-action:disabled{opacity:.35;cursor:default}
+.dashboard-task-link{display:flex;gap:5px;align-items:center;justify-content:space-between;text-align:left;min-width:0;min-height:30px;color:var(--field-selected-ink);font-size:11px;padding:3px 5px;border-radius:6px}
+.dashboard-task-link span{overflow-wrap:anywhere;min-width:0}
+.dashboard-task-link svg{flex-shrink:0}
+.dashboard-task-empty{display:grid;justify-items:center;gap:5px;padding:5px;font-size:12px;color:var(--ui-muted)}
+.dashboard-task-empty .dashboard-task-link{justify-content:center}
+.activities-page .activity-row-actions>.priority-action[aria-pressed=true]{color:var(--accent-ink)}
+@media(max-width:759px){
+ .dashboard-task-row label,.dashboard-task-icon,.dashboard-task-link{min-height:44px}
+ .dashboard-task-icon{width:44px;height:44px;flex-basis:44px}
+ .dashboard-task-row label{font-size:11px!important}
+ .dashboard-card-actions{gap:0}
+ .dashboard-card-actions>.card-icon-action{min-width:44px;min-height:44px}
+ .activity-task-row .activity-row-actions{flex-wrap:wrap;justify-content:flex-end;max-width:132px}
+}
+@media(max-width:359px){.activity-task-row .activity-row-actions{max-width:88px}}
+/* Minimum-size widget previews never require internal scrolling. */
+.workspace:not(.editing) .widget[data-widget=tasks].small .dashboard-task-row:nth-child(n+3){display:none}
+.workspace:not(.editing) .widget[data-widget=tasks].small .dashboard-task-actions .priority-action{display:none}

@@ -1,0 +1,77 @@
+import { useState } from 'react';
+import { Timer, Coffee, Monitor, Target, Link2, ShieldCheck, Check, ArrowRight, ArrowLeft, UserRound, LayoutGrid, Sparkles, Settings, Unplug } from 'lucide-react';
+import { Button,Dialog,Field,SelectField,ToggleCard } from './ui';
+import googleSignIn from './assets/providers/google-signin.svg';
+import { ProviderIcon,ProviderLabel,type ProviderId } from './provider-icons';
+import { type FocusPreferences,type Profile,type Preset,focusPresets,matchesFocusPreset } from './preferences-model';
+
+const details:Record<ProviderId,{title:string;account:string;permissions:string[];description:string;planned?:boolean}>={
+ 'google-calendar':{title:'Google Agenda',account:'agenda.demo@example.com',permissions:['Consultar calendários disponíveis','Consultar horários e títulos dos eventos'],description:'Veja compromissos e intervalos de foco no painel.'},
+ outlook:{title:'Calendário do Outlook',account:'outlook.demo@example.com',permissions:['Consultar calendários da conta','Consultar compromissos e disponibilidade'],description:'Reúna sua agenda de trabalho e pessoal.'},
+ spotify:{title:'Spotify',account:'music.demo@example.com',permissions:['Consultar estado de reprodução','Controlar reprodução em dispositivos compatíveis'],description:'Acompanhe a música durante suas sessões.'},
+ gmail:{title:'Gmail',account:'mail.demo@example.com',permissions:['Exemplo conceitual de autorização de e-mail'],description:'Capture um e-mail fictício como tarefa na Entrada.',planned:true},
+ 'google-meet':{title:'Google Meet',account:'meet.demo@example.com',permissions:['Exemplo de acesso aos links dos eventos'],description:'Links de reunião poderão vir do calendário; conexão separada não é necessária neste MVP.',planned:true},
+ teams:{title:'Microsoft Teams',account:'teams.demo@example.com',permissions:['Exemplo de acesso aos links dos eventos'],description:'Links de reunião poderão vir do Outlook; conexão separada não é necessária neste MVP.',planned:true},
+};
+export function ConnectionDialog({provider,connected,onChange,onDismiss}:{provider:ProviderId;connected:boolean;onChange:(connected:boolean)=>void;onDismiss:()=>void}){
+ const [step,setStep]=useState(0);const [empty,setEmpty]=useState(false);const d=details[provider];
+ return <Dialog title={connected?'Conexão de demonstração': 'Conectar '+d.title} description="Simulação OAuth · nenhuma autenticação real." onDismiss={onDismiss}>
+  <div className="connection-flow" key={step}><div className="oauth-brand"><ProviderIcon provider={provider} size={42}/><Link2 size={20}/><span className="oauth-app"><Timer size={24}/></span></div><div className="demo-warning"><ShieldCheck size={17}/><span>Ambiente de demonstração. Não informe credenciais reais.</span></div>
+  {connected?<><div className="oauth-account"><UserRound size={22}/><div><b>{d.title}</b><small>{d.account}</small></div><Check size={18}/></div><p>Conexão simulada ativa. Não existem tokens, chamadas de API ou dados importados.</p><footer className="dialog-actions"><Button variant="secondary" onClick={onDismiss}>Fechar</Button><Button onClick={()=>{onChange(false);onDismiss()}}><Unplug size={15}/> Desconectar</Button></footer></>:step===0?<><p>{d.description}</p><button className="oauth-account" onClick={()=>setStep(1)}><UserRound size={22}/><div><b>Conta de demonstração</b><small>{d.account}</small></div><ArrowRight size={18}/></button><footer className="dialog-actions"><Button variant="secondary" onClick={onDismiss}>Cancelar</Button></footer></>:<><h3>Permissões simuladas</h3><p>O Focus Workspace solicitaria:</p><ul className="oauth-scopes">{d.permissions.map(s=><li key={s}><Check size={16}/>{s}</li>)}</ul>{d.planned&&<small>Somente exploração visual. Isso não adiciona a integração ao MVP.</small>}<footer className="dialog-actions"><Button variant="secondary" onClick={()=>setStep(0)}>Voltar</Button><Button onClick={()=>{onChange(true);onDismiss()}}>Autorizar simulação</Button></footer></>}
+  </div>
+ </Dialog>;
+}
+export function IntegrationPanel({connections,onChange,onOpenTasks}:{connections:ProviderId[];onChange:(next:ProviderId[])=>void;onOpenTasks?:()=>void}){
+ const [provider,setProvider]=useState<ProviderId|null>(null);
+ return <section className="settings-surface"><header className="settings-section-header"><Link2 size={20}/><div><h2>Integrações</h2><p>Conecte serviços para personalizar seu espaço de trabalho.</p></div></header>
+  <div className="integration-summary"><span className="integration-summary-icon"><Link2 size={22}/></span><div><b>{connections.filter(id=>!details[id].planned).length} de 3 conexões simuladas</b><small>Conecte apenas os serviços que deseja usar.</small></div></div>
+  <div className="integration-preview-list integration-groups">{[{label:'Calendários',ids:['google-calendar','outlook']},{label:'Música',ids:['spotify']},{label:'E-mail e reuniões',ids:['gmail','google-meet','teams']}].map(group=><section className="integration-group" key={group.label}><h3>{group.label}</h3><div className={'integration-group-rows'+(group.label==='Calendários'?' calendar-integration-grid':'')}>{group.ids.map(key=>{const id=key as ProviderId,d=details[id],connected=!d.planned&&connections.includes(id);return <article className="integration-preview-row integration-service" key={id}><div className="integration-service-copy"><span className="integration-service-mark"><ProviderIcon provider={id} size={24}/></span><div><b>{d.title}</b><p>{d.description}</p><small className={'integration-service-status'+(connected?' connected':'')}><i/>{connected?'Conectado · demo':d.planned?'Disponível nos exemplos':'Não conectado'}</small></div></div>{d.planned?<Button variant="secondary" size="sm" onClick={onOpenTasks}>Ver em Tarefas</Button>:<Button variant={connected?'secondary':'soft'} size="sm" aria-label={(connected?'Gerenciar ':'Conectar ')+d.title} onClick={()=>setProvider(id)}>{connected?'Gerenciar':'Conectar'}</Button>}</article>})}</div></section>)}</div>
+  <div className="settings-info"><ShieldCheck size={18}/><span>Ambiente de demonstração. Nenhuma conta, dado ou permissão real é acessada.</span></div>
+  {provider&&<ConnectionDialog provider={provider} connected={connections.includes(provider)} onDismiss={()=>setProvider(null)} onChange={on=>onChange(on?[...new Set([...connections,provider])]:connections.filter(p=>p!==provider))}/>}
+ </section>;
+}
+export function FocusSettings({prefs,onChange,disabled=false,wakeStatus='off',compact=false,onChooseRhythm}:{compact?:boolean;onChooseRhythm?:()=>void;prefs:FocusPreferences;onChange:(p:FocusPreferences)=>void;disabled?:boolean;wakeStatus?:'off'|'active'|'unavailable'|'waiting'}){
+ const opts=(values:number[],current:number)=>[...new Set([...values,current])].sort((a,b)=>a-b);
+ const duration=(label:string,key:'focus'|'short'|'long',values:number[],hint?:string)=><SelectField label={label} hint={hint} value={prefs[key]} disabled={disabled} onValueChange={v=>onChange({...prefs,[key]:Number(v)})} options={opts(values,prefs[key]).map(n=>({value:String(n),label:n/60+(n===60?' minuto':' minutos')}))}/>;
+ const [advanced,setAdvanced]=useState(false);
+ const fields=<div className={"focus-settings-fields"+(compact?" compact-focus-fields":"")}>
+  {!compact&&<div className="focus-preset-group"><h3>Ritmos de foco</h3><p>Escolha um ponto de partida e ajuste como preferir.</p><div className="focus-presets" role="group" aria-label="Presets de concentração">{focusPresets.map(preset=><button type="button" className="focus-preset" key={preset.id} aria-pressed={matchesFocusPreset(prefs,preset)} disabled={disabled} onClick={()=>onChange({...prefs,focus:preset.focus,short:preset.short,long:preset.long,cycles:preset.cycles})}><span className="focus-preset-title"><b>{preset.label}</b>{matchesFocusPreset(prefs,preset)&&<Check size={15}/>}</span><span className="focus-preset-time">{preset.focus/60}<small> min</small><span> / {preset.short/60} min pausa</span></span><small>{preset.description}</small></button>)}</div><small>{focusPresets.some(p=>matchesFocusPreset(prefs,p))?'A meta diária e os inícios automáticos são mantidos.':'Ritmo personalizado · suas alterações são mantidas.'}</small></div>}
+  {(!compact||!advanced)&&<>
+  {duration('Duração do Pomodoro','focus',[60,900,1200,1500,1800,2700,3000,3600,5400,7200], compact?undefined:'Duração da próxima sessão. 1 minuto permite testar a demo.')}
+  {duration('Pausa curta','short',[60,180,300,600,900])}
+  {duration('Pausa longa','long',[60,600,900,1200,1800,2700])}
+  <SelectField label="Ciclos até a pausa longa" value={prefs.cycles} disabled={disabled} onValueChange={v=>onChange({...prefs,cycles:Number(v)})} options={Array.from({length:12},(_,i)=>({value:String(i+1),label:(i+1)+' '+(i===0?'ciclo':'ciclos')}))}/>
+  </>}
+  {(!compact||advanced)&&<>
+  <SelectField label="Meta diária de foco" value={prefs.goal} disabled={disabled} onValueChange={v=>onChange({...prefs,goal:Number(v)})} options={opts([30,60,90,120,180,240,300,360,480],prefs.goal).map(n=>({value:String(n),label:n+' minutos'}))}/>
+  <div className="preference-toggles"><ToggleCard title="Iniciar pausas automaticamente" description="Ao terminar um período de foco." icon={<Coffee size={19}/>} checked={prefs.autoBreak} disabled={disabled} onChange={v=>onChange({...prefs,autoBreak:v})}/><ToggleCard title="Iniciar o próximo foco automaticamente" description="Ao terminar uma pausa." icon={<Timer size={19}/>} checked={prefs.autoFocus} disabled={disabled} onChange={v=>onChange({...prefs,autoFocus:v})}/><ToggleCard title="Manter tela ligada" description="Durante o foco, solicite ao navegador que evite bloquear a tela. Pode aumentar o consumo de bateria." icon={<Monitor size={19}/>} checked={prefs.keepAwake===true} disabled={disabled} onChange={v=>onChange({...prefs,keepAwake:v})}/>{prefs.keepAwake&&<small role="status">{wakeStatus==='active'?'Tela mantida ligada.':wakeStatus==='unavailable'?'O navegador ou dispositivo não permitiu manter a tela ligada.':wakeStatus==='waiting'?'Proteção temporariamente suspensa.':'A proteção será solicitada ao iniciar o foco, quando suportada.'}</small>}</div></>}
+  {disabled&&<small>Encerre ou reinicie a sessão atual para alterar as preferências.</small>}
+ </div>;
+ return compact?<div className="focus-dialog-content">
+  <nav className="dialog-section-nav" aria-label="Seções da configuração de foco">
+   <button type="button" aria-pressed={!advanced} onClick={()=>setAdvanced(false)}>Sessão</button>
+   <button type="button" aria-pressed={advanced} onClick={()=>setAdvanced(true)}>Preferências</button>
+  </nav>
+  <div className="dialog-scroll-body" key={String(advanced)}>
+   {!advanced&&onChooseRhythm&&<Button className="choose-rhythm-action" variant="secondary" disabled={disabled} onClick={onChooseRhythm}><Timer size={16} aria-hidden="true"/> Escolher ou criar ritmo de foco</Button>}
+   {fields}
+  </div>
+ </div>:fields;
+}
+export function AccountOptions(){
+ return <div className="account-options" role="group" aria-label="Opções de conta"><small>Login opcional · indisponível nesta versão. Seus dados locais não dependem de uma conta.</small>
+  <button type="button" className="onboarding-choice" disabled><img className="google-signin-mark" src={googleSignIn} width={24} height={24} alt=""/><span><b>Continuar com Google</b><small>Login ainda não configurado.</small></span></button>
+  <button type="button" className="onboarding-choice" disabled><ProviderIcon provider="outlook" size={24}/><span><b>Continuar com Microsoft</b><small>Login ainda não configurado.</small></span></button>
+ </div>;
+}
+export function Onboarding({profile,prefs,canStartEmpty=false,onFinish,onDismiss}:{profile:Profile|null;prefs:FocusPreferences;canStartEmpty?:boolean;onFinish:(profile:Profile,prefs:FocusPreferences,preset:Preset|null,empty:boolean)=>void;onDismiss:()=>void}){
+ const [step,setStep]=useState(0);
+ const [draft,setDraft]=useState(prefs);
+ const [startEmpty,setStartEmpty]=useState(canStartEmpty);
+ return <Dialog title={step===0?'Começar no Focora':'Seu primeiro ritmo de foco'} description={step===0?'Escolha como começar.':'Escolha um ritmo inicial. Você pode alterar depois.'} onDismiss={onDismiss}>
+ <div className="onboarding-progress" aria-label={'Etapa '+(step+1)+' de 2'}>{[0,1].map(i=><i key={i} className={i<=step?'active':''}/>)}</div>
+ <div className="onboarding-step" key={step}>
+ {step===0?<><AccountOptions/><div className="onboarding-local-note"><UserRound size={20}/><div><b>Continuar sem conta</b><p>Seus dados ficam neste navegador, sem login ou sincronização.</p></div></div>{canStartEmpty&&<ToggleCard title="Começar sem exemplos" description="Sem tarefas, livros ou sessões fictícias. A agenda e a música ainda são demonstrações." checked={startEmpty} onChange={setStartEmpty}/>}</>:<><div className="quick-focus-presets" role="group" aria-label="Ritmo inicial">{focusPresets.map(p=><button key={p.id} type="button" aria-pressed={matchesFocusPreset(draft,p)} onClick={()=>setDraft({...draft,focus:p.focus,short:p.short,long:p.long,cycles:p.cycles})}><span><b>{p.label}</b><small>{p.description}</small></span><span className="quick-preset-duration"><strong>{p.focus/60} min</strong><small>{p.short/60} min de pausa</small></span></button>)}</div><small>As integrações de agenda são demonstrações e não acessam suas contas.</small></>}
+ </div><footer className="dialog-actions onboarding-actions">{step>0&&<Button variant="secondary" onClick={()=>setStep(0)}>Voltar</Button>}<Button onClick={()=>step===0?setStep(1):onFinish(profile??'guest',draft,null,canStartEmpty&&startEmpty)}>{step===0?'Continuar sem conta':'Começar'}<ArrowRight size={15}/></Button></footer>
+ </Dialog>;
+}

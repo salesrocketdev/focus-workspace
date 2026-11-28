@@ -1,0 +1,8 @@
+# V4.36 — Focus experience
+
+- Zen is an optional in-session presentation toggle, hiding the activity detail and agenda/music side cards without changing the timer, selected scenario, notifications or workspace. The clock and controls remain available.
+- Quick rhythm chooser shares existing focus presets and preferences. It is available only while no session is active and the current tab owns the workspace. Preserves daily goal and auto-start settings.
+- Reset prompts when an interval/cycle is active, including a paused interval. Cancel leaves the timer unchanged (a running clock continues). Confirm discards only current unfinished interval, resets cycle; prior records remain. Compact/PiP returns control to the main application for confirmation. If a countdown reaches its deadline while confirming, let the phase transition finish and close the dialog.
+- A non-blocking summary presents the recorded duration, method, category and completed/interrupted state, optionally completes the associated task, updates the matching book's reading progress, or starts a ready break. Automatic phase transitions continue; recovery does not fabricate extra records. Dismissal does not delete the record. Summary and Zen are transient UI state, not synced or backed up; recorded session data remains durable.
+- No arbitrary session note field or native fullscreen API in this step. Existing session history, workspace schema and backup remain compatible.
+- Regression tests cover cancel and confirm reset, quick presets, Zen and starting a break; mobile matrix includes Zen. Physical iOS and PiP validation remain pending.

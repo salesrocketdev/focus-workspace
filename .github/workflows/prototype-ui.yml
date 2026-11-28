@@ -1,0 +1,39 @@
+name: V4 prototype checks
+on:
+  push:
+    branches: [prototype/ui-v4]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    if: github.ref == 'refs/heads/prototype/ui-v4' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[check]'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: prototypes/ui
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-prototype-${{ runner.os }}-${{ hashFiles('prototypes/ui/package.json', 'prototypes/ui/package-lock.json') }}
+          restore-keys: npm-prototype-${{ runner.os }}-
+      - run: |
+          if [ -f package-lock.json ]; then npm ci --no-audit --no-fund; else npm install --no-audit --no-fund; fi
+      - run: npm run build
+      - run: npm run build-storybook
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm test
+      - run: npm run test:offline
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v4-prototype-evidence
+          path: prototypes/ui/test-results/
+          if-no-files-found: warn
+          retention-days: 7

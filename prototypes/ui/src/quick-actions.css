@@ -1,0 +1,35 @@
+/* Shared compact session and searchable action surface. */
+.quick-header-actions{display:flex;align-items:center;gap:6px}
+.quick-action-button{gap:6px!important;width:auto!important;min-width:34px;padding:0 7px!important}
+.quick-action-button kbd,.command-footer kbd{font:inherit;font-size:10px;padding:2px 4px;border:1px solid var(--ui-line);border-radius:4px;background:var(--ui-surface);color:var(--ui-muted);white-space:nowrap}
+.compact-focus{display:grid;gap:8px;min-width:0;padding:12px;background:var(--ui-paper);color:var(--ui-ink);border:1px solid var(--field-edge);border-radius:14px;box-shadow:0 8px 32px #2b1c1520;animation:v4-step 180ms ease-out}
+.compact-dock{position:fixed;right:20px;bottom:20px;width:320px;max-width:calc(100vw - 28px);z-index:8}
+.with-compact-focus .workspace-main{padding-bottom:205px}
+.compact-focus header{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.compact-focus header>span{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:650;color:var(--ui-muted)}
+.compact-focus header>div{display:flex;align-items:center;gap:2px}
+.compact-focus header .ui-icon-button{width:27px;height:27px;min-height:27px;flex-basis:27px}
+.compact-main{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.compact-time{display:grid;gap:3px;min-width:0}
+.compact-time strong{font-size:36px;line-height:1.05;font-variant-numeric:tabular-nums;letter-spacing:-.05em}
+.compact-time small{font-size:10px;line-height:1.4;overflow-wrap:anywhere}
+.compact-transport{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.compact-transport .ui-icon-button{width:30px;height:34px;min-height:34px;flex-basis:30px}
+.compact-play{display:grid;place-items:center;width:42px;height:42px;flex:0 0 42px;border-radius:50%;background:var(--ui-action);color:#fff;transition:filter 150ms}
+.compact-play:hover{filter:brightness(.91)}
+.compact-context{font-size:12px;color:var(--ui-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.compact-progress{height:4px;border-radius:10px;background:var(--ring-track);overflow:hidden}
+.compact-progress i{display:block;height:100%;background:var(--accent);border-radius:10px;transition:width 250ms linear}
+.compact-pip-document{margin:0;padding:8px;min-height:100vh;background:var(--canvas);font-family:Inter Variable,Inter,system-ui,sans-serif;display:grid;align-items:center;overflow:auto}
+.compact-detached{width:100%;border:0;box-shadow:none;border-radius:9px;animation:none}
+.command-palette{display:grid;gap:12px;min-width:0}
+.command-list{display:grid;gap:4px;max-height:min(47vh,370px);overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:2px}
+.command-item{width:100%;min-height:56px;display:flex;align-items:center;justify-content:flex-start;text-align:left;gap:10px;border:1px solid transparent;border-radius:9px;padding:7px;color:var(--ui-ink);transition:background-color 150ms,border-color 150ms}
+.command-item[data-active=true],.command-item:hover{background:var(--field-selected);border-color:var(--field-selected-edge)}
+.command-item>span:nth-child(2){display:grid;gap:3px;flex:1;min-width:0}
+.command-item b{font-size:13px;font-weight:600}.command-item small{font-size:11px;line-height:1.35}
+.command-icon{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border-radius:8px;background:var(--ui-surface);color:var(--field-selected-ink)}
+.command-footer{display:flex;justify-content:flex-end;gap:11px;flex-wrap:wrap;font-size:10px;color:var(--ui-muted);padding-top:8px;border-top:1px solid var(--ui-line)}
+.command-footer>span{display:flex;align-items:center;gap:4px}
+.command-empty{display:grid;justify-items:center;text-align:center;gap:8px;padding:28px 8px;font-size:13px;color:var(--ui-muted)}
+@media(max-width:759px){.quick-action-button kbd{display:none}.quick-header-actions{gap:4px}.compact-dock{right:14px;bottom:calc(70px + env(safe-area-inset-bottom));width:calc(100% - 28px);max-width:360px}.with-compact-focus .workspace-main{padding-bottom:260px}.compact-focus{padding:10px}.compact-time strong{font-size:32px}.command-footer{display:none}.command-list{max-height:49dvh}.focus-top .ui-icon-button{width:30px;flex-basis:30px}}

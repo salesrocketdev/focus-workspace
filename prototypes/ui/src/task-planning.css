@@ -1,0 +1,33 @@
+.planning-page { display:grid; gap:1rem; }
+.planning-actions,.planning-meta,.planning-weekdays,.planning-check { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem; }
+.planning-toolbar,.planning-capture,.planning-checklist { display:grid; gap:.65rem; }
+.planning-list { list-style:none; padding:0; margin:0; display:grid; gap:.65rem; }
+.planning-row,.planning-habit { display:flex; gap:.75rem; align-items:center; padding:.8rem; border:1px solid var(--ui-line,var(--border)); border-radius:12px; }
+.planning-row-body,.planning-habit>div:first-child { flex:1; min-width:0; }
+.planning-title { font:inherit; color:inherit; font-weight:650; background:none; border:0; padding:0; text-align:left; overflow-wrap:anywhere; }
+.planning-meta { margin-top:.35rem; }
+.planning-meta,.planning-empty,.planning-habit small { color:var(--muted); font-size:.85rem; }
+.planning-meta span { display:inline-flex; gap:.25rem; align-items:center; }
+.planning-meta .planning-overdue { font-weight:700; color:var(--danger,#b93843); }
+.planning-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.65rem; }
+.planning-fields input { min-width:0; }
+.planning-weekdays label,.planning-habit-days label { display:grid; justify-items:center; gap:.25rem; }
+.planning-habit-days { display:flex; gap:.65rem; flex-wrap:wrap; font-size:.8rem; }
+.planning-habit small { display:block; margin-top:.25rem; }
+.planning-page button svg,.planning-title svg { vertical-align:middle; }
+.planning-capture button { height:auto; min-height:2.5rem; white-space:normal; justify-content:flex-start; text-align:left; }
+@media(max-width:759px) {
+ .planning-page .activity-section-head,.planning-habit { align-items:flex-start; flex-direction:column; }
+ .planning-row { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:start; }
+ .planning-row>.planning-actions { grid-column:2; }
+ .planning-fields { grid-template-columns:1fr; }
+}
+.task-deadlines { margin-top:1rem; }
+.dashboard-task-row label small { display:block; font-size:.72rem; color:var(--ui-muted); }
+.dashboard-task-row label .planning-overdue { color:var(--danger,#b93843); }
+.ui-dialog.task-details-dialog { width:min(100%,500px); max-height:100dvh; height:100dvh; margin:0 0 0 auto; border-radius:16px 0 0 16px; }
+.planning-email { padding:.75rem; border:1px solid var(--ui-line); border-radius:.65rem; }
+.planning-email p { margin:.35rem 0 0; }
+@media(max-width:759px) {
+ .ui-dialog.task-details-dialog { width:100%; border-radius:0; padding-bottom:max(18px,env(safe-area-inset-bottom)); }
+}

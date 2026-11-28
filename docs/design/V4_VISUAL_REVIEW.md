@@ -1,0 +1,129 @@
+# V4 visual review — iteration 2
+
+Reviewed the approved raster concept and six actual Playwright screenshot candidates from [CI run 45868355699](https://github.com/salesrocketdev/focus-workspace/actions/runs/45868355699). Desktop 1366px and mobile 390px evidence confirms basic composition and interaction flow; not yet a pixel-identical baseline. Live deployment was confirmed by maintainer.
+
+Observed differences: stronger/darker orange buttons, nearly uniform ring, smaller and clipped book cover typography, player controls below metadata in wide card, mobile editor header crowded, mobile focus view taller than reference. This iteration adjusts ring gradient (without inventing timer progress), accent, music layout, reading artwork dimensions, editor selection and mobile density. Mobile focus hides next commitment and volume in this compact mockup; full calendar remains accessible elsewhere. Desktop editor keeps summary widget because removing it would change the dashboard default.
+
+New test candidates cover adding notes, changing size, ordering, saved layouts independent of screen size, and desktop-to-mobile width matrix. Screenshots are not approved baselines. Exact original PNG still pending upload (#3); artwork and provider symbols are placeholders. Use no real provider data or secrets. Review new CI evidence before closing #28–#33 or starting production.
+## Iteration 3 — composition and viewport fidelity
+Re-inspected actual screenshots from successful [run 45868734853](https://github.com/salesrocketdev/focus-workspace/actions/runs/45868734853) against the exact 1536 × 1024 user reference. Changes: desktop 12-column grid with default 6/6, 4/5/3, 8/4 spans; wider sidebar, taller reading artwork, editor's add slot aligned with bottom widgets, mobile quick-start timer with full method controls in focus route, compact mobile reading player, visible mobile navigation in focus, more faithful right-side orange ring and decorative original landscape silhouettes. Existing custom size and order remain supported; default editor retains summary unlike the reference because it is a real configured widget. Mobile provider labels remain text; music remains demo. Screenshot capture now uses viewport and CSS-pixel scale for fair comparison rather than full-page mobile screenshots at device scale. New timer navigation test added. Await CI and visual approval, not a pixel-perfect claim.
+
+## Iteration 4 — dashboard editor control system
+Maintainer reported inconsistent button dimensions and card UI. Introduced isolated editor components (icon button, action button, card toolbar, size selector, add tile, passive preview) and scoped styles. Desktop toolbar has three uniform 28px controls (drag/options/remove), with ordering and size presets in the options popover, rather than four competing header actions. Selected widget gets seven visual handles and one functional resize handle. Mobile row actions 32px; page actions 36px desktop / 40px mobile. The focus, tasks, reading and music previews use noninteractive markup, not live CTAs. Remaining widget contents stay inert. Catalogue rows share fixed height; size controls are no longer layered over widget content. Added Playwright dimension, inert and menu keyboard checks. Compact mobile targets are a prototype compromise, not final accessibility approval. Keep issue #33 open pending screenshot review.
+
+## Iteration 5 — shared header and route alignment
+Inspected all six actual screenshots in [successful run 45870745752](https://github.com/salesrocketdev/focus-workspace/actions/runs/45870745752). Editor controls now look more consistent, but mobile editor lacks the normal brand row, its title is centered, and the desktop editor timer preview is smaller than intended. Source inspection also found vertical auto margins on main, which can center short routes. Introduced shared PageHeader/MobileMasthead and top-aligned shell, standardized heading/subtitle placement, and consistent route card spacing. Removed auto vertical centering. Kept immersive toolbar intentionally distinct as in V4. Fixed editor timer sizing and enabled more readable already-added catalogue entries. Added real coordinate checks across all six standard pages plus multiple viewport widths. New screenshots and tests remain to be validated before approval.
+
+## Iteration 6 — provider and functional iconography
+Inspected 12 route captures from successful [run 45872046801](https://github.com/salesrocketdev/focus-workspace/actions/runs/45872046801). Shared page headings are now consistently aligned; previous coordinate tests passed. Replaced generic G/O provider badges and Spotify music-note placeholder with local SVG brand assets, including mobile agenda and edit catalogue. Added a settings preview with Gmail/Meet/Teams visual references, explicitly not connected. Standardized Lucide navigation/card stroke and icon size, preserved aspect ratios, added Storybook catalogue and local asset rendering tests. The historical Google/Outlook designs deliberately match the V4 style rather than claiming latest brand assets. Brand permissions remain a release gate.
+
+## Iteration 7 — typography, artwork and form polish
+Inspected actual dashboard/editor/focus/settings captures (desktop/mobile) from [successful run 45876559666](https://github.com/salesrocketdev/focus-workspace/actions/runs/45876559666); provider assets loaded and header alignment checks passed. Remaining differences: system font fallback, simplistic shared cover, low-detail form and inconsistent control heights. Bundle Inter Variable locally, replace cover with original layered landscape SVG variants, refine card surface/shadow and focus button pair, introduce reusable form/dialog/notice primitives and consistent settings fields. Add Storybook examples and browser tests for focus restoration, invalid input, dialog action heights and font/settings behavior. This is prototype polish, not production functionality or final fidelity approval. Original reference binary remains pending.
+
+## Iteration 8 — coordinate editor and free space
+Reviewed real V4.07 editor screenshot and confirmed successful [CI 45878567627](https://github.com/salesrocketdev/focus-workspace/actions/runs/45878567627) and Pages deployment. Added explicit desktop positions and independent width/height, snapped pointer/keyboard gestures, collision ghost, first-free add tile, saved layout migration and fixed goal header label. Desktop >=1151px has spatial editing; smaller widths retain presets/order. No push-away collision or automatic compaction while dragging: invalid placement is rejected to avoid unintended layout changes. The prototype uses CSS Grid, no new drag dependency. Added tests for collision, pointer movement/height, keyboard resizing, persistence and reset/cancel. New CI and screenshots must be reviewed before approval.
+
+## Iteration 9 — editor placement polish
+Inspected V4.08 editor capture from successful [CI 45879247713](https://github.com/salesrocketdev/focus-workspace/actions/runs/45879247713); Pages also succeeded. Added explicit collision policy toggle, shared atomic downward push planner, neighbor destination ghosts, catalogue drag placement, vertical compaction and reduced-motion-aware FLIP animation for committed moves. Adjusted narrow card preview density. The prototype retains block-by-default and no automatic compaction, and keeps existing mobile editing. New browser tests check opt-in collision push, compact behavior, catalogue drop and save/cancel. No claim of latest passing CI or final visual approval until validated.
+
+## Iteration 10 — calendar and V4.09 stabilization
+V4.09 Pages deployment succeeded, but [CI 45879620991](https://github.com/salesrocketdev/focus-workspace/actions/runs/45879620991) had 24 passing and two failing tests. Button bounding boxes differed by 0.000122px during FLIP; measure layout dimensions via offsetWidth/Height rather than transient transformed rectangles. Fix actual reset bug: resolve default desktop placements at restore time so removing a card does not auto-repack others before explicit compaction. Avoid FLIP when the grid element or width changes (navigation/editor transition). Agenda now has a dedicated responsive prototype with day/week/month, local provider marks, date navigation, filtering, accessible details, all-calendar free-window suggestions and fixed V4 fixtures. Other internal pages remain separate follow-ups. Added calendar browser checks and Storybook example; latest build and screenshots pending.
+
+## Iteration 11 — activities hub and contextual focus
+Verified successful V4.10 CI ([45888542602](https://github.com/salesrocketdev/focus-workspace/actions/runs/45888542602)) and Pages deploy. Added shared task/category/book fixtures, responsive activity hub, overview stats, filters, search, category/task/book creation, task editing/completion, multi-book reading progress and focus context selection. Existing dashboard/editor use the same state and preserve the V4 initial reading appearance. Context switching is blocked while a session is running or paused mid-session; task completion is explicit. All activity mutations are in memory; only existing layout storage persists across reload. Added Storybook and desktop/mobile flow tests. Latest CI and visual review pending.
+
+## Iteration 12 — motion, no-scroll widgets, onboarding and authorization demos
+V4.11 CI and deployment succeeded. Implemented first-run onboarding, local preference/profile/connection markers, separate mock OAuth dialogs for all six provider icons, configurable Pomodoro focus/break/cycle/goal and phase transitions, reduced-motion-aware animations and bounded card previews. No real login or OAuth, no credentials or secrets, no actual provider permissions. Gmail/Meet/Teams remain concept-only. Existing route tests bypass onboarding explicitly; new tests cover first run, mock consent/revoke, preference reload, phase transition and card overflow style. New CI and visual inspection pending.
+V4.12 follow-up: separated Google identity mark from Gmail, moved notes editing to a dialog with bounded preview (no textarea in card), aligned reset with the next focus preference, and installed Playwright clock before starting timer.
+
+## Iteration 13 — History and appearance
+V4.12 latest CI [45890926045](https://github.com/salesrocketdev/focus-workspace/actions/runs/45890926045) and Pages succeeded. Replaced placeholder history and dashboard metrics with shared deterministic fixtures plus current-execution focus records; added responsive charts, filters, details and pagination. Added light/dark/system preference and reduced-motion toggle, using scoped theme overrides without changing provider artwork. Added Storybook and browser checks. History data remains in-memory and fixed-date for demo; dark theme still requires visual and contrast audit. Current CI and screenshots pending.
+V4.13 follow-up: honor app-level reduced motion in JS FLIP as well as CSS, improve dark palette contrast in editor/settings, add interrupted/reset history regression. Full theme contrast audit remains pending.
+
+## Iteration 14 — branded form controls
+V4.13 latest CI [45892460839](https://github.com/salesrocketdev/focus-workspace/actions/runs/45892460839) and Pages succeeded. Replaced native selects throughout app with custom accessible select-only combobox, unified text/search/textarea fields, and switch cards for automatic focus/break, onboarding layout, motion and compact editor collision toggle. Retained checkboxes for task and calendar selection. Updated Storybook and interaction tests to use actual dropdown and switch semantics. New CI and screenshots pending; top-layer behavior on native iOS/Windows shells remains unverified.
+V4.14 follow-up: guarded popover fallback cleanup and corrected singular minute labels.
+
+## Iteration 15 — settings information architecture and notifications
+V4.14 Pages succeeded; CI [45894102580](https://github.com/salesrocketdev/focus-workspace/actions/runs/45894102580) had 42 passes and two failures caused by the required label marker in the book author field. Move the visual marker to CSS so the label text is stable. Based on the user's settings reference, add a secondary settings rail, grouped section navigation, mobile compact sections and notification center with persistent preferences/inbox, real opt-in system notification path, test action, PWA manifest and notification-only worker. No closed-app schedule or real calendar reminders. Latest CI, installability and OS delivery require verification.
+
+## Iteration 16 — compact focus and quick actions
+V4.15 CI and Pages passed. Implemented shared-state mini timer, desktop Document Picture-in-Picture feature detection and safe fallback, header action palette with keyboard search, edit-session guard, responsive compact styling and Playwright tests. No second timer or independent session state. PiP requires supported secure browser, user activation and opener lifetime. Current CI and device verification pending.
+V4.16 stabilization: Pages run 45895492760 succeeded, including live React verification. CI run 45895498641 had 48 passes and four failures: partial accessible-name match for start/restart compact timer and Ctrl+K dispatched immediately after goto, before verified React mount. Use exact selectors, wait for the real header control before sending the shortcut, and register the keyboard listener in a layout effect. New CI required to confirm the keyboard-race diagnosis.
+
+
+## V4.17 — route motion, header alignment and iOS notification guidance
+V4.16 hotfix Pages succeeded; CI still failed twice on Escape in searchbox (native search input may consume Escape). Explicitly dismiss palette on Escape. Key route content by navigation, add 320ms route entry and 240ms dialog motion, avoid competing child animations, preserve reduced motion. Align desktop header actions at 36px and use horizontal flex for search icon/shortcut. Detect Apple mobile standalone vs browser, provide installation steps and gate authorization, use notification worker scoped to base, optional installed-app badge. No real iPhone device test or background Web Push. Add browser regression tests for motion, header geometry, and simulated iPhone browser guidance.
+
+## V4.18 — mobile ergonomics and navigation regression
+V4.17 deployed but CI 45896222716 had 28 failures: duplicated DOM from sibling React keys both equal to view, transformed modal measurement, flex computed style. Prefix keys by region and do not mark hidden route as active; remove scale from dialog, use layout measurements, accept flex computed display. Mobile: safe-area viewport and bottom navigation, 44px key controls and editor rows, remove non-functional grip and duplicate save, explicit selected widget, top scroll on route navigation, bottom-sheet dialogs with 16px input text, visible weekly calendar counts, responsive settings and compact controls. Preserve native dialog semantics, reduced motion and no scroll inside dashboard cards. Add 320–430px regression, no duplicate widgets, touch geometry and mobile screenshots. Pending CI and physical iOS/Safari inspection.
+
+## Iteration 19 — mobile settings
+V4.18 Pages succeeded; CI 58 passed / 3 failed (heading alignment and transformed provider geometry). Align mobile heading at start, measure provider icon layout dimensions. Mobile settings now uses a grouped index, live preference summaries, dedicated detail, back/focus restoration and direct notification shortcut. Desktop rail unchanged. Updated tests for changed mobile navigation and added mobile-only screenshots/summary persistence. New CI and real device visual review pending.
+
+## V4.20 — focus presets and contextual picker
+V4.19 Pages passed; CI left one compact/tablet editor width regression. Tightened editor sizing and wrap rules. Added Classic 25/5/15 x4, Deep 50/10/20 x3, Quick 15/3/10 x3 presets to shared focus settings; preserve daily goal and automation flags, custom changes remain editable, active/paused sessions locked. Added searchable focus context picker for pending tasks, books and categories, available in immersive focus, desktop dashboard activity label and quick actions. Reading changes synchronize reading widget selection. New browser tests; device audit and CI pending.
+
+## Iteration 21 — immersive, filters, integrations and iOS
+V4.20 CI and Pages passed. Removed immersive mobile tabbar and fixed centered header grid; transactional mobile history filter sheet; grouped integration cards with status and demo warning; keyboard-aware mobile dialogs via VisualViewport; WebKit prefixed route animations and actual animation event regression, preserving system reduced motion. Added dedicated iPhone WebKit CI project rather than relying on mobile Chromium only. Physical iPhone keyboard and PWA motion remain unverified; simulated visual viewport is not a real OS keyboard. Latest CI pending.
+V4.21 hotfix: CI 45900036075 and Pages 45900027946 failed at TypeScript compilation (TS2367). The mobile tabbar render guard excludes focus, so remove unreachable view==='focus' checks in the tabbar's active state and aria-current. Preserve the immersive tabbar removal and all other V4.21 changes. Fresh CI required.
+
+
+## V4.22 — minimal mobile activity tabs
+V4.21 hotfix Pages succeeded; CI 63 passed / 3 failed due to stale integration summary and mobile autofocus expectations. Update those assertions to verify the actual new UI and deliberate input focus. Replace mobile activity section segmented boxes with transparent text tabs and a thin animated active underline; preserve 44px touch targets, accessible pressed state, dark theme and reduced motion. Desktop and task-status filters unchanged. New mobile geometry regression and screenshot; CI pending.
+
+
+## Book catalogue prototype — #35
+V4.22 CI and Pages passed. Added local fictional edition search and review, editable metadata, duplicate detection, missing page/contents states, book details with independent chapter checklist and manual chapter addition. No external calls or durable storage; existing manual entry remains. See docs/features/BOOK_METADATA.md. New tests and deploy pending.
+
+
+## Appearance personalization
+Audit confirmed book mock CI and Pages passed; earlier color/ring/chart proposal was not implemented, not a missed deploy. Add persistent preset/custom accent, derived contrast-aware control tokens, four ring styles and previews, smooth SVG progress/tick transitions and reduced motion. Update PiP accent sync. No chart library migration in this change. CI pending.
+
+
+## Interactive analytics — #36
+Appearance deploy 45903927119 succeeded. Replace basic history bars with interactive daily bars/line, in-flow detail tooltip (date, duration, session count, day-over-day comparison), category donut/legend selection, animated daily goal with details and dashboard summary points. Data derives from shared records and active filters; goal remains independent of history filters. Native React/SVG/CSS avoids new dependencies for this prototype; ECharts evaluation remains production follow-up. Add Chromium and WebKit interaction tests. Pending CI/device review.
+
+
+## Session recovery
+Charts deployment passed, CI had three strict selector failures because both SVG and parent shared chart-line. Rename parent chart type class and fix selected-day fallback. Add versioned workspace snapshot, recovery from elapsed wall-clock time and visibility events, no automatic catch-up cycles, local history and activities, optional wake lock. New tests for running/paused/expired reload, no duplicate completion and mocked wake lock. Real iPhone behavior, cross-tab concurrency and notification delivery while closed remain unverified/out of scope. CI pending.
+
+
+## Native distraction shield and mobile refinement
+Previous session recovery CI and Pages passed. Add opt-in DND reminder, accessible native Focus guide, iOS explicit shortcut invocation with duration; no false system state. Mobile prioritize timer above reading card, compact secondary actions, long book titles, notification rows, dialogs and touch targets. Update outdated activity persistence copy. Tests added for reminder persistence, shortcut URL, mobile geometry and existing session behavior; physical iPhone verification pending.
+
+
+## Opt-in iOS Shortcut on manual start (#38)
+Previous native guide CI and Pages passed. Extend the reminder preference with backward-compatible optional shortcut handoff, persist running timer before invoking user-created shortcut, no launch during recovery/automatic transitions, keep manual fallback. Automated test intercepts the URL handoff and asserts saved timer state; actual native execution requires a configured physical iPhone. CI pending.
+
+
+## Clean filters and focus trend card
+Previous iOS shortcut commit CI and Pages passed. Unify agenda day/week/month, history period, activity section/status controls as transparent text tabs with a thin accent underline. Compact today/date navigation, provider filters, category selector and history filter trigger; keep mobile 44px hit areas and existing accessible names/filter behaviors. Focus trend removes nested tooltip card, uses inline date/value/session/comparison, icon-only chart type controls with accessible labels, taller chart with subtle guides and selected day emphasis, compact day navigation. Remove plot gaps and use CSS markers for exact line/point alignment without stretched SVG dots. Add narrow viewport regressions and screenshots. CI and physical-device review pending.
+
+
+## Mobile immersive focus controls
+Previous filter/chart CI and Pages passed. Mobile-only transport adopts a single filled start/pause pill with readable labels and quiet reset/stop icon actions, compact text method tabs, borderless context/secondary actions, retained 44px touch targets and centered header. Disable unavailable method changes during a session rather than silently ignoring them. Desktop controls retain layout. Add mobile and WebKit tests for alignment and timer actions. CI pending.
+
+
+## Quiet activity cards and contextual buttons
+Previous focus mobile hotfix CI and Pages passed. Replace wrapped mobile category mini-cards with full-width clickable rows in a shared surface, preserve contextual focus and accessible labels. Desktop uses two columns of rows. Compact metrics, neutral task edit/play icons, inline library start/details actions, search/manual add in a single header, quiet dashboard secondary actions. Keep mobile 44px targets; test narrow layouts and category/book interactions. CI pending; physical device inspection pending.
+
+
+## Offline app shell
+Previous activity polish CI/Pages passed. Add deterministic production precache, scoped version caches, waiting activation, offline readiness and connection indicator, retain notifications. CI production subpath offline desktop/mobile tests. Offline cache is not persistent storage guarantee or background alarm; no external provider cache. See docs/features/OFFLINE_PWA.md. New CI and device verification pending.
+
+
+## Cross-tab workspace coordination
+Offline CI and Pages passed. Add exclusive Web Locks writer, read-only mirrors via storage events, automatic takeover after the writer closes, restore authoritative snapshot before acquiring writes, writer-only phase completion, record and wake lock. Guard workspace actions including activity mutations and timer controls. No forced lock stealing; suspended writer may delay completion until it resumes or closes. Unsupported browsers warn to use one tab; preferences outside workspace (appearance/layout/inbox) remain per existing behavior. Automated multi-page test; new CI/device validation pending.
+
+
+## Local session audio and quiet hours (V4.32)
+Previous cross-tab CI and Pages succeeded. Add opt-in start/completion audio, three original synthesized tones, alert volume, previews, daily overnight quiet hours and all-day behavior for equal bounds. Preserve inbox during quiet hours; suppress audio/native notification attempts. Persist preference/inbox actions and mirror via storage events. Test with fake AudioContext and timer clock. Actual audibility and native Focus behavior require device review; CI pending.
+
+
+## Backup, restore and CSV (V4.33)
+V4.32 build failed on a leftover inboxRef reference; removed it. Add versioned JSON backup with strict known-key validation, local restore preview/confirmation, writer and idle-session guard, best-effort rollback on write failure, reset unfinished timers and device-specific permissions/shortcut opt-in. Persist quick notes. CSV exports current history filters or all from profile, UTF-8 BOM and semicolon separator, escaped cells with formula-injection protection. No remote upload. Test export, invalid backup, confirmed restoration and CSV. New pipeline pending.
+
+
+## V4.34 accessibility and responsive audit
+V4.33 Pages succeeded; CI failed only two history assertions expecting the obsolete 'Nesta execução' copy. Align regression with 'Sessão local'. Add keyboard skip link, desktop active navigation semantics, named widget headings and progress bars, remove nonfunctional ellipsis, accessible focus indicators, system reduced-motion coverage and safe-area notice dismissal. Audit secondary workspace state: mirror note updates, persist and synchronize shortcut preference on explicit changes, reject malformed imported history dates/times. Add keyboard/dialog-focus and narrow responsive settings regression in both themes. Source review and automated checks are not a formal WCAG conformance audit; new CI and device validation remain pending.

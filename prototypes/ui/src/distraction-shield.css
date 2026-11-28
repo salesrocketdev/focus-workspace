@@ -1,0 +1,16 @@
+.shield-content{display:grid;gap:15px;min-width:0}
+.shield-intro{display:flex;align-items:center;gap:12px;padding:13px;border:1px solid var(--field-selected-edge);background:var(--field-selected);border-radius:12px}
+.shield-intro>span{display:grid;place-items:center;width:42px;height:42px;flex:0 0 42px;border-radius:11px;background:var(--ui-paper);color:var(--field-selected-ink)}
+.shield-intro>div{display:grid;gap:5px;min-width:0}
+.shield-intro b{font-size:14px}
+.shield-method{display:grid;gap:10px;padding:12px;border:1px solid var(--ui-line);border-radius:12px;background:var(--ui-paper)}
+.shield-method h3{font-size:14px}
+.shield-method p{font-size:13px;line-height:1.5}
+.shield-method small,.shield-setup li{font-size:12px;line-height:1.5;color:var(--ui-muted)}
+.shield-method>a:not(.ui-button){display:inline-flex;gap:6px;align-items:center;color:var(--accent-ink);font-size:12px;min-height:36px}
+.shield-shortcut{display:flex;align-items:center;justify-content:center;text-decoration:none;min-height:44px;gap:7px}
+.shield-shortcut:focus-visible{outline:2px solid var(--field-focus);outline-offset:3px}
+.shield-setup{display:grid;gap:8px}
+.shield-setup ol{padding-left:19px;margin:0;display:grid;gap:6px}
+.distraction-settings>.ui-button{justify-self:start}
+@media(max-width:759px){.distraction-settings>.ui-button{width:100%}.shield-method>.ui-button{min-height:44px}.shield-method>a:not(.ui-button){min-height:44px}}

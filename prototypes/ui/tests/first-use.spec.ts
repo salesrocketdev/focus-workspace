@@ -1,0 +1,45 @@
+import { openNavigation } from '../navigate-test';
+import {test,expect} from '@playwright/test';
+test('empty first-use workspace is usable and persists without fixture records',async({page})=>{
+ await page.goto('/');
+ const dialog=page.getByRole('dialog');
+ await expect(dialog.getByRole('switch',{name:'Começar sem exemplos'})).toHaveAttribute('aria-checked','true');
+ await dialog.getByRole('button',{name:'Continuar sem conta',exact:true}).click();
+ await dialog.getByRole('button',{name:'Começar',exact:true}).click();
+ await expect(dialog).toHaveCount(0);
+ await expect(page.locator('[data-widget=reading]')).toContainText('Nenhum livro na biblioteca');
+ await expect(page.locator('[data-widget=tasks]')).toContainText('Nenhuma tarefa');
+ await page.reload();
+ await expect(page.locator('[data-widget=reading]')).toContainText('Nenhum livro na biblioteca');
+ const nav=page.getByRole('navigation',{name:'Navegação principal'});
+ await openNavigation(nav,'Histórico');
+ await expect(page.getByRole('button',{name:'CSV',exact:true})).toBeDisabled();
+ await page.getByRole('button',{name:'Abrir primeira sessão'}).click();
+ await expect(page.locator('.focus-context-picker')).toContainText('Trabalho');
+ await page.getByRole('button',{name:'Voltar',exact:true}).click();
+ await page.locator('[data-widget=reading]').getByRole('button',{name:'Adicionar livro',exact:true}).click();
+ await page.getByRole('button',{name:'Adicionar primeiro livro'}).click();
+ await dialog.getByLabel('Título do livro',{exact:true}).fill('Meu primeiro livro');
+ await dialog.getByLabel('Autor').fill('Autora');
+ await dialog.getByRole('button',{name:'Salvar',exact:true}).click();
+ await nav.getByRole('button',{name:'Hoje',exact:true}).click();
+ await expect(page.locator('[data-widget=reading]')).toContainText('Meu primeiro livro');
+ const data=await page.evaluate(()=>JSON.parse(localStorage.getItem('focus-workspace:v4:workspace')!));
+ expect(data.records).toEqual([]);expect(data.tasks).toEqual([]);expect(data.books).toHaveLength(1);
+});
+
+test('refazer onboarding não oferece remoção de dados existentes',async({page},info)=>{
+ await page.addInitScript(()=>localStorage.setItem('focus-workspace:v4:onboarding',JSON.stringify('guest')));
+ await page.goto('/');
+ const nav=page.getByRole('navigation',{name:'Navegação principal'});
+ const mobile=info.project.name==='mobile';
+ await openNavigation(nav,mobile?'Ajustes':'Configurações');
+ await page.getByRole('navigation',{name:'Seções de configurações'}).getByRole('button',{name:'Perfil e painel',exact:true}).click();
+ await page.getByRole('button',{name:'Configuração inicial'}).click();
+ const dialog=page.getByRole('dialog');
+ await dialog.getByRole('button',{name:'Continuar sem conta',exact:true}).click();
+ await expect(dialog.getByRole('switch',{name:'Começar sem exemplos'})).toHaveCount(0);
+ await dialog.getByRole('button',{name:'Começar',exact:true}).click();
+ const data=await page.evaluate(()=>JSON.parse(localStorage.getItem('focus-workspace:v4:workspace')!));
+ expect(data.books.length).toBeGreaterThan(0);expect(data.tasks.length).toBeGreaterThan(0);expect(data.records.length).toBeGreaterThan(0);
+});

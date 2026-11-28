@@ -1,0 +1,14 @@
+.backup-row{display:flex;align-items:center;gap:8px;justify-content:space-between;border-bottom:1px solid var(--ui-line);padding:6px 0;min-width:0}
+.backup-row>div{display:grid;gap:4px;min-width:0}.backup-row b{display:flex;align-items:center;gap:6px;font-size:13px}
+.backup-row small{font-size:11px;line-height:1.4}.backup-row>.ui-button,.history-export-action.ui-button{background:transparent;border-color:transparent;color:var(--field-selected-ink);box-shadow:none;font-weight:600;flex-shrink:0}
+.backup-row>.ui-button:hover:not(:disabled),.history-export-action.ui-button:hover:not(:disabled){background:var(--field-selected)}
+.backup-note{display:flex;align-items:flex-start;gap:6px;line-height:1.5}
+.backup-review{display:grid;gap:12px}.backup-counts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.backup-counts>div{display:grid;gap:3px;padding:10px 6px;background:var(--ui-surface);border-radius:8px;text-align:center}.backup-counts strong{font-size:22px;font-variant-numeric:tabular-nums}
+.backup-confirm{display:flex;align-items:center;gap:9px;min-height:44px;font-size:13px}.backup-confirm input{width:17px;height:17px;flex:0 0 17px;accent-color:var(--action)}
+.history-surface>header.history-export-header{display:grid;grid-template-columns:minmax(0,1fr) auto;justify-content:stretch;align-items:center;gap:8px;min-width:0}
+.history-export-copy{display:grid;gap:5px;min-width:0}
+.history-export-copy h2,.history-export-copy small{min-width:0;overflow-wrap:anywhere}
+.history-export-copy small{display:block;line-height:1.45}
+.history-export-header>.history-export-action.ui-button{justify-self:end;align-self:center;width:max-content;min-width:60px;min-height:36px;white-space:nowrap;gap:5px;padding:0 9px}
+@media(max-width:759px){.history-export-header>.history-export-action.ui-button{min-height:44px;min-width:60px;padding-inline:8px}}
+@media(max-width:759px){.backup-row>.ui-button,.history-export-action.ui-button{min-height:44px;font-size:11px;padding-inline:5px}.backup-counts{grid-template-columns:repeat(2,minmax(0,1fr))}.backup-row b{font-size:12px}}

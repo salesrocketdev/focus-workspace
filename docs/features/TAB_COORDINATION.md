@@ -1,0 +1,7 @@
+# Cross-tab workspace coordination — prototype
+
+A Web Locks exclusive lock protects the shared version-1 workspace snapshot. Each document queues for the lock; only the current writer can persist workspace data or complete a timer phase, emit session records/notifications, launch the timed iOS shortcut or hold the wake lock. Read-only mirrors update from localStorage storage events, and recompute remaining time from the clock origin. They can navigate and inspect history while the controlling tab is open. Closing the writer releases the browser lock. The next tab rereads the latest stored workspace before enabling writes, including an expired timer, and completes at most the current phase. No timeout leases or forced lock stealing.
+
+Scope: same origin, same browser storage partition. No multi-device sync or native background guarantee. A frozen or suspended writer may delay completion until it resumes or is closed. Older browsers without Web Locks show a single-tab warning; local storage unavailability also prevents reliable mirroring. Appearance, dashboard layout, notification inbox and notes are not transactionally synchronized in this prototype. Production should move to IndexedDB/SQLite repositories with durable atomic operations and test BFCache and suspended native app behavior.
+
+Tests open three tabs, mirror start/pause and category edits, transfer ownership on close and verify exactly one completion record. CI and physical iPhone review pending.

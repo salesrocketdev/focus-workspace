@@ -1,0 +1,105 @@
+/* Motion and density rules: scroll belongs to pages and dialogs, not dashboard cards. */
+@keyframes v4-reveal{from{opacity:.55}to{opacity:1}}
+@keyframes v4-step{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@keyframes v4-ghost{from{opacity:.5}to{opacity:1}}
+.route-content>.calendar-page,.route-content>.activities-page,.route-content>.settings-page,.workspace:not(.editing) .widget>.card,.focus-main .immersive-grid{animation:v4-reveal 200ms ease-out}
+.ui-dialog[open]{animation:v4-reveal 170ms ease-out}.ui-dialog::backdrop{animation:v4-reveal 180ms ease-out}
+.onboarding-step,.connection-flow{animation:v4-step 180ms ease-out}
+.ui-button,.edit-icon-button,.edit-text-button,.card-icon-action,.calendar-event,.activity-category,.onboarding-choice,.oauth-account,.catalogue-item,.sidebar nav button,.bottom-nav button{transition:background-color 150ms ease,border-color 150ms ease,color 150ms ease,box-shadow 150ms ease}
+.grid-ghost,.grid-neighbor-ghost{animation:v4-ghost 140ms ease-out}
+.progress>span,.progress>i{transition:width 220ms ease-out}
+.timer-ring circle{transition:stroke-dasharray 250ms linear}
+.widget>.card>.card-body{min-height:0;overflow:clip}
+.widget>.card>.card-body>div{min-width:0}
+.widget .task-list label{min-width:0;gap:7px}.widget .task-list label>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.widget .task-list input{flex-shrink:0}
+.widget .task-list{gap:7px!important}
+.widget .card-more{justify-content:flex-start;font-size:11px;color:var(--action);min-height:24px;padding:2px 0}
+.widget .activity-tag{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0}
+.widget .book-info>b,.widget .track-details>b,.widget .event b{overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+.widget .book-info .ui-button{max-width:100%;white-space:normal;line-height:1.2}
+.widget .music-body .track-details{min-width:0}
+.widget .music-body .player-controls{gap:3px}
+.widget .goal-body footer{gap:4px}
+.widget .card textarea{max-height:100%;resize:none}
+.editing .widget .card-body{overflow:clip}
+@media(min-width:1151px){
+ .coordinate-grid>.widget{container-type:size}
+ .coordinate-grid>.widget>.card{overflow:visible}
+ .coordinate-grid>.widget>.card>.card-body{overflow:clip}
+ .coordinate-grid .widget[data-widget=focus] .focus-controls{gap:7px}
+ .coordinate-grid .widget[data-widget=focus] .focus-widget{gap:10px}
+ .coordinate-grid .widget[data-widget=agenda] .agenda-list{gap:7px}
+ .coordinate-grid .widget[data-widget=agenda] .event{min-height:35px;padding-block:3px}
+ .coordinate-grid .widget[data-widget=tasks] .task-list{gap:5px!important}
+ .coordinate-grid .widget[data-widget=music] .music-body{gap:7px}
+ .coordinate-grid .widget[data-widget=music] .cover.album{width:42px;height:42px}
+ .coordinate-grid .widget[data-widget=music] .music-info{gap:4px}
+ .coordinate-grid .widget[data-widget=music] .player-controls button{min-height:25px;max-height:29px;padding:3px}
+ .coordinate-grid .widget[data-widget=music] .player-controls .circle-button{width:30px;height:30px;min-width:30px}
+}
+@container(max-width:270px){
+ .coordinate-grid .widget[data-widget=focus] .focus-widget,.coordinate-grid .widget[data-widget=focus] .edit-focus-preview{display:grid;grid-template-columns:1fr auto;align-items:center;gap:5px}
+ .coordinate-grid .widget[data-widget=focus] .focus-widget .timer-ring,.coordinate-grid .widget[data-widget=focus] .edit-focus-preview .timer-ring{width:min(80px,100%)}
+ .coordinate-grid .widget[data-widget=focus] .ring-copy strong{font-size:20px}
+ .coordinate-grid .widget[data-widget=focus] .focus-controls{max-width:110px;gap:4px}
+ .coordinate-grid .widget[data-widget=focus] .activity-tag,.coordinate-grid .widget[data-widget=focus] .focus-start .icon-btn{display:none}
+ .coordinate-grid .widget[data-widget=focus] .focus-start .timer-start{height:30px;min-height:30px;padding:4px;font-size:10px}
+ .coordinate-grid .widget[data-widget=focus] .segment button{font-size:10px;padding:4px}
+ .coordinate-grid .widget[data-widget=music] .music-body,.coordinate-grid .widget[data-widget=music] .edit-music-preview{flex-wrap:nowrap;flex-direction:row}
+ .coordinate-grid .widget[data-widget=music] .player-controls button[aria-label="Favoritar"],.coordinate-grid .widget[data-widget=music] .edit-preview-transport>span:last-child{display:none}
+ .coordinate-grid .widget[data-widget=music] .cover.album{width:32px;height:32px}
+ .coordinate-grid .widget[data-widget=music] .track-details small{display:none}
+ .coordinate-grid .widget[data-widget=reading] .reading-body,.coordinate-grid .widget[data-widget=reading] .edit-reading-preview{flex-direction:row;align-items:center}
+ .coordinate-grid .widget[data-widget=reading] .book{width:45px}
+ .coordinate-grid .widget[data-widget=goal] .goal-body footer{font-size:9px}
+}
+@container (max-height:185px){
+ .coordinate-grid .widget>.card{padding:10px;gap:6px}
+ .coordinate-grid .widget .card-head{min-height:24px}
+ .coordinate-grid .widget[data-widget=tasks] .task-list label:nth-child(n+4),.coordinate-grid .widget[data-widget=tasks] .edit-task-preview>div:nth-child(n+4){display:none}
+ .coordinate-grid .widget[data-widget=reading] .book-info{gap:4px}
+ .coordinate-grid .widget[data-widget=reading] .book{width:55px}
+ .coordinate-grid .widget[data-widget=music] .music-info>.progress{display:none}
+ .coordinate-grid .widget[data-widget=summary] .bars{max-height:42px}
+ .coordinate-grid .widget[data-widget=agenda] .event-duration{display:none}
+}
+.settings-page{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+.settings-surface{display:grid;gap:16px;min-width:0;padding:17px;border:1px solid var(--ui-line);border-radius:14px;background:var(--ui-paper);box-shadow:var(--ui-shadow)}
+.settings-section-header{display:flex;align-items:flex-start;gap:9px}.settings-section-header>svg{color:var(--action);flex-shrink:0}
+.settings-section-header h2{font-size:17px;letter-spacing:-.025em;line-height:1.3}
+.settings-section-header p{font-size:12px;line-height:1.45;color:var(--ui-muted);margin-top:4px}
+.focus-settings-fields{display:grid;gap:14px}
+.settings-page .focus-settings-fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+.settings-page .focus-settings-fields>.ui-field:first-child,.settings-page .focus-settings-fields>.preference-toggles,.settings-page .focus-settings-fields>small{grid-column:1/-1}
+.preference-toggles{display:grid;gap:12px}
+.preference-toggles label,.onboarding-check{display:flex;gap:9px;align-items:flex-start;font-size:12px;line-height:1.45;cursor:pointer}
+.preference-toggles input,.onboarding-check input{width:16px;height:16px;flex-shrink:0;accent-color:var(--action);margin:2px 0 0}
+.preference-toggles label>span{display:grid;gap:3px}.preference-toggles b{font-size:12px;font-weight:550}
+.integration-state{display:flex;flex-direction:column;align-items:flex-end;gap:5px;min-width:0}
+.integration-state small{text-align:right;line-height:1.3}.integration-state .ui-button{min-width:78px}
+.settings-action-group{display:flex;flex-wrap:wrap;gap:8px}
+.connection-flow,.onboarding-step{display:grid;gap:14px;font-size:13px;line-height:1.5}
+.oauth-brand{display:flex;align-items:center;justify-content:center;gap:14px;padding:12px 0;color:var(--ui-muted)}
+.oauth-app{display:grid;place-items:center;width:45px;height:45px;background:#fbe4d3;border-radius:12px;color:var(--action)}
+.demo-warning{display:flex;gap:8px;align-items:flex-start;background:#f8eee5;border:1px solid #eddccd;border-radius:8px;padding:10px;font-size:12px;color:#78513a}
+.demo-warning svg{flex-shrink:0;color:var(--action)}
+.oauth-account,.onboarding-choice{display:flex;align-items:center;gap:10px;text-align:left;width:100%;min-width:0;border:1px solid var(--ui-line);background:var(--ui-surface);border-radius:10px;padding:12px;color:var(--ui-ink)}
+.oauth-account>div,.onboarding-choice>span{flex:1;min-width:0;display:grid;gap:3px;overflow-wrap:anywhere}
+.oauth-account small,.onboarding-choice small{font-size:11px;line-height:1.4}
+.oauth-account:hover,.onboarding-choice:hover,.onboarding-choice[aria-pressed=true]{border-color:#df9e70;background:#fff3e9}
+.oauth-account>svg,.onboarding-choice>svg{flex-shrink:0;color:var(--action)}
+.oauth-scopes{display:grid;gap:10px;padding:0;list-style:none}
+.oauth-scopes li{display:flex;align-items:flex-start;gap:8px}
+.oauth-scopes svg{flex-shrink:0;color:#53765b}
+.onboarding-progress{display:flex;gap:5px;margin-bottom:18px}.onboarding-progress i{flex:1;height:4px;border-radius:4px;background:#e8e0d9}.onboarding-progress i.active{background:var(--accent)}
+.onboarding-hero{display:grid;gap:9px;justify-items:center;text-align:center;padding:10px 4px}
+.onboarding-hero>span{display:grid;place-items:center;background:#fbe4d3;color:var(--action);width:72px;height:72px;border-radius:20px}
+.onboarding-hero h3{font-size:21px;letter-spacing:-.035em}.onboarding-hero p{font-size:13px;color:var(--ui-muted)}
+.onboarding-actions{margin-top:18px}
+@media(max-width:1250px){.settings-page{grid-template-columns:1fr}}
+@media(max-width:759px){.settings-surface{padding:13px;gap:12px}.settings-page .focus-settings-fields{grid-template-columns:1fr}.settings-page .integration-preview-row{gap:8px}.settings-page .integration-preview-row>.provider-label{font-size:12px;flex-shrink:1}.integration-state .ui-button{min-width:68px}.focus-center>.ui-button{height:30px;min-height:30px}.widget .task-list{gap:6px!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+.google-signin-mark{object-fit:contain;flex:0 0 24px}
+.notes-preview{display:grid;gap:7px;min-width:0}.notes-preview p{font-size:12px;line-height:1.4;white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;color:var(--ui-muted)}.notes-preview .ui-button{justify-self:start}.notes-dialog-label{display:grid;gap:8px;font-size:13px;font-weight:550}.notes-dialog-label textarea{width:100%;padding:10px;border:1px solid var(--ui-line);border-radius:8px;background:var(--ui-paper);font:inherit;resize:vertical}
+@container(max-height:150px){.coordinate-grid .notes-preview p{-webkit-line-clamp:1}.coordinate-grid .notes-preview{gap:4px}}

@@ -1,0 +1,4 @@
+.tab-indicator{display:flex;align-items:flex-start;gap:7px;padding:8px 10px;margin-bottom:9px;border:1px solid var(--ui-line);border-radius:8px;background:var(--ui-surface);color:var(--ui-muted);font-size:12px;line-height:1.45;max-width:100%}
+.tab-indicator svg{flex-shrink:0;margin-top:1px}
+.focus-top+.tab-indicator{max-width:560px;margin:12px auto 0}
+@media(max-width:759px){.tab-indicator{font-size:11px;margin-bottom:6px}}

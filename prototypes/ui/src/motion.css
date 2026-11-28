@@ -1,0 +1,44 @@
+/* Route entry is keyed by navigation, never by timer ticks or form updates. */
+:root{--motion-route:320ms;--motion-ui:180ms;--motion-ease:cubic-bezier(.22,.75,.25,1)}
+@keyframes route-enter{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+@keyframes workspace-enter{from{opacity:0}to{opacity:1}}
+@keyframes dialog-enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.route-enter:not([hidden]){animation:route-enter var(--motion-route) var(--motion-ease)}
+.workspace-enter{animation:workspace-enter var(--motion-route) var(--motion-ease)}
+.route-content>.calendar-page,.route-content>.activities-page,.route-content>.settings-page,.route-content>.history-page,.workspace:not(.editing) .widget>.card{animation:none}
+.focus-main .immersive-grid.route-enter{animation:route-enter var(--motion-route) var(--motion-ease)}
+.settings-section-body{animation:route-enter 260ms var(--motion-ease)}
+.ui-dialog[open]{animation:dialog-enter 240ms var(--motion-ease)}
+.ui-dialog::backdrop{animation:workspace-enter 200ms ease-out}
+.sidebar nav button,.bottom-nav button,.ui-icon-button,.page-action,.ui-button,.calendar-view-switch button,.activity-tabs button,.settings-nav-group button{transition:background-color var(--motion-ui) ease,border-color var(--motion-ui) ease,color var(--motion-ui) ease,box-shadow var(--motion-ui) ease}
+.ui-button:active:not(:disabled),.page-action:active:not(:disabled),.quick-header-actions button:active:not(:disabled){transform:scale(.98)}
+/* All four header actions share the same horizontal centerline. */
+.workspace-page-header .page-header-actions{display:flex;flex-wrap:nowrap;align-items:center;gap:10px;padding-top:0;min-height:36px}
+.workspace-page-header .head-actions:not(.edit-header){gap:8px;flex-wrap:nowrap}
+.workspace-page-header .head-actions:not(.edit-header)>.ui-icon-button,.quick-header-actions>.ui-icon-button{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;height:36px;min-height:36px;width:36px;min-width:36px;gap:6px;white-space:nowrap}
+.workspace-page-header .page-action{white-space:nowrap}
+.quick-header-actions{display:flex;align-items:center;flex-wrap:nowrap;gap:4px}
+.quick-header-actions>.quick-action-button{display:inline-flex!important;flex-direction:row!important;flex-wrap:nowrap!important;width:auto!important;min-width:36px!important;padding:0 7px!important}
+.quick-header-actions .quick-action-button kbd{display:inline-flex;align-items:center;height:20px;line-height:1;white-space:nowrap}
+.desktop-notification{display:flex;align-items:center}
+.ios-install-guide{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--field-selected-edge);border-radius:10px;background:var(--field-selected);color:var(--ui-ink);padding:12px}
+.ios-install-guide>svg{color:var(--field-selected-ink);flex-shrink:0}
+.ios-install-guide>div{display:grid;gap:7px;min-width:0}
+.ios-install-guide b{font-size:13px}.ios-install-guide p,.ios-install-guide li{font-size:12px;line-height:1.5;color:var(--ui-muted)}
+.ios-install-guide ol{margin:0;padding-left:18px}
+@media(max-width:759px){.desktop-notification{display:none}.workspace-page-header .page-header-actions{gap:6px}.workspace-page-header .head-actions:not(.edit-header){gap:4px}.quick-header-actions .quick-action-button kbd{display:none}.quick-header-actions>.ui-icon-button{height:36px;min-height:36px}.workspace-page-header .head-actions:not(.edit-header)>.ui-icon-button{width:30px;min-width:30px}}
+@media(prefers-reduced-motion:reduce){.route-enter,.workspace-enter,.settings-section-body,.ui-dialog[open]{animation:none!important}.ui-button:active,.page-action:active,.quick-header-actions button:active{transform:none!important}}
+[data-motion=reduced] .route-enter,[data-motion=reduced] .workspace-enter,[data-motion=reduced] .settings-section-body,[data-motion=reduced] .ui-dialog[open]{animation:none!important}
+
+/* Safari: a real entry animation on freshly mounted route content, with a
+   prefixed fallback for older WebKit. Only opacity/transform are animated. */
+@-webkit-keyframes route-enter{from{opacity:.15;-webkit-transform:translate3d(0,10px,0)}to{opacity:1;-webkit-transform:translate3d(0,0,0)}}
+@-webkit-keyframes workspace-enter{from{opacity:.15}to{opacity:1}}
+@keyframes route-enter{from{opacity:.15;transform:translate3d(0,10px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes workspace-enter{from{opacity:.15}to{opacity:1}}
+@media(prefers-reduced-motion:no-preference){
+ .route-enter:not([hidden]),.focus-main .immersive-grid.route-enter{-webkit-animation:route-enter var(--motion-route) var(--motion-ease);animation:route-enter var(--motion-route) var(--motion-ease)}
+ .workspace-enter{-webkit-animation:workspace-enter var(--motion-route) var(--motion-ease);animation:workspace-enter var(--motion-route) var(--motion-ease)}
+}
+@media(prefers-reduced-motion:reduce){.route-enter,.workspace-enter{-webkit-animation:none!important;animation:none!important}}
+[data-motion=reduced] .route-enter,[data-motion=reduced] .workspace-enter{-webkit-animation:none!important;animation:none!important}

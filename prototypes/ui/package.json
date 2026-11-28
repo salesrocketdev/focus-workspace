@@ -1,0 +1,33 @@
+{
+  "name": "focus-workspace-ui-prototype",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && node scripts/build.mjs",
+    "preview": "vite preview --host 127.0.0.1",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "test": "playwright test",
+    "test:visual": "playwright test visual.spec.ts",
+    "test:offline": "playwright test --config=offline.playwright.config.ts"
+  },
+  "dependencies": {
+    "lucide-react": "^0.468.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@fontsource-variable/inter": "^5.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.0",
+    "typescript": "~5.7.2",
+    "@playwright/test": "^1.51.1",
+    "@storybook/react-vite": "^8.6.14",
+    "@storybook/react": "^8.6.14",
+    "storybook": "^8.6.14"
+  }
+}

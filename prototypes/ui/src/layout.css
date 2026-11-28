@@ -1,0 +1,33 @@
+/* Shared page shell. Vertical position must never depend on route content height. */
+.workspace-main{margin-block:0;align-self:start;min-width:0;--page-heading-size:28px}
+.workspace-page-header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:12px;margin:0 0 22px;min-height:54px}
+.workspace-page-header .page-heading{min-width:0;text-align:left}
+.workspace-page-header h1{margin:0;font-size:var(--page-heading-size);line-height:1.15;font-weight:700;letter-spacing:-.04em;text-align:left}
+.workspace-page-header p{margin:5px 0 0;font-size:13px;line-height:1.4;text-align:left;color:#756b65}
+.page-header-actions{display:flex;align-items:center;justify-content:flex-end;min-width:0;padding-top:1px}
+.page-header-actions .head-actions{justify-content:flex-end;align-items:center}
+.workspace-page-header .page-action{height:36px;min-height:36px;padding:0 12px}
+.route-content{display:grid;gap:14px;align-content:start}
+.route-content[hidden]{display:none}
+.route-content>.card{height:auto;min-height:120px;max-width:100%;justify-self:stretch}
+.route-content>.card .card-body{justify-content:flex-start;gap:12px}
+.focus-top{min-height:34px}
+.focus-top h1.focus-breadcrumb{font-size:14px;font-weight:550;line-height:1.2;letter-spacing:0}
+@media(min-width:760px) and (max-width:1150px){
+ .workspace-main{--page-heading-size:26px}
+ .workspace-page-header.edit-page-head{grid-template-columns:minmax(0,1fr);gap:10px}
+ .workspace-page-header.edit-page-head .page-header-actions{justify-content:flex-start;padding:0}
+}
+@media(max-width:759px){
+ .workspace-main{--page-heading-size:25px}
+ .app-masthead{display:flex;min-height:32px;height:32px;margin:0 0 12px;align-items:center;justify-content:space-between}
+ .workspace-page-header{min-height:53px;margin:0 0 14px;gap:8px}
+ .workspace-page-header p{font-size:12px}
+ .workspace-page-header.edit-page-head{grid-template-columns:1fr;gap:10px}
+ .workspace-page-header.edit-page-head h1,.workspace-page-header.edit-page-head p{text-align:left}
+ .workspace-page-header.edit-page-head .page-header-actions{width:100%;padding:0}
+ .workspace-page-header .page-action{font-size:11px;padding:0 8px;height:36px;min-height:36px}
+ .workspace-page-header .page-action svg{width:13px}
+ .focus-top h1.focus-breadcrumb{font-size:15px;font-weight:650}
+ .focus-top{min-height:32px}
+}

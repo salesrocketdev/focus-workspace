@@ -1,0 +1,105 @@
+/* Shared quiet navigation: a generous hit area with a thin selected indicator. */
+.calendar-view-switch,.history-toolbar .history-ranges,.activity-tabs,.activity-topbar>.activity-tabs:not(.small-tabs){
+ display:flex;align-items:stretch;gap:4px;padding:0;border:0;border-bottom:1px solid var(--ui-line);border-radius:0;background:transparent;box-shadow:none;min-width:0;
+}
+[data-theme=dark] .calendar-view-switch,[data-theme=dark] .history-toolbar .history-ranges,[data-theme=dark] .activity-tabs{background:transparent}
+.calendar-view-switch>button,.history-toolbar .history-ranges>button,.activity-tabs>button,.activity-topbar>.activity-tabs:not(.small-tabs)>button{
+ position:relative;min-width:0;min-height:36px;height:36px;padding:0 12px;border:0;border-radius:0;background:transparent;box-shadow:none;font-size:12px;font-weight:500;line-height:1.25;color:var(--ui-muted);white-space:nowrap;
+}
+.calendar-view-switch>button[aria-pressed=true],.history-toolbar .history-ranges>button[aria-pressed=true],.activity-tabs>button[aria-pressed=true],.activity-topbar>.activity-tabs:not(.small-tabs)>button[aria-pressed=true],
+:root[data-accent] .calendar-view-switch>button[aria-pressed=true],:root[data-accent] .history-toolbar .history-ranges>button[aria-pressed=true],:root[data-accent] .activity-tabs>button[aria-pressed=true]{
+ color:var(--field-selected-ink);background:transparent;box-shadow:none;font-weight:650;
+}
+.calendar-view-switch>button::after,.history-toolbar .history-ranges>button::after,.activity-tabs>button::after,.activity-topbar>.activity-tabs:not(.small-tabs)>button::after{
+ content:'';position:absolute;height:2px;bottom:0;left:14%;right:14%;border-radius:2px 2px 0 0;background:var(--field-focus);opacity:0;transform:scaleX(.45);transition:opacity 160ms ease,transform 180ms ease;
+}
+.calendar-view-switch>button[aria-pressed=true]::after,.history-toolbar .history-ranges>button[aria-pressed=true]::after,.activity-tabs>button[aria-pressed=true]::after,.activity-topbar>.activity-tabs:not(.small-tabs)>button[aria-pressed=true]::after{opacity:1;transform:scaleX(1)}
+.calendar-view-switch>button:focus-visible,.history-toolbar .history-ranges>button:focus-visible,.activity-tabs>button:focus-visible{outline-offset:-3px;border-radius:6px}
+.calendar-toolbar{padding:10px 16px;gap:6px 12px}
+.calendar-date-controls .calendar-today,.history-toolbar .history-filter-trigger{background:transparent;border-color:transparent;box-shadow:none;color:var(--field-selected-ink);font-size:12px;font-weight:600;padding-inline:8px}
+.calendar-date-controls .calendar-today:hover,.history-toolbar .history-filter-trigger:hover{background:var(--field-selected);border-color:transparent}
+.calendar-filters,[data-theme=dark] .calendar-filters{background:transparent;border-block:1px solid var(--ui-line);padding:3px 16px;gap:4px 12px}
+.calendar-filters>span{font-size:11px;font-weight:500}
+.calendar-filters label{gap:5px;min-height:34px;font-size:11px;white-space:nowrap}
+.calendar-filters input{width:13px;height:13px}
+.calendar-demo{font-size:10px}
+.history-toolbar{gap:8px}
+.history-toolbar .history-filter-trigger{white-space:nowrap;gap:5px}
+.history-toolbar .history-filter-trigger .history-filter-count{min-width:16px;height:16px;font-size:10px}
+.history-filters{background:transparent;border:0;box-shadow:none;padding:0;gap:8px 14px}
+.history-filters>.ui-field .ui-select-trigger,.activity-task-filters>.ui-field .ui-select-trigger{border-color:transparent;background:transparent;border-radius:6px;padding:0 6px;gap:5px;color:var(--field-selected-ink);font-weight:500;box-shadow:none}
+.history-filters>.ui-field .ui-select-trigger:focus-visible,.history-filters>.ui-field .ui-select-trigger[aria-expanded=true],.activity-task-filters>.ui-field .ui-select-trigger:focus-visible,.activity-task-filters>.ui-field .ui-select-trigger[aria-expanded=true]{border-color:var(--field-focus);box-shadow:0 0 0 2px var(--field-halo)}
+.history-filters>.ui-field .ui-select-trigger svg,.activity-task-filters>.ui-field .ui-select-trigger svg{width:14px;height:14px}
+.activity-task-filters{gap:4px 12px}
+.activity-task-filters>.ui-field{min-width:0}
+.activity-task-filters>.small-tabs{gap:0}
+.activity-task-filters>.small-tabs>button{padding-inline:10px}
+.activity-search-control .ui-input-shell{box-shadow:none;border-color:var(--ui-line)}
+/* Chart: inline value and metadata, no nested card. Actual plotted data retains
+   pointer/keyboard interactions. Zero gaps align SVG coordinates to button centers. */
+.focus-trend-card{gap:12px}
+.focus-trend-card header h2{font-size:15px}
+.focus-trend-card .focus-trend{gap:7px}
+.focus-trend-card .chart-heading{flex-wrap:nowrap;align-items:flex-start;gap:10px}
+.focus-trend-card .chart-tooltip{padding:0;border:0;border-radius:0;background:transparent;gap:4px;min-width:0;flex:1}
+.focus-trend-card .chart-date{font-size:11px;color:var(--ui-muted)}
+.focus-trend-card .chart-tooltip strong{font-size:30px;font-weight:650;line-height:1.15;color:var(--ui-ink);letter-spacing:-.045em}
+.chart-meta{display:flex;flex-wrap:wrap;gap:3px 8px;align-items:center}
+.chart-meta>small{font-size:11px;line-height:1.4}
+.chart-comparison{color:var(--field-selected-ink)}
+.focus-trend-card .chart-type{background:transparent;border:0;padding:0;gap:2px}
+.focus-trend-card .chart-type button{width:36px;height:36px;min-height:36px;padding:0;border:0;background:transparent;border-radius:8px;color:var(--ui-muted)}
+.focus-trend-card .chart-type button[aria-pressed=true]{background:var(--field-selected);color:var(--field-selected-ink)}
+.focus-trend-card .history-bars{height:214px;padding-top:8px;gap:8px}
+.focus-trend-card .history-axis{font-size:10px;line-height:1}
+.focus-trend-card .history-plot{gap:0;background:linear-gradient(to bottom,var(--ui-line) 1px,transparent 1px),linear-gradient(to bottom,transparent calc(50% - .5px),var(--ui-line) calc(50% - .5px),var(--ui-line) calc(50% + .5px),transparent calc(50% + .5px)),linear-gradient(to top,var(--ui-line) 1px,transparent 1px);background-size:100% calc(100% - 22px);background-repeat:no-repeat}
+.focus-trend-card .history-bar-column{border-radius:0;grid-template-rows:minmax(0,1fr) 22px}
+.focus-trend-card .history-bar-column[aria-pressed=true]{background:transparent;box-shadow:none}
+.focus-trend-card .history-bar-track{position:relative;isolation:isolate}
+.focus-trend-card .history-bar-track i{width:min(58%,30px);border-radius:4px 4px 0 0;opacity:.28}
+.focus-trend-card .history-bar-column[aria-pressed=true] .history-bar-track i{opacity:1}
+.focus-trend-card .history-bar-column[aria-pressed=true] .history-bar-track:before{content:'';position:absolute;inset:0 10%;background:var(--field-selected);border-radius:5px;z-index:-1}
+.focus-trend-card .history-bar-column small{font-size:10px;color:var(--ui-muted)}
+.focus-trend-card .history-bar-column[aria-pressed=true] small{font-weight:650;color:var(--field-selected-ink)}
+.focus-trend-card .dense-bars .history-bar-track i{width:70%;border-radius:2px 2px 0 0}
+.focus-trend-card .plot-kind-line .history-bar-column[aria-pressed=true] .history-bar-track:before{inset:0 auto 0 50%;width:1px;background:var(--field-focus);opacity:.5}
+.focus-trend-card .chart-line{z-index:0}
+.chart-dot{position:absolute;left:50%;width:5px;height:5px;border-radius:50%;background:var(--accent);transform:translate(-50%,50%);pointer-events:none;transition:bottom 300ms ease,width 180ms ease,height 180ms ease}
+.history-bar-column[aria-pressed=true] .chart-dot{width:9px;height:9px;border:2px solid var(--ui-paper);box-shadow:0 0 0 1px var(--accent)}
+.focus-trend-card .chart-point-controls{gap:5px;align-items:center;border-top:1px solid var(--ui-line);padding-top:3px}
+.focus-trend-card .chart-point-controls>small{display:flex;align-items:center;gap:6px;font-size:11px;text-align:left}
+.chart-key{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.chart-day-navigation{display:flex;align-items:center;gap:2px}
+.chart-day-navigation small{min-width:32px;white-space:nowrap;font-size:11px}
+.focus-trend-card .chart-day-navigation button{border:0;background:transparent;border-radius:6px;width:36px;height:36px;padding:0}
+.focus-trend-card .chart-day-navigation button:hover:not(:disabled){background:var(--field-selected)}
+@media(max-width:759px){
+ .calendar-toolbar{display:grid;grid-template-columns:minmax(0,1fr);padding:8px 12px 0;gap:0}
+ .calendar-date-controls{display:grid;grid-template-columns:auto minmax(0,1fr) auto;width:100%;gap:4px;align-items:center}
+ .calendar-date-controls .calendar-today{grid-column:1;grid-row:1;min-height:44px;padding:0 6px;font-size:12px}
+ .calendar-date-controls .calendar-period{grid-column:2;grid-row:1;text-align:center;padding:0;min-width:0;font-size:13px;overflow-wrap:anywhere}
+ .calendar-date-controls .calendar-arrows{grid-column:3;grid-row:1;gap:0}
+ .calendar-date-controls .calendar-arrows button{width:44px;height:44px;min-width:44px;flex-basis:44px}
+ .calendar-view-switch,.history-toolbar .history-ranges,.activity-topbar>.activity-tabs:not(.small-tabs),.activity-task-filters>.small-tabs{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+ .calendar-view-switch>button,.history-toolbar .history-ranges>button,.activity-tabs>button,.activity-topbar>.activity-tabs:not(.small-tabs)>button{height:44px;min-height:44px;font-size:12px;padding-inline:4px}
+ .calendar-filters{padding:0 12px 3px;gap:0 12px;border-top:0}
+ .calendar-filters>span{width:auto;font-size:11px}
+ .calendar-filters label{min-height:44px}
+ .calendar-demo{width:100%;font-size:10px;margin:0}
+ .history-toolbar{grid-template-columns:minmax(0,1fr) auto;gap:4px 6px}
+ .history-toolbar .history-filter-trigger{min-height:44px;height:44px;font-size:12px;padding-inline:6px}
+ .history-toolbar>small{padding-top:2px}
+ .activity-task-filters{display:grid;grid-template-columns:minmax(0,1fr);gap:0}
+ .activity-task-filters>.ui-field{width:max-content;max-width:100%;justify-self:end}
+ .activity-task-filters>.ui-field .ui-select-trigger{height:44px;min-height:44px;max-width:100%;font-size:12px}
+ .focus-trend-card{padding:13px 12px;gap:14px}
+ .focus-trend-card .chart-heading{gap:4px}
+ .focus-trend-card .chart-tooltip strong{font-size:28px}
+ .focus-trend-card .chart-type button{height:44px;min-height:44px;width:44px}
+ .focus-trend-card .history-bars{height:205px;gap:6px}
+ .focus-trend-card .history-bar-column small{font-size:9px}
+ .focus-trend-card .chart-day-navigation button{height:44px;width:44px}
+}
+@media(max-width:359px){.calendar-date-controls .calendar-period{font-size:12px}.calendar-filters{column-gap:8px}.calendar-filters label{font-size:10px}.focus-trend-card .chart-tooltip strong{font-size:26px}.focus-trend-card .chart-meta{gap:2px 5px}}
+@media(prefers-reduced-motion:reduce){.chart-dot,.calendar-view-switch>button::after,.history-ranges>button::after,.activity-tabs>button::after{transition:none!important}}
+[data-motion=reduced] .chart-dot,[data-motion=reduced] .calendar-view-switch>button::after,[data-motion=reduced] .history-ranges>button::after,[data-motion=reduced] .activity-tabs>button::after{transition:none!important}

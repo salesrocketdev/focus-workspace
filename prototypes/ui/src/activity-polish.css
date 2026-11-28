@@ -1,0 +1,71 @@
+/* Quiet contextual actions. Scope to activities and dashboard; dialogs and
+   editor save/cancel retain their existing emphasis. */
+.activities-page .activity-section-head .activity-add-action,
+.activities-page .book-row-actions .activity-reading-action,
+.workspace:not(.editing) .widget .widget-quiet-action,
+:root[data-accent] .activities-page .book-row-actions .activity-reading-action,
+:root[data-accent] .workspace:not(.editing) .widget .widget-quiet-action{
+ background:transparent;border-color:transparent;box-shadow:none;color:var(--field-selected-ink);font-weight:600;padding-inline:6px;
+}
+.activities-page .activity-section-head .activity-add-action:hover,
+.activities-page .book-row-actions .activity-reading-action:hover,
+.workspace:not(.editing) .widget .widget-quiet-action:hover{
+ background:var(--field-selected);border-color:transparent;
+}
+.activities-page .activity-categories{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 18px;min-width:0}
+.activities-page .activity-category,[data-theme=dark] .activities-page .activity-category{display:block;padding:0;border:0;border-bottom:1px solid var(--ui-line);border-radius:0;background:transparent;min-width:0}
+.category-focus-row{display:grid;grid-template-columns:34px minmax(0,1fr) 36px;align-items:center;gap:10px;width:100%;min-width:0;min-height:64px;padding:7px 3px;text-align:left;border-radius:8px}
+.category-focus-row:hover:not(:disabled){background:var(--field-selected)}
+.category-focus-row .category-mark{width:34px;height:34px;flex-basis:34px;border-radius:9px}
+.category-row-copy{display:grid;gap:4px;min-width:0}
+.category-row-copy b{font-size:13px;line-height:1.3;overflow-wrap:anywhere}
+.category-row-copy small{font-size:11px;line-height:1.35}
+.category-focus-indicator{display:grid;place-items:center;width:36px;height:36px;color:var(--field-selected-ink);border-radius:50%;background:var(--field-selected)}
+.category-focus-row:active .category-focus-indicator{background:var(--action);color:white}
+.activity-categories .activity-empty{grid-column:1/-1}
+.activities-page .activity-stat{box-shadow:none;gap:9px}
+.activity-stat .activity-stat-icon{border-radius:8px}
+.activities-page .activity-surface{box-shadow:none}
+.activities-page .activity-row-actions>.ui-icon-button,
+:root[data-accent] .activities-page .activity-row-actions>.task-play{
+ background:transparent;border-color:transparent;box-shadow:none;color:var(--ui-muted);border-radius:8px;
+}
+.activities-page .activity-row-actions>.task-play,:root[data-accent] .activities-page .activity-row-actions>.task-play{color:var(--field-selected-ink)}
+.activities-page .activity-row-actions>.ui-icon-button:hover:not(:disabled){background:var(--field-selected);color:var(--field-selected-ink)}
+.activity-section-head>.book-header-actions{display:flex;align-items:center;justify-content:flex-end;gap:2px;flex-shrink:0}
+.book-header-actions .book-add-manual{gap:4px}
+.activities-page .activity-library{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:0 18px}
+.activities-page .activity-book,[data-theme=dark] .activities-page .activity-book{border:0;border-bottom:1px solid var(--ui-line);border-radius:0;background:transparent;padding:12px 0;align-items:flex-start}
+.activity-book-copy{gap:5px}
+.book-row-actions{display:flex;align-items:center;justify-content:space-between;gap:4px;min-width:0}
+.book-row-actions .activity-reading-action{justify-content:flex-start;padding-left:0;white-space:normal;text-align:left}
+.book-row-actions .book-details-action{width:36px;height:36px;flex:0 0 36px;background:transparent;border-color:transparent;box-shadow:none;color:var(--ui-muted)}
+.book-row-actions .book-details-action:hover{background:var(--field-selected);color:var(--field-selected-ink)}
+.workspace:not(.editing) .widget .widget-quiet-action{justify-content:flex-start}
+@media(max-width:759px){
+ .activities-page .activity-categories,.activities-page .activity-library{grid-template-columns:minmax(0,1fr);gap:0}
+ .category-focus-row{min-height:62px;grid-template-columns:34px minmax(0,1fr) 36px;padding:7px 2px}
+ .category-row-copy b{font-size:14px}
+ .activities-page .activity-category:last-child,.activities-page .activity-book:last-child{border-bottom:0}
+ .activities-page .activity-overview{gap:6px}
+ .activities-page .activity-stat{padding:9px 7px;gap:5px}
+ .activities-page .activity-stat-icon{width:26px;height:26px;flex-basis:26px}
+ .activities-page .activity-stat strong{font-size:21px}
+ .activities-page .activity-stat small{font-size:10px;line-height:1.3}
+ .activities-page .activity-section-head .activity-add-action{min-height:44px;font-size:12px;white-space:nowrap;padding-inline:5px;gap:4px}
+ .activity-section-head>.book-header-actions{gap:0;flex-shrink:0}
+ .book-header-actions .book-add-manual{width:44px;min-width:44px;padding:0}
+ .book-header-actions .book-add-manual>span{display:none}
+ .activities-page .activity-book{gap:10px;padding:10px 0}
+ .activity-book-copy>b{font-size:13px;line-height:1.35}
+ .book-row-actions .activity-reading-action{min-height:44px;font-size:12px;line-height:1.3}
+ .book-row-actions .book-details-action{height:44px;width:44px;flex-basis:44px}
+ .activities-page .activity-row-actions{gap:0}
+ .activities-page .activity-row-actions>.ui-icon-button{height:44px;width:44px;flex-basis:44px}
+ .activity-task-row label{min-height:44px}
+ .workspace:not(.editing) .widget .widget-quiet-action{min-height:44px;font-size:11px;padding-inline:4px}
+ .workspace-page-header:not(.edit-page-head) .head-actions>.page-action{background:transparent;border-color:transparent;box-shadow:none;color:var(--field-selected-ink)}
+ .workspace-page-header:not(.edit-page-head) .head-actions>.ui-icon-button,.quick-header-actions>.ui-icon-button{background:transparent;border-color:transparent;box-shadow:none}
+ .workspace:not(.editing) .widget .card-icon-action{background:transparent;border-color:transparent;box-shadow:none}
+}
+@media(max-width:359px){.activities-page .activity-section-head .activity-add-action{font-size:11px}.activity-section-head h2{font-size:13px}.category-focus-row{gap:8px}}

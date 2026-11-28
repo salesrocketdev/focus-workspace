@@ -1,0 +1,80 @@
+/* Final mobile QA: preserve compact icons, expand hit areas and improve hierarchy. */
+.focus-trend-card .history-bar-column[aria-pressed=true] .history-bar-track:before{inset:0 auto 0 50%;width:min(62%,32px);transform:translateX(-50%);opacity:.65}
+.focus-trend-card .plot-kind-line .history-bar-column[aria-pressed=true] .history-bar-track:before{width:1px;opacity:.5}
+@media(max-width:759px){
+ .quick-header-actions>.quick-action-button,.app-masthead .quick-action-button{width:44px!important;min-width:44px!important;height:44px;min-height:44px;padding:0!important;flex:0 0 44px}
+ .calendar-date-controls .calendar-today{min-width:44px}
+ .workspace:not(.editing) .widget[data-widget=focus]:not(.small) .focus-widget{grid-template-columns:minmax(0,1fr) minmax(100px,auto);gap:8px;padding:0 2px}
+ .workspace:not(.editing) .widget[data-widget=focus]:not(.small) .timer-ring{width:min(100%,148px)}
+ .workspace:not(.editing) .widget[data-widget=focus]:not(.small) .ring-copy strong{font-size:32px}
+ .workspace:not(.editing) .widget[data-widget=focus]:not(.small) .focus-start{width:100%;justify-self:stretch}
+ .workspace:not(.editing) .widget[data-widget=focus]:not(.small) .timer-start{width:100%;min-width:100px;min-height:44px;border-radius:10px;padding:0 8px;gap:5px;font-size:12px;white-space:normal;line-height:1.25;box-shadow:none}
+ .workspace:not(.editing) .widget[data-widget=focus]:not(.small) .timer-start span{display:inline}
+ .workspace:not(.editing) .widget[data-widget=music] .music-body{gap:8px;min-width:0}
+ .workspace:not(.editing) .widget[data-widget=music] .music-info{grid-template-columns:minmax(0,1fr)}
+ .workspace:not(.editing) .widget[data-widget=music] .player-controls{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:0}
+ .workspace:not(.editing) .widget[data-widget=music] .player-controls>button{width:44px;height:44px;min-width:44px;min-height:44px;flex:0 0 44px;padding:0;position:relative;border:0;background:transparent;color:var(--ui-muted);box-shadow:none;border-radius:8px}
+ .workspace:not(.editing) .widget[data-widget=music] .player-controls>button.primary{background:transparent;color:var(--field-selected-ink);isolation:isolate}
+ .workspace:not(.editing) .widget[data-widget=music] .player-controls>button.primary:before{content:'';position:absolute;inset:5px;border-radius:50%;background:var(--field-selected);z-index:-1}
+ .workspace:not(.editing) .widget[data-widget=music] .player-controls>button:active{background:var(--field-selected)}
+ .workspace:not(.editing) .widget[data-widget=music].small .music-body{flex-direction:column;align-items:stretch}
+ .edit-page-head .edit-header .edit-text-button:not(.edit-primary),[data-theme=dark] .edit-page-head .edit-header .edit-text-button:not(.edit-primary){background:transparent;border-color:transparent;box-shadow:none;color:var(--ui-muted)}
+ .edit-page-head .edit-header .edit-text-button:not(.edit-primary):hover{background:var(--field-selected);color:var(--field-selected-ink)}
+}
+@media(max-width:359px){
+ .workspace:not(.editing) .widget[data-widget=focus]:not(.small) .timer-ring{width:min(100%,132px)}
+ .workspace:not(.editing) .widget[data-widget=focus]:not(.small) .ring-copy strong{font-size:29px}
+ .workspace:not(.editing) .widget[data-widget=music]:not(.small) .cover.album{width:50px;height:50px;flex-shrink:0}
+}
+@media(max-width:759px) and (max-height:740px){
+ .focus-main .immersive-grid{margin-top:8px;gap:10px}
+ .immersive-grid>.focus-center{gap:8px}
+ .focus-center .ring-large{width:min(62vw,220px)}
+ .focus-center .ring-large .ring-copy strong{font-size:39px}
+}
+@media(max-width:950px) and (max-height:500px) and (orientation:landscape) and (pointer:coarse){
+ .focus-main .immersive-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start;gap:12px;margin-top:8px}
+ .focus-main .immersive-grid>.focus-center{grid-column:1;grid-row:1/span 2;order:0;gap:8px}
+ .focus-main .immersive-grid>.book-panel,.focus-main .immersive-grid>.focus-activity-panel{grid-column:2;grid-row:1}
+ .focus-main .immersive-grid>.focus-side{grid-column:2;grid-row:2;display:grid;grid-template-columns:minmax(0,1fr)}
+ .focus-main .ring-large{width:min(100%,180px)}
+ .focus-main .ring-large .ring-copy strong{font-size:34px}
+ .focus-main .focus-center .transport{gap:8px}
+}
+
+/* Resilience to long labels and the narrowest portrait layouts. */
+.history-session-copy small,.history-detail dd,.category-row-copy small,.activity-book-copy small,.backup-row small{overflow-wrap:anywhere;min-width:0}
+.history-detail dt{flex-shrink:0}
+.history-session-meta{min-width:0}
+@media(max-width:359px){
+ .activity-section-head{gap:5px}
+ .activity-section-head>div:first-child h2{overflow-wrap:anywhere;line-height:1.3}
+ .activity-section-head>.book-header-actions{gap:0}
+ .activity-section-head>.book-header-actions .activity-add-action{padding-inline:3px}
+ .backup-row{gap:5px}
+ .backup-row>.ui-button{white-space:nowrap}
+ .history-surface>header.history-export-header{gap:5px}
+}
+@media(max-width:759px) and (max-height:600px){
+ .focus-main .immersive-grid{margin-top:4px}
+ .immersive-grid>.focus-center{gap:6px}
+ .focus-center .ring-large{width:min(55vw,188px)}
+ .focus-center .ring-large .ring-copy strong{font-size:34px}
+}
+
+/* Do not let the mobile history mark or disclosure glyph exceed its track.
+   Reuse exact icon dimensions; text may wrap, but the actions never overlap. */
+.history-session-copy,.history-session-meta,.history-export-copy{min-width:0}
+.history-session-copy small,.history-session-meta small{overflow-wrap:anywhere}
+.history-session-mark{flex-shrink:0}
+@media(max-width:759px){
+ .history-session-copy{align-self:center}
+ .history-session-meta{justify-self:end;align-self:center}
+ .history-session>svg{justify-self:end;align-self:center}
+ .history-list{min-width:0}
+ .history-session:focus-visible{outline-offset:-2px}
+ .backup-row>div{flex:1;min-width:0}
+ .backup-row>div>b{overflow-wrap:anywhere}
+ .book-row-actions .activity-reading-action{min-width:0;height:auto;min-height:44px;padding-block:6px}
+ .history-detail dd{min-width:0;overflow-wrap:anywhere}
+}

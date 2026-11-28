@@ -1,0 +1,37 @@
+name: V4 published site audit
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    if: github.ref == 'refs/heads/prototype/ui-v4'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: prototypes/ui
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-prototype-${{ runner.os }}-${{ hashFiles('prototypes/ui/package.json', 'prototypes/ui/package-lock.json') }}
+          restore-keys: npm-prototype-${{ runner.os }}-
+      - run: |
+          if [ -f package-lock.json ]; then npm ci --no-audit --no-fund; else npm install --no-audit --no-fund; fi
+      - run: npx playwright install --with-deps chromium webkit
+      # Standalone manual audit tests the currently published site, not necessarily this SHA.
+      - run: npx playwright test --config=live-audit.config.ts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v4-live-audit
+          path: |
+            prototypes/ui/live-audit-results/
+            prototypes/ui/live-audit-report/
+          if-no-files-found: warn
+          retention-days: 7

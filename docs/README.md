@@ -15,3 +15,6 @@ Status: planning baseline, subject to maintainer review.
 | Decisions | [ADR index](adr/README.md) |
 
 Product docs describe behavior; architecture docs describe implementation proposals; issues own delivery status. Mockups are visual references, not proof of implemented functionality. If sources conflict, clarify in the issue and update the specification before changing behavior.
+
+## Approved prototyping approach
+See [V4 mockup as code](design/PROTOTYPE.md) and [prototype run instructions](../prototypes/ui/README.md).

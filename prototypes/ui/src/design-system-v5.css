@@ -1,0 +1,286 @@
+/* V5 / G4 — semantic surfaces and interaction states.
+ * Keep widget geometry, editor affordances and user-selected accent/ring intact.
+ * This layer is loaded after legacy component sheets while they are migrated. */
+:root {
+  --ds-space-1: 4px;
+  --ds-space-2: 8px;
+  --ds-space-3: 12px;
+  --ds-space-4: 16px;
+  --ds-space-5: 24px;
+  --ds-text-caption: 12px;
+  --ds-text-body: 13px;
+  --ds-text-section: 16px;
+  --ds-radius-control: 8px;
+  --ds-radius-surface: 12px;
+  --ds-hover: color-mix(in srgb, var(--ui-ink) 5%, var(--ui-paper));
+  --ds-pressed: color-mix(in srgb, var(--ui-ink) 9%, var(--ui-paper));
+}
+
+:root .workspace:not(.editing) .route-content > .card,
+:root .history-surface,
+:root .activity-surface,
+:root .calendar-surface {
+  background: var(--ui-paper);
+  box-shadow: none;
+  border-color: var(--ui-line);
+  border-radius: var(--ds-radius-surface);
+}
+:root .history-stat {
+  background: transparent;
+  box-shadow: none;
+  border: 0;
+  border-bottom: 1px solid var(--ui-line);
+  border-radius: 0;
+}
+:root .history-stat-icon,
+:root .activity-stat-icon {
+  color: var(--ui-muted);
+  border: 0;
+  box-shadow: none;
+}
+.history-surface h2, .activity-surface h2 {
+  font-size: var(--ds-text-section);
+  font-weight: 650;
+  line-height: 1.35;
+}
+.history-session-copy small, .history-session-meta small,
+.activity-book-copy small, .category-row-copy small {
+  font-size: var(--ds-text-caption);
+  line-height: 1.4;
+}
+.history-session-meta b, .event time, .daily-focus-progress strong {
+  font-variant-numeric: tabular-nums;
+}
+:root .history-status.interrupted {
+  background: transparent;
+  color: var(--field-selected-ink);
+  border: 1px solid var(--field-selected-edge);
+}
+
+/* A neutral secondary action should not change to the brand color on hover.
+ * Selected/primary actions continue to use the configured accent tokens. */
+:root .ui-button.ui-secondary:not(.widget-quiet-action):not(.activity-reading-action):not(.activity-add-action):hover:not(:disabled) {
+  background: var(--ds-hover);
+  border-color: var(--field-hover);
+  color: var(--ui-ink);
+}
+:root .ui-button.ui-secondary:not(.widget-quiet-action):not(.activity-reading-action):not(.activity-add-action):active:not(:disabled) {
+  background: var(--ds-pressed);
+}
+:root .ui-icon-button:hover:not(:disabled) {
+  background: var(--ds-hover);
+}
+:root .ui-button:disabled,
+:root .ui-icon-button:disabled {
+  cursor: not-allowed;
+}
+:root .ui-button:focus-visible,
+:root .ui-icon-button:focus-visible {
+  outline: 2px solid var(--field-focus);
+  outline-offset: 2px;
+}
+:root .ui-field > small {
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+:root .ui-field > small.ui-field-error {
+  color: var(--field-error);
+}
+:root .ui-toggle-card:not([aria-checked=true]) .ui-toggle-icon {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+:root .ui-toggle-card[aria-checked=true] .ui-toggle-icon {
+  background: transparent;
+  border-color: transparent;
+}
+:root .cover.cover-placeholder.album > svg {
+  position: static;
+  width: min(50%, 28px);
+  height: auto;
+  aspect-ratio: 1;
+}
+:root .cover.cover-placeholder.book b {
+  font-size: clamp(10px, 2.6cqw, 14px);
+  line-height: 1.3;
+  letter-spacing: -.015em;
+  overflow-wrap: anywhere;
+}
+:root .dialog-book .cover.cover-placeholder.book b { font-size: 8px; }
+:root .book-panel .cover.cover-placeholder.book b { font-size: clamp(12px, 3cqw, 20px); }
+
+@media (max-width: 759px) {
+  .history-session-copy small, .history-session-meta small {
+    font-size: 11px;
+  }
+  :root .book-panel .cover.cover-placeholder.book b { font-size: 10px; }
+}
+@media (forced-colors: active) {
+  :root .ui-button:focus-visible, :root .ui-icon-button:focus-visible {
+    outline-color: Highlight;
+  }
+}
+
+/* Compact dialogs: natural height, bounded viewport, responsive fields and sticky actions.
+   Native dialog retains focus trapping, Escape, backdrop and visualViewport handling. */
+.ui-dialog.compact-dialog {
+  width:min(calc(100% - 32px), 480px);
+  max-height:min(85dvh, calc(var(--sheet-height,100dvh) - 24px));
+  height:fit-content;
+  padding:16px 20px;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scroll-padding-block:60px 70px;
+}
+.compact-dialog .dialog-header {
+  position:sticky;top:-16px;z-index:2;
+  background:var(--ui-paper);padding:8px 0;
+  margin:-8px 0 10px;
+  border-bottom:1px solid var(--ui-line);
+}
+.compact-dialog .dialog-header h2 {font-size:18px;line-height:1.3}
+.compact-dialog .dialog-form {gap:10px}
+.compact-dialog .dialog-actions {
+  position:sticky;bottom:-16px;z-index:2;
+  background:var(--ui-paper);border-top:1px solid var(--ui-line);
+  padding:10px 0 8px;margin-top:4px;
+}
+.compact-dialog .ui-field {gap:5px;max-width:none}
+.compact-dialog .ui-textarea {min-height:68px}
+.compact-dialog .dialog-disclosure {
+  width:100%;justify-content:space-between;text-align:left;
+  height:auto;min-height:36px;white-space:normal;
+  background:transparent;border-color:transparent;border-bottom-color:var(--ui-line);
+  border-radius:0;padding:8px 0;color:var(--ui-ink);
+}
+.compact-dialog .dialog-disclosure::after {
+  content:'+';font-size:18px;color:var(--ui-muted);font-weight:400;
+}
+.compact-dialog .dialog-disclosure[aria-expanded=true]::after {content:'−'}
+.focus-settings-dialog > .ui-button {width:100%;margin-bottom:12px}
+.compact-focus-fields {grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.compact-focus-fields > .dialog-disclosure,.compact-focus-fields > .preference-toggles,.compact-focus-fields > small {grid-column:1/-1}
+.compact-focus-fields .preference-toggles {display:grid;gap:4px}
+.compact-focus-fields .ui-toggle-card {min-height:58px;padding:8px;border-radius:8px}
+.compact-focus-fields .ui-toggle-icon {display:none}
+.task-editor-dialog .planning-fields {grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.task-editor-dialog .planning-fields > :last-child {grid-column:1/-1}
+.rhythm-dialog .quick-focus-presets > button {min-height:54px;padding:8px 10px}
+.rhythm-dialog .custom-rhythm-form {margin:0;padding:0;border:0}
+.rhythm-dialog .custom-rhythm-list {margin-block:8px}
+@media(max-width:759px) {
+  .ui-dialog.compact-dialog {
+    width:100%;margin:0;padding:12px max(16px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+    max-height:min(90dvh, calc(var(--sheet-height,100dvh) - 12px));
+    border-radius:16px 16px 0 0;
+  }
+  .compact-dialog .dialog-header {top:-12px;padding-block:4px}
+  .compact-dialog .dialog-actions {bottom:calc(-12px - env(safe-area-inset-bottom));padding-bottom:calc(8px + env(safe-area-inset-bottom))}
+  .compact-dialog .dialog-disclosure {min-height:44px}
+  .compact-focus-fields .ui-toggle-card {min-height:64px}
+  .compact-dialog[data-keyboard=open] .dialog-actions {position:static}
+  .ui-dialog.compact-dialog[data-keyboard=open] {max-height:calc(var(--sheet-height,100dvh) - 10px);padding-bottom:12px}
+}
+@media(max-width:359px) {
+  .task-editor-dialog .planning-fields {grid-template-columns:1fr}
+  .compact-focus-fields {column-gap:8px}
+  .compact-focus-fields .ui-select-trigger {padding-inline:8px;font-size:12px}
+}
+
+.compact-field-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:start}
+.rhythm-dialog>.ui-button{margin-top:8px;width:100%}
+
+/* Sectioned dialogs: header, navigation and footer remain outside the scrolling content. */
+.ui-dialog.structured-dialog[open] {
+ display:flex;flex-direction:column;box-sizing:border-box;width:min(calc(100% - 32px),480px);
+ height:fit-content;min-height:0;max-height:min(78dvh,calc(var(--sheet-height,100dvh) - 32px));
+ padding:0;overflow:hidden;
+}
+.structured-dialog .dialog-header {
+ position:static;flex:0 0 auto;margin:0;padding:14px 20px 10px;
+ border:0;align-items:center;background:var(--ui-paper);
+}
+.structured-dialog .dialog-header p{margin-top:3px}
+.structured-dialog .dialog-form,.structured-dialog .focus-dialog-content {
+ display:flex;flex-direction:column;gap:0;min-height:0;overflow:hidden;
+}
+.structured-dialog .dialog-section-nav {
+ display:flex;gap:2px;flex:0 0 auto;margin:0 20px;border-bottom:1px solid var(--ui-line);
+}
+.structured-dialog .dialog-section-nav button {
+ flex:1 1 0;min-width:0;min-height:38px;padding:6px 3px;
+ border:0;border-bottom:2px solid transparent;border-radius:0;box-shadow:none;background:transparent;
+ color:var(--ui-muted);font-size:12px;font-weight:550;white-space:normal;overflow-wrap:normal;
+}
+.structured-dialog .dialog-section-nav button[aria-pressed=true] {
+ border-bottom-color:var(--field-focus);color:var(--field-selected-ink);font-weight:650;
+}
+.structured-dialog .dialog-section-nav button:focus-visible{outline-offset:-3px}
+.structured-dialog .dialog-scroll-body {
+ display:grid;gap:12px;align-content:start;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+ padding:14px 20px;scroll-padding:12px;scrollbar-width:thin;
+}
+.structured-dialog .dialog-actions {
+ position:static;flex:0 0 auto;margin:0;padding:12px 20px;border-top:1px solid var(--ui-line);
+ background:var(--ui-paper);
+}
+.structured-dialog .dialog-section-error{padding:0 20px 10px;font-size:12px;flex:none}
+.structured-dialog .dialog-section-hint{font-size:12px;line-height:1.45;color:var(--ui-muted);margin:0}
+.structured-dialog .choose-rhythm-action{width:100%;min-height:38px;white-space:normal}
+.structured-dialog .compact-focus-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.structured-dialog .compact-focus-fields .preference-toggles,.structured-dialog .compact-focus-fields>small{grid-column:1/-1}
+.structured-dialog .task-priority-control {
+ display:grid;grid-template-columns:20px minmax(0,1fr) 18px;align-items:center;gap:10px;
+ min-height:54px;padding:9px 12px;border:1px solid var(--ui-line);border-radius:8px;cursor:pointer;
+}
+.structured-dialog .task-priority-control:has(input:checked){background:var(--field-selected);border-color:var(--field-selected-edge)}
+.structured-dialog .task-priority-control:has(input:disabled){opacity:.65;cursor:not-allowed}
+.structured-dialog .task-priority-control input{appearance:auto;accent-color:var(--ui-action);width:18px;height:18px;min-width:18px;margin:0;cursor:inherit}
+.structured-dialog .task-priority-control input:focus-visible{outline:2px solid var(--field-focus);outline-offset:3px}
+.structured-dialog .task-priority-control span{display:grid;gap:3px;min-width:0}
+.structured-dialog .task-priority-control b{font-size:13px;font-weight:600;line-height:1.3}
+.structured-dialog .task-priority-control small{font-size:11px;color:var(--ui-muted);line-height:1.35}
+.structured-dialog .task-priority-control>svg{color:var(--ui-muted)}
+.structured-dialog .task-priority-control:has(input:checked)>svg{color:var(--field-selected-ink);fill:var(--field-selected-ink)}
+.structured-dialog .planning-weekdays {margin:0;min-width:0;border:1px solid var(--ui-line);border-radius:8px;padding:8px;gap:4px}
+.structured-dialog .planning-weekdays label{flex:1 1 30px;min-height:44px}
+.structured-dialog .planning-weekdays input,.structured-dialog .planning-checklist input{accent-color:var(--ui-action);width:17px;height:17px;margin:0;flex:none}
+@media(max-width:759px) {
+ .ui-dialog.structured-dialog[open]{width:100%;max-height:min(88dvh,calc(var(--sheet-height,100dvh) - 12px));padding:0}
+ .structured-dialog .dialog-header{padding:10px 16px 6px}
+ .structured-dialog .dialog-section-nav{margin-inline:16px}
+ .structured-dialog .dialog-section-nav button{min-height:44px;font-size:11px}
+ .structured-dialog .dialog-scroll-body{padding:12px 16px}
+ .structured-dialog .dialog-actions{padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+ .ui-dialog.structured-dialog[data-keyboard=open][open]{max-height:calc(var(--sheet-height,100dvh) - 10px)}
+ .structured-dialog[data-keyboard=open] .dialog-actions{padding-bottom:8px}
+ .structured-dialog .choose-rhythm-action{min-height:44px}
+}
+@media(max-width:359px){
+ .task-editor-dialog .dialog-section-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .structured-dialog .compact-focus-fields{gap:8px}
+}
+
+/* Quality pass: distinguish sample analytics and make interactive targets reachable. */
+.history-origin-switch{display:flex;gap:4px;align-self:start;border-bottom:1px solid var(--ui-line)}
+.history-origin-switch button{min-height:44px;padding:8px 14px;border-bottom:2px solid transparent;color:var(--ui-muted);font-size:13px}
+.history-origin-switch button[aria-pressed=true]{color:var(--field-selected-ink);border-bottom-color:var(--field-focus);font-weight:650}
+.history-plot-scroll{display:flex;flex:1;min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}
+.history-plot-scroll>.history-plot{flex:1;min-width:100%}
+@media(max-width:759px){
+ .workspace:not(.editing) .focus-controls>.activity-tag{min-height:44px}
+ .planning-page .planning-title{min-height:44px;align-items:center;justify-content:flex-start;line-height:1.35}
+ .planning-page .planning-actions .priority-action{width:44px;height:44px;min-width:44px;min-height:44px}
+ .history-plot-scroll>.history-plot{min-width:max(100%,calc(var(--chart-day-count)*44px));gap:0}
+ .history-plot-scroll .history-bar-column{flex:1 0 44px;min-width:44px}
+ .history-plot-scroll .history-bar-column small{font-size:10px}
+}
+.app.immersive:has(.focus-landscape) .focus-center .transport .circle-button:not(.big),
+.app.immersive:has(.focus-landscape) .focus-center .immersive-actions>.ui-button,
+.app.immersive:has(.focus-landscape) .focus-top .ui-icon-button{
+ background:var(--ui-paper);color:var(--ui-ink);border:1px solid var(--ui-line);box-shadow:none;
+}
+.app.immersive:has(.focus-landscape) .focus-center .focus-context-picker{
+ background:var(--ui-paper);border:1px solid var(--ui-line);border-radius:10px;color:var(--ui-ink);
+}
